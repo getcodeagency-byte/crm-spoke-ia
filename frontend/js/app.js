@@ -2,40 +2,31 @@
 // LÓGICA DE LA APLICACIÓN 2.6 (EVOLUTION + AJUSTES CRÍTICOS) - spoke!
 // ==========================================================================
 
-// Inicialización del cliente de Supabase V2
+// ==========================================================================
+// 1. INICIALIZACIÓN DE SUPABASE Y FUNCIÓN MAESTRA
+// ==========================================================================
 const supabaseUrl = 'https://luyeqpcqhdngaisfzdnl.supabase.co';
 const supabaseKey = 'sb_publishable_5PhCsOnvuqs3HagvA1CxxA_lHYhuEjb';
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-/**
- * Guarda un mensaje enviado o recibido en la tabla 'chat_history' de Supabase.
- * @param {string} leadId - ID único del lead/conversación
- * @param {string} sender - Emisor del mensaje ('human' o 'ai')
- * @param {string} content - Contenido textual del mensaje
- * @param {string} msgType - Tipo de mensaje ('text' o 'carousel')
- * @param {object|null} metadata - Datos adicionales (ej. estructura de productos para el carrusel)
- */
 async function guardarMensajeEnSupabase(leadId, sender, content, msgType = 'text', metadata = null) {
     try {
-        console.log(`💾 Guardando mensaje de ${sender} en Supabase para el lead: ${leadId}...`);
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from('chat_history')
             .insert([
-                {
-                    lead_id: leadId,
-                    sender: sender,
-                    content: content,
+                { 
+                    lead_id: leadId, 
+                    sender: sender, 
+                    content: content, 
                     type: msgType,
-                    products_data: metadata
+                    products_data: metadata 
                 }
             ]);
-        if (error) {
-            console.error('❌ Error al guardar mensaje en Supabase:', error);
-        } else {
-            console.log('✅ Mensaje guardado en Supabase con éxito:', data);
-        }
-    } catch (err) {
-        console.error('❌ Error inesperado en guardarMensajeEnSupabase:', err);
+
+        if (error) throw error;
+        console.log(`✅ Mensaje de ${sender} guardado exitosamente en Supabase.`);
+    } catch (error) {
+        console.error("❌ Error al guardar en Supabase:", error.message);
     }
 }
 
