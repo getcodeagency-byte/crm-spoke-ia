@@ -1,0 +1,26 @@
+{
+  "name": "spoke-crm",
+  "version": "1.0.0",
+  "description": "spoke! — Inteligencia Comercial Omnicanal CRM",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "migrate": "node backend/db/migrate.js"
+  },
+  "keywords": [
+    "crm",
+    "multi-tenant",
+    "n8n",
+    "postgres",
+    "ai"
+  ],
+  "author": "Antigravity",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsdom": "^29.1.1",
+    "pg": "^8.11.5"
+  }
+}

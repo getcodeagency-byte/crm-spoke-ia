@@ -1,0 +1,7 @@
+Created At: 2026-05-29T18:35:27Z
+Completed At: 2026-05-29T18:35:35Z
+
+				The command completed successfully.
+				Output:
+				channelSVGs = {\n        whatsapp: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NDggNTEyIj48cGF0aCBmaWxsPSIjMjVEMzY2IiBkPSJNMzgwLjkgOTcuMUMzMzkgNTUuMSAyODMuMiAzMiAyMjMuOSAzMmMtMTIyLjQgMC0yMjIgOTkuNi0yMjIgMjIyIDAgMzkuMSAxMC4yIDc3LjMgMjkuNiAxMTFMMy4yIDQ5NmwxMzMuOS0zNS4xYzMyLjcgMTcuOCA2OS40IDI3LjIgMTA2LjcgMjcuMiAxMjIuNCAwIDIyMi05OS42IDIyMi0yMjIgMC01OS4zLTIzLTExNS4xLTY1LTE1Ny4xek0yMjMuOSA0NDUuNWMtMzMuMiAwLTY1LjctOC45LTk0LTI1LjdsLTYuNy00LTc5LjggMjAuOSAyMS4zLTc3LjgtNC40LTdjLTE4LjUtMjkuNC0yOC4yLTYzLjMtMjguMi05OC4yIDAtMTAxLjcgODIuOC0xODQuNSAxODQuNi0xODQuNSA0OS4zIDAgOTUuNiAxOS4yIDEzMC40IDU0LjEgMzQuOCAzNC45IDU2LjIgODEuMiA1Ni4xIDEzMC41IDAgMTAxLjgtODQuOSAxODQuNy0xODYuNiAxODQuN3ptMTAxLjItMTM4LjJjLTUuNS0yLjgtMzIuOC0xNi4yLTM3LjktMTgtNS4xLTEuOQ==',\n        instagram: '...',\n        tiktok: '...',\n        webchat: '...', // Icono Webchat cian\n        messenger: '...'\n    }
+

@@ -1,0 +1,31 @@
+Created At: 2026-05-29T17:15:05Z
+Completed At: 2026-05-29T17:15:05Z
+The following changes were made by the replace_file_content tool to: /Users/macbook/Desktop/Spoke - IA/frontend/js/app.js. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -309,6 +309,22 @@
+         messenger: 'fa-brands fa-facebook-messenger messenger'
+     };
+ 
++    const channelSVGs = {
++        whatsapp: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NDggNTEyIj48cGF0aCBmaWxsPSIjMjVEMzY2IiBkPSJNMzgwLjkgOTcuMUMzMzkgNTUuMSAyODMuMiAzMiAyMjMuOSAzMmMtMTIyLjQgMC0yMjIgOTkuNi0yMjIgMjIyIDAgMzkuMSAxMC4yIDc3LjMgMjkuNiAxMTFMMy4yIDQ5NmwxMzMuOS0zNS4xYzMyLjcgMTcuOCA2OS40IDI3LjIgMTA2LjcgMjcuMiAxMjIuNCAwIDIyMi05OS42IDIyMi0yMjIgMC01OS4zLTIzLTExNS4xLTY1LTE1Ny4xek0yMjMuOSA0NDUuNWMtMzMuMiAwLTY1LjctOC45LTk0LTI1LjdsLTYuNy00LTc5LjggMjAuOSAyMS4zLTc3LjgtNC40LTdjLTE4LjUtMjMuNC0yOC4yLTYzLjMtMjguMi05OC4yIDAtMTAxLjcgODIuOC0xODQuNSAxODQuNi0xODQuNSA0OS4zIDAgOTUuNiAxOS4yIDEzMC40IDU0LjEgMzQuOCAzNC45IDU2LjIgODEuMiA1Ni4xIDEzMC41IDAgMTAxLjgtODQuOSAxODQuNy0xODYuNiAxODQuN3ptMTAxLjItMTM4LjJjLTUuNS0yLjgtMzIuOC0xNi4yLTM3LjktMTgtNS4xLTEuOS04LjgtMi44LTEyLjUgMi44LTMuNyA1LjYtMTQuMyAxOC0xNy42IDIxLjgtMy4yIDMuNy02LjUgNC4yLTEyIDEuNC0zMi42LTE2LjMtNTQtMjkuMS03NS41LTY2LTUuNy05LjggNS43LTkuMSAxNi4zLTMwLjMgMS44LTMuNy45LTYuOS0uNS05LjctMS40LTIuOC0xMi41LTMwLjEtMTcuMS00MS4yLTQuNS0xMC48LTkuMS05LjUtMTIuNS05LjUtMy4yLS4yLTYuOS0uMi0xMC42LS4yLTMuNyAwLTkuNyAxLjQtMTQuOCA2LjktNS4xIDUuNi0xOS40IDE5LTE5LjQgNDYuMyAwIDI3LjMgMTkuOSA1My43IDIyLjYgNTcuNCAyLjggMy43IDM5LjEgNTkuNyA5NC44IDgzLjggMzUuMiAxNS4yIDQ5IDE2LjUgNjYuNiAxMy45IDEwLjctMS42IDMyLjgtMTMuNCAzNy40LTI2LjQgNC42LTEzIDQuNi0yNC4xIDMuMi0yNi40LTEuMy0yLjUtNS0zLjktMTAuNS02LjZ6Ii8+PC9zdmc+',
++        messenger: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjMDA4NEYiIiBkPSJNMjU2LjU1IDhDMTE2LjUyIDggOCAxMTAuMzQgOCAyNDguNTdjMCA3Mi4zIDI5LjcxIDEzNC43OCA3OC4yOCAxNzcu
+<truncated 2149 bytes>
+MDIuNy05IDEzMi4xeiIvPjwvc3ZnPg==',
++        tiktok: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NDggNTEyIj48cGF0aCBmaWxsPSIjMDAwMDAwIiBkPSJNNDQ4IDIwOS45MWEyMTAuMDYgMjEwLjA2IDAgMCAxLTEyMi43Ny0zOS4yNXYxNzguNzJhMTYyLjU1IDE2Mi41NSAwIDEgMS0yMjUtMTUwYzUuNzQtLjgzIDExLjU1LTEuMjUgMTcuMzgtMS4yNUExNjMuNzYgMTYzLjc2IDAgMCAxIDE4NCAyMDUuOTd2ODEuMWE4MS4zOSA4MS4zOSAwIDEgMC02Ni4yNyA3OS43OWMzLjgxLi80IDcuNjIuNiAxMS40My42YTgxLjE2IDgxLjE2IDAgMCAwIDgxLjE1LTgxLjE1di0yODVoODUuNDdjLjI0IDM3Ljg4IDIzLjI2IDcxIDU4Ljc0IDg0LjE4djgxLjFhMTI2LjggMTI2LjggMCAwIDAtMzguMzEtNi4xOWMtMy4xIDAtNi4xOC4xNy05LjI1LjV2ODEuMUEyMDkuOCAyMDkuOCAwIDAgMSA0NDggMjA5LjkxeiIvPjwvc3ZnPg==',
++        webchat: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBmaWxsPSIjMDZCNkQ0IiBkPSJNMjU2IDMyQzEyMC4xIDMyIDEyIDEyMC4xIDEyIDI1NmMwIDYwLjYgMjIgMTE2IDU4LjcgMTU4LjdMMzIgNDgwbDY1LjMtMzguN0MyNTYuNSA0NzcuMyAzNTcuOSA0NTIuMyA0MzUgMzkwLjcgNDgzLjMgMzM4IDUxMiAyOTcuNiA1MTIgMjU2IDUxMiAxMjAuMSA0MDMuOSAzMiAyNTYgMzJ6bTAgMzg0Yy05Mi44IDAtMTY4LTU3LjMtMTY4LTEyOHM3NS4yLTEyOCAxNjgtMTI4IDE2OCA1Ny4zIDE2OCAxMjgtNzUuMiAxMjgtMTY4IDEyOHoiLz48L3N2Zz4='
++    };
++
++    function getChannelSVGHTML(channel, size = '16px') {
++        const svg = channelSVGs[channel];
++        if (svg) {
++            return `<img src="${svg}" alt="${channel}" class="channel-svg-icon" style="width: ${size}; height: ${size}; vertical-align: middle; display: inline-block;" />`;
++        }
++        return `<i class="fa-solid fa-circle"></i>`;
++    }
++
+     // ----------------------------------------------------------------------
+     // 2. Lógica de Autenticación y Registro (Login Seguro - V3.0)
+     // ----------------------------------------------------------------------
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.

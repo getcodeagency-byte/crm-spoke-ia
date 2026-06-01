@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>spoke! - CRM Inteligente (Modo Día)</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        /* VARIABLES GLOBALES - MODO CLARO (POR DEFECTO) */
+        :root {
+            --neon-green: #00E676;
+            --bg-main: #F3F4F6;
+            --card-bg: #FFFFFF;
+            --text-main: #1F2937;
+            --text-muted: #6B7280;
+            --border-color: #E5E7EB;
+            --header-bg: #FFFFFF;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --badge-bg: #111827;
+            --badge-text: #FFFFFF;
+        }
+
+        /* VARIABLES - MODO OSCURO (SE ACTIVA CON ATRIBUTO DATA-THEME) */
+        [data-theme="dark"] {
+            --bg-main: #0A0A0A;
+            --card-bg: #111827;
+            --text-main: #F9FAFB;
+            --text-muted: #9CA3AF;
+            --border-color: #1F2937;
+            --header-bg: #0A0A0A;
+            --glass-bg: rgba(17, 24, 39, 0.7);
+            --badge-bg: rgba(255, 255, 255, 0.1);
+            --badge-text: #F9FAFB;
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        /* NAVBAR HEADER */
+        header {
+            background-color: var(--header-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            color: var(--text-main);
+        }
+
+        .logo span {
+            color: var(--neon-green);
+        }
+
+        /* BOTÓN TOGGLE TEMA */
+        .theme-toggle {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .theme-toggle:hover {
+            background: var(--border-color);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 40px auto;
+        }
+
+        /* KANBAN / GRID CRM */
+        .kanban-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .kanban-column h3 {
+            font-size: 16px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* TARJETAS DE LEADS */
+        .lead-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+        }
+
+        .lead-card:hover {
+            border-color: var(--neon-green);
+            transform: translateY(-2px);
+        }
+
+        .lead-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .lead-name {
+            font-weight: 700;
+            font-size: 16px;
+            margin: 0 0 5px 0;
+        }
+
+        .lead-channel {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* PRESUPUESTO */
+        .budget-tag {
+            background: rgba(0, 230, 118, 0.1);
+            color: var(--neon-green);
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            border: 1px solid rgba(0, 230, 118, 0.3);
+        }
+
+        /* ETIQUETAS */
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            background: var(--badge-bg);
+            color: var(--badge-text);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* POP-UP GLASSMORPHISM ANIMADO */
+        @keyframes popupGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .popup-modal {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(45deg, #0f172a, #000000, #064e3b);
+            background-size: 400% 400%;
+            animation: popupGradient 10s ease infinite;
+            padding: 20px;
+            border-radius: 16px;
+            width: 320px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            color: white;
+            z-index: 1000;
+        }
+
+        .popup-glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .popup-glass h4 {
+            margin: 0 0 5px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .popup-glass p {
+            font-size: 12px;
+            color: #D1D5DB;
+            margin: 0 0 15px 0;
+            line-height: 1.4;
+        }
+
+        .btn-neon {
+            background: var(--neon-green);
+            color: #000;
+            width: 100%;
+            padding: 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            text-transform:

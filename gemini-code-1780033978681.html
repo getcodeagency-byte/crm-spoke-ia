@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>spoke! - CRM Inteligente (Modo Día)</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <style>
+        /* VARIABLES GLOBALES - MODO CLARO (POR DEFECTO) */
+        :root {
+            --neon-green: #00E676;
+            --bg-main: #F3F4F6;
+            --card-bg: #FFFFFF;
+            --text-main: #1F2937;
+            --text-muted: #6B7280;
+            --border-color: #E5E7EB;
+            --header-bg: #FFFFFF;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --badge-bg: #111827;
+            --badge-text: #FFFFFF;
+        }
+
+        /* VARIABLES - MODO OSCURO (SE ACTIVA CON ATRIBUTO DATA-THEME) */
+        [data-theme="dark"] {
+            --bg-main: #0A0A0A;
+            --card-bg: #111827;
+            --text-main: #F9FAFB;
+            --text-muted: #9CA3AF;
+            --border-color: #1F2937;
+            --header-bg: #0A0A0A;
+            --glass-bg: rgba(17, 24, 39, 0.7);
+            --badge-bg: rgba(255, 255, 255, 0.1);
+            --badge-text: #F9FAFB;
+        }
+
+        * {
+            box-sizing: border-box;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        /* NAVBAR HEADER */
+        header {
+            background-color: var(--header-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            color: var(--text-main);
+        }
+
+        .logo span {
+            color: var(--neon-green);
+        }
+
+        /* BOTÓN TOGGLE TEMA */
+        .theme-toggle {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .theme-toggle:hover {
+            background: var(--border-color);
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 40px auto;
+        }
+
+        /* KANBAN / GRID CRM */
+        .kanban-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .kanban-column h3 {
+            font-size: 16px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* TARJETAS DE LEADS */
+        .lead-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+        }
+
+        .lead-card:hover {
+            border-color: var(--neon-green);
+            transform: translateY(-2px);
+        }
+
+        .lead-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .lead-name {
+            font-weight: 700;
+            font-size: 16px;
+            margin: 0 0 5px 0;
+        }
+
+        .lead-channel {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* PRESUPUESTO */
+        .budget-tag {
+            background: rgba(0, 230, 118, 0.1);
+            color: var(--neon-green);
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            border: 1px solid rgba(0, 230, 118, 0.3);
+        }
+
+        /* ETIQUETAS */
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            background: var(--badge-bg);
+            color: var(--badge-text);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* POP-UP GLASSMORPHISM ANIMADO */
+        @keyframes popupGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .popup-modal {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(45deg, #0f172a, #000000, #064e3b);
+            background-size: 400% 400%;
+            animation: popupGradient 10s ease infinite;
+            padding: 20px;
+            border-radius: 16px;
+            width: 320px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            color: white;
+            z-index: 1000;
+        }
+
+        .popup-glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .popup-glass h4 {
+            margin: 0 0 5px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .popup-glass p {
+            font-size: 12px;
+            color: #D1D5DB;
+            margin: 0 0 15px 0;
+            line-height: 1.4;
+        }
+
+        .btn-neon {
+            background: var(--neon-green);
+            color: #000;
+            width: 100%;
+            padding: 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">spoke<span>!</span></div>
+        
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <div style="font-size: 14px; font-weight: 500;">
+                <i class="fa-solid fa-circle" style="color: var(--neon-green); font-size: 10px; margin-right: 5px;"></i>
+                Vendedora Activa
+            </div>
+            <button class="theme-toggle" id="theme-btn" title="Cambiar Tema">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <div style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
+            <h1 style="margin: 0; font-size: 24px;">Tablero Comercial Muebleo</h1>
+            <div style="background: var(--card-bg); border: 1px solid var(--border-color); padding: 10px 15px; border-radius: 8px; font-size: 14px;">
+                <i class="fa-solid fa-filter"></i> Filtros Activos: Ninguno
+            </div>
+        </div>
+
+        <div class="kanban-grid">
+            
+            <div class="kanban-column">
+                <h3>Leads Nuevos (IA) <span style="background: var(--neon-green); color: black; padding: 2px 8px; border-radius: 10px; font-size: 12px;">2</span></h3>
+                
+                <div class="lead-card">
+                    <div class="lead-header">
+                        <div>
+                            <h4 class="lead-name">Cliente: Anónimo</h4>
+                            <span class="lead-channel"><i class="fa-brands fa-whatsapp" style="color:#25D366;"></i> WhatsApp</span>
+                        </div>
+                        <div class="budget-tag">$2.5M COP</div>
+                    </div>
+                    <div class="tags-container">
+                        <span class="tag">Alta Intención</span>
+                        <span class="tag">Interés Sala</span>
+                    </div>
+                </div>
+
+                <div class="lead-card">
+                    <div class="lead-header">
+                        <div>
+                            <h4 class="lead-name">María Rodríguez</h4>
+                            <span class="lead-channel"><i class="fa-brands fa-instagram" style="color:#E1306C;"></i> Instagram</span>
+                        </div>
+                        <div class="budget-tag">Calculando...</div>
+                    </div>
+                    <div class="tags-container">
+                        <span class="tag">Pregunta Stock</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kanban-column">
+                <h3>En Seguimiento <span style="background: var(--border-color); color: var(--text-main); padding: 2px 8px; border-radius: 10px; font-size: 12px;">1</span></h3>
+                
+                <div class="lead-card">
+                    <div class="lead-header">
+                        <div>
+                            <h4 class="lead-name">Carlos Giraldo</h4>
+                            <span class="lead-channel"><i class="fa-solid fa-globe" style="color:#3B82F6;"></i> Webchat</span>
+                        </div>
+                        <div class="budget-tag" style="background: transparent; color: var(--text-main); border-color: var(--border-color);">Cotizado: $4.2M</div>
+                    </div>
+                    <div class="tags-container">
+                        <span class="tag">Comedor 6 Puestos</span>
+                        <span class="tag" style="background: #F59E0B; color: white;">Seguimiento Hoy</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="popup-modal">
+        <div class="popup-glass">
+            <h4><i class="fa-solid fa-bell" style="color: var(--neon-green);"></i> ¡Nuevo Lead Premium!</h4>
+            <p>La IA detectó una solicitud de cotización urgente para personalización de muebles de oficina.</p>
+            <button class="btn-neon">Tomar Control del Chat</button>
+        </div>
+    </div>
+
+    <script>
+        const themeBtn = document.getElementById('theme-btn');
+        const themeIcon = themeBtn.querySelector('i');
+        const rootElement = document.documentElement;
+
+        // Forzamos el modo claro para la demostración
+        let currentTheme = 'light';
+        
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                rootElement.setAttribute('data-theme', 'dark');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                rootElement.removeAttribute('data-theme');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+        }
+
+        // Ejecutar tema claro al cargar
+        applyTheme(currentTheme);
+
+        // Evento click en el botón
+        themeBtn.addEventListener('click', () => {
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            applyTheme(currentTheme);
+        });
+    </script>
+</body>
+</html>

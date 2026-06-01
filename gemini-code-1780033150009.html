@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brandbook UI - spoke IA (Light Mode)</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            --neon-green: #00E676;
+            --dark-accent: #111827;
+            --bg-main: #F3F4F6;
+            --card-bg: #FFFFFF;
+            --text-main: #1F2937;
+            --text-muted: #6B7280;
+            --border-light: #E5E7EB;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            min-height: 100vh;
+        }
+
+        /* ANIMACIÓN PARA POP-UPS */
+        @keyframes popupGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 50px 0;
+        }
+
+        /* LOGO CONCEPT */
+        .logo-container {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .logo {
+            font-size: 48px;
+            font-weight: 800;
+            letter-spacing: -2px;
+            color: var(--dark-accent);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .logo span {
+            color: var(--neon-green);
+        }
+
+        h2 {
+            font-size: 20px;
+            margin-top: 0;
+            margin-bottom: 25px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 10px;
+            color: var(--dark-accent);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border: 1px solid var(--border-light);
+        }
+
+        /* COLOR PALETTE */
+        .color-swatch {
+            height: 60px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .c-white { background: #FFFFFF; color: #111827; border: 1px solid var(--border-light); }
+        .c-bg { background: #F3F4F6; color: #111827; border: 1px solid var(--border-light); }
+        .c-dark { background: #111827; color: #FFFFFF; }
+        .c-green { background: #00E676; color: #111827; }
+
+        /* TYPOGRAPHY */
+        .type-demo h1 { font-size: 28px; margin: 0 0 10px 0; font-weight: 700; }
+        .type-demo p { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+        /* BUTTONS */
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: none;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn-dark {
+            background: var(--dark-accent);
+            color: #FFFFFF;
+        }
+
+        .btn-dark:hover {
+            background: #000000;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--dark-accent);
+            color: var(--dark-accent);
+        }
+
+        .btn-outline:hover {
+            background: var(--bg-main);
+            transform: translateY(-2px);
+        }
+
+        .component-preview {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        /* DEMO DE POP-UP (EL EFECTO QUE PEDISTE) */
+        .popup-overlay-demo {
+            background: var(--bg-main);
+            border-radius: 16px;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px dashed #D1D5DB;
+        }
+
+        .popup-modal {
+            background: linear-gradient(45deg, #0f172a, #000000, #064e3b);
+            background-size: 400% 400%;
+            animation: popupGradient 10s ease infinite;
+            padding: 30px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 350px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* EFECTO GLASSMORPHISM DENTRO DEL POP-UP */
+        .popup-glass-content {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .popup-glass-content h3 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .popup-glass-content p {
+            margin: 0 0 20px 0;
+            font-size: 13px;
+            color: #D1D5DB;
+        }
+
+        .btn-neon {
+            background: var(--neon-green);
+            color: #000000;
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <div class="logo-container">
+        <div class="logo">spoke<span>!</span></div>
+        <p style="color: var(--text-muted); font-size: 16px; font-weight: 500;">Inteligencia Comercial Omnicanal</p>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <h2>Paleta Base (Light Theme)</h2>
+            <div class="color-swatch c-white">Pure White (#FFFFFF) - Tarjetas</div>
+            <div class="color-swatch c-bg">Light Gray (#F3F4F6) - Fondo Web</div>
+            <div class="color-swatch c-dark">Slate Dark (#111827) - Textos/Botones</div>
+            <div class="color-swatch c-green">Success Neon (#00E676) - Acentos</div>
+        </div>
+
+        <div class="card">
+            <h2>Tipografía: Poppins</h2>
+            <div class="type-demo">
+                <h1>H1. Interfaz Principal</h1>
+                <p><strong>Body Bold:</strong> Utilizado para métricas y nombres de clientes. Destaca por su geometría y limpieza.</p>
+                <p>Body Regular: Texto principal para el chat y descripciones. Al estar sobre fondo blanco, descansa la vista y mantiene la concentración del asesor.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <h2>Botones UI Principal</h2>
+            <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 13px;">Diseño sólido y minimalista para las acciones del CRM.</p>
+            <div class="component-preview">
+                <button class="btn btn-dark">Ver Cliente</button>
+                <button class="btn btn-outline">Filtrar</button>
+            </div>
+        </div>
+
+        <div class="card" style="box-shadow: none; border: none; background: transparent; padding: 0;">
+            <h2 style="padding-left: 10px;">Demo: Pop-up Modal</h2>
+            <div class="popup-overlay-demo">
+                
+                <div class="popup-modal">
+                    <div class="popup-glass-content">
+                        <h3>¡Nuevo Lead Premium!</h3>
+                        <p>El cliente solicita una cotización urgente para una sala a medida.</p>
+                        <button class="btn-neon">Atender Ahora</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

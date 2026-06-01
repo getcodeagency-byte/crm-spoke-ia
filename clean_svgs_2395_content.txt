@@ -1,0 +1,34 @@
+Created At: 2026-05-29T18:35:55Z
+Completed At: 2026-05-29T18:35:57Z
+
+				The command completed successfully.
+				Output:
+				Created At: 2026-05-29T17:15:05Z
+Completed At: 2026-05-29T17:15:05Z
+The following changes were made by the replace_file_content tool to: /Users/macbook/Desktop/Spoke - IA/frontend/js/app.js. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -309,6 +309,22 @@
+         messenger: 'fa-brands fa-facebook-messenger messenger'
+     };
+ 
++    const channelSVGs = {
++        whatsapp: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NDggNTEyIj48cGF0aCBmaWxsPSIjMjVEMzY2IiBkPSJNMzgwLjkgOTcuMUMzMzkgNTUuMSAyODMuMiAzMiAyMjMuOSAzMmMtMTIyLjQgMC0yMjIgOTkuNi0yMjIgMjIyIDAgMzkuMSAxMC4yIDc3LjMgMjkuNiAxMTFMMy4yIDQ5NmwxMzMuOS0zNS4xYzMyLjcgMTcuOCA2OS40IDI3LjIgMTA2LjcgMjcuMiAxMjIuNCAwIDIyMi05OS42IDIyMi0yMjIgMC01OS4zLTIzLTExNS4xLTY1LTE1Ny4xek0yMjMuOSA0NDUuNWMtMzMuMiAwLTY1LjctOC45LTk0LTI1LjdsLTYuNy00LTc5LjggMjAuOSAyMS4zLTc3LjgtNC40LTdjLTE4LjUtMjMuNC0yOC4yLTYzLjMtMjguMi05OC4yIDAtMTAxLj
+...
+uMSA0MDMuOSAzMiAyNTYgMzJ6bTAgMzg0Yy05Mi44IDAtMTY4LTU3LjMtMTY4LTEyOHM3NS4yLTEyOCAxNjgtMTI4IDE2OCA1Ny4zIDE2OCAxMjgtNzUuMiAxMjgtMTY4IDEyOHoiLz48L3N2Zz4='
++    };
++
++    function getChannelSVGHTML(channel, size = '16px') {
++        const svg = channelSVGs[channel];
++        if (svg) {
++            return `<img src="${svg}" alt="${channel}" class="channel-svg-icon" style="width: ${size}; height: ${size}; vertical-align: middle; display: inline-block;" />`;
++        }
++        return `<i class="fa-solid fa-circle"></i>`;
++    }
++
+     // ----------------------------------------------------------------------
+     // 2. Lógica de Autenticación y Registro (Login Seguro - V3.0)
+     // ----------------------------------------------------------------------
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+

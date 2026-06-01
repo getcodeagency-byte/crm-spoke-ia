@@ -1,0 +1,7 @@
+{
+  "CommandLine": "\"python3 -c \\\"\\nimport json\\nwith open('/Users/macbook/.gemini/antigravity/brain/29667d9f-431e-4d0c-96ef-71b818564768/.system_generated/logs/transcript.jsonl', 'r') as f:\\n    for line in f:\\n        if 'channelSVGs' in line and 'data:image/svg+xml;base64' in line:\\n            # We want to find a line containing the full definitions of the SVGs\\n            # Let's parse JSON\\n            data = json.loads(line)\\n            content = data.get('content', '')\\n            if 'PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NDggNTEyIj4=' in content or 'whatsapp:' in content:\\n                print(content[:1000])\\n                print('...')\\n                print(content[-1000:])\\n                break\\n\\\"\"",
+  "Cwd": "\"/Users/macbook/Desktop/Spoke - IA\"",
+  "WaitMsBeforeAsync": "2000",
+  "toolAction": "\"Extracting channelSVGs definition from transcript.jsonl\"",
+  "toolSummary": "\"Extracting channelSVGs definition\""
+}
