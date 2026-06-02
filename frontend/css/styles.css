@@ -3310,3 +3310,180 @@ i[class*=" fa-"] {
 .carousel-card-btn:active {
     transform: scale(0.97);
 }
+
+/* ==========================================================================
+   NUEVA IDENTIDAD VISUAL: EFECTO CRISTAL Y REDISEÑO DE COMPONENTES (V5.0.0)
+   ========================================================================== */
+
+/* Fondo Global con Degradados Suaves */
+body, #crm-layout {
+    background: radial-gradient(at 0% 0%, rgba(30, 27, 75, 0.4) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, rgba(6, 182, 212, 0.15) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, rgba(0, 230, 118, 0.1) 0, transparent 50%), 
+                #0f172a !important;
+    background-attachment: fixed !important;
+}
+
+/* Efecto Cristal (Glassmorphic) */
+.sidebar-left, 
+.kanban-column, 
+.inbox-sidebar, 
+.chat-container, 
+.glass-modal, 
+.modal-body, 
+.login-box, 
+.jira-modal-content, 
+.lead-card, 
+.morning-briefing-card, 
+.stat-card, 
+.details-card, 
+.pipeline-summary-card, 
+.convo-card, 
+.carousel-card, 
+.chat-bubble {
+    background: rgba(255, 255, 255, 0.08) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Ajustes de color en Light Mode para mantener contraste en Modo Claro */
+[data-theme="light"] .sidebar-left, 
+[data-theme="light"] .kanban-column, 
+[data-theme="light"] .inbox-sidebar, 
+[data-theme="light"] .chat-container, 
+[data-theme="light"] .glass-modal, 
+[data-theme="light"] .modal-body, 
+[data-theme="light"] .login-box, 
+[data-theme="light"] .jira-modal-content, 
+[data-theme="light"] .lead-card, 
+[data-theme="light"] .morning-briefing-card, 
+[data-theme="light"] .stat-card, 
+[data-theme="light"] .details-card, 
+[data-theme="light"] .pipeline-summary-card, 
+[data-theme="light"] .convo-card, 
+[data-theme="light"] .carousel-card, 
+[data-theme="light"] .chat-bubble {
+    background: rgba(255, 255, 255, 0.55) !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05) !important;
+    color: #1f2937 !important;
+}
+
+/* Diferenciación sutil para burbujas de chat en glassmorfismo */
+.chat-bubble.ai {
+    border-color: rgba(6, 182, 212, 0.4) !important; /* Borde Cian para la IA */
+}
+.chat-bubble.human {
+    border-color: rgba(0, 230, 118, 0.4) !important; /* Borde Verde para Asesor */
+}
+.chat-bubble.customer {
+    border-color: rgba(255, 255, 255, 0.15) !important; /* Borde Neutro para Cliente */
+    color: #FFFFFF !important;
+}
+
+/* Sobrescribir estilos de todos los botones de acción a Botones Negros */
+button, 
+.btn, 
+.btn-primary, 
+.btn-neon, 
+.carousel-card-btn, 
+.chat-send-btn, 
+#channel-submit-btn,
+.audio-play-btn,
+.file-download-btn,
+.login-tab-btn {
+    background-color: #111827 !important;
+    color: #FFFFFF !important;
+    border-radius: 12px !important;
+    padding: 10px 20px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    font-weight: 600 !important;
+    transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease !important;
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    font-family: 'Poppins', sans-serif !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15) !important;
+    text-shadow: none !important;
+}
+
+/* Hover de Botones */
+button:hover, 
+.btn:hover, 
+.btn-primary:hover, 
+.btn-neon:hover, 
+.carousel-card-btn:hover, 
+.chat-send-btn:hover, 
+#channel-submit-btn:hover,
+.audio-play-btn:hover,
+.file-download-btn:hover {
+    transform: translateY(-2px) !important;
+    background-color: #1F2937 !important;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25) !important;
+}
+
+/* Click de Botones */
+button:active, 
+.btn:active, 
+.btn-primary:active, 
+.btn-neon:active, 
+.carousel-card-btn:active, 
+.chat-send-btn:active {
+    transform: translateY(0) !important;
+}
+
+/* Inputs fluidos con enfoque (focus) */
+input, 
+textarea, 
+select {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: #FFFFFF !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
+    outline: none !important;
+}
+
+/* Inputs en modo claro */
+[data-theme="light"] input, 
+[data-theme="light"] textarea, 
+[data-theme="light"] select {
+    background-color: rgba(0, 0, 0, 0.03) !important;
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    color: #111827 !important;
+}
+
+/* Inputs en Foco */
+input:focus, 
+textarea:focus, 
+select:focus {
+    background-color: #FFFFFF !important;
+    border-color: #111827 !important;
+    color: #111827 !important;
+    box-shadow: 0 0 0 2px rgba(17, 24, 39, 0.1) !important;
+}
+
+/* Enfoque en modo oscuro para evitar texto invisible */
+body[data-theme="dark"] input:focus, 
+body[data-theme="dark"] textarea:focus, 
+body[data-theme="dark"] select:focus {
+    background-color: #FFFFFF !important;
+    color: #111827 !important;
+    border-color: #000000 !important;
+}
+
+/* Asegurar legibilidad del placeholder en inputs */
+input::placeholder, 
+textarea::placeholder {
+    color: rgba(255, 255, 255, 0.4) !important;
+}
+
+[data-theme="light"] input::placeholder, 
+[data-theme="light"] textarea::placeholder {
+    color: rgba(0, 0, 0, 0.4) !important;
+}
