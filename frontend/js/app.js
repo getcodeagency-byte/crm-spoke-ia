@@ -521,6 +521,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (loginPasswordInput) loginPasswordInput.value = '';
                 
                 console.log("Login exitoso, cargando CRM...");
+                // Blindaje: audio protegido + ocultamiento forzado del modal
+                try {
+                    // Espacio reservado para audio de login si se agrega en el futuro
+                } catch (audioError) {
+                    console.warn("Audio no disponible, continuando flujo...", audioError);
+                }
+                const _loginOverlay1 = document.getElementById('login-screen');
+                if (_loginOverlay1) {
+                    _loginOverlay1.classList.add('force-hide-modal');
+                    _loginOverlay1.style.setProperty('display', 'none', 'important');
+                }
                 checkAuth();
             } else if (email === 'vendedora@muebleo.com' && password === 'muebleo123') {
                 // Credenciales semilla por defecto
@@ -537,6 +548,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (loginPasswordInput) loginPasswordInput.value = '';
                 
                 console.log("Login exitoso, cargando CRM...");
+                // Blindaje: audio protegido + ocultamiento forzado del modal
+                try {
+                    // Espacio reservado para audio de login si se agrega en el futuro
+                } catch (audioError) {
+                    console.warn("Audio no disponible, continuando flujo...", audioError);
+                }
+                const _loginOverlay2 = document.getElementById('login-screen');
+                if (_loginOverlay2) {
+                    _loginOverlay2.classList.add('force-hide-modal');
+                    _loginOverlay2.style.setProperty('display', 'none', 'important');
+                }
                 checkAuth();
             } else {
                 if (loginErrorMsg) loginErrorMsg.classList.remove('hidden');

@@ -106,6 +106,9 @@ textarea::placeholder {
 }
 
 .app-layout {
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     display: flex;
     min-height: 100vh;
     width: 100vw;
@@ -137,7 +140,13 @@ textarea::placeholder {
     border: 1px solid var(--border-color);
     background: var(--bg-glass);
     backdrop-filter: var(--glass-blur);
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     -webkit-backdrop-filter: var(--glass-blur);
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     box-shadow: var(--shadow-lg);
 }
 
@@ -217,6 +226,9 @@ textarea::placeholder {
    -------------------------------------------------------------------------- */
 
 .sidebar-left {
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     width: 240px;
     background-color: var(--bg-sidebar);
     border-right: 1px solid var(--border-color);
@@ -417,11 +429,17 @@ textarea::placeholder {
    -------------------------------------------------------------------------- */
 
 .main-content {
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     flex: 1;
     margin-left: 240px;
     padding: 24px;
     min-height: 100vh;
-}
+
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    will-change: scroll-position;}
 
 .tab-section {
     display: none;
@@ -480,7 +498,13 @@ textarea::placeholder {
 .glass-panel {
     background: var(--bg-glass);
     backdrop-filter: var(--glass-blur);
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     -webkit-backdrop-filter: var(--glass-blur);
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     border: 1px solid var(--border-glass);
     border-radius: 16px;
     box-shadow: var(--shadow-sm);
@@ -817,7 +841,7 @@ textarea::placeholder {
     display: flex;
     align-items: center;
     gap: 8px;
-    transition: all 0.2s ease;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
 }
 
 .btn-secondary:hover {
@@ -849,7 +873,13 @@ textarea::placeholder {
 .kanban-column {
     background: var(--bg-glass);
     backdrop-filter: none;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     -webkit-backdrop-filter: none;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     border-radius: 12px;
     border: 1px solid var(--border-color);
     padding: 12px;
@@ -915,7 +945,13 @@ textarea::placeholder {
 .lead-card {
     background-color: var(--bg-card);
     backdrop-filter: none;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     -webkit-backdrop-filter: none;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     border: 1px solid var(--border-color);
     border-radius: 10px;
     padding: 12px;
@@ -1573,8 +1609,14 @@ textarea::placeholder {
     z-index: 1000;
     opacity: 1;
     transition: opacity 0.3s ease;
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
+    backdrop-filter: blur(8px) !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
 }
 
 .modal-overlay.hidden {
@@ -1692,7 +1734,7 @@ textarea::placeholder {
     width: 100%;
     cursor: pointer;
     box-shadow: none;
-    transition: all 0.2s ease;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
 }
 
 .btn-neon:hover {
@@ -2157,7 +2199,7 @@ textarea::placeholder {
     justify-content: center;
     gap: 6px;
     margin-bottom: 12px;
-    transition: all 0.2s ease;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
 }
 
 .btn-add-lead-inline:hover {
@@ -2187,7 +2229,7 @@ textarea::placeholder {
     font-weight: 600;
     cursor: pointer;
     font-family: 'Poppins', sans-serif;
-    transition: all 0.2s ease;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
 }
 
 .inbox-filter-btn:hover {
@@ -2283,7 +2325,7 @@ textarea::placeholder {
     justify-content: center;
     cursor: pointer;
     font-size: 16px;
-    transition: all 0.2s ease;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
 }
 
 .chat-media-btn:hover {
@@ -2408,7 +2450,7 @@ textarea::placeholder {
     font-size: 18px;
     position: relative;
     box-shadow: var(--shadow-md);
-    transition: all 0.2s ease;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
 }
 
 .noti-bell-btn:hover {
@@ -2527,7 +2569,7 @@ textarea::placeholder {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    transition: all 0.2s ease;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
     border-left: 3px solid var(--neon-cyan);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
 }
@@ -2638,7 +2680,7 @@ textarea::placeholder {
     justify-content: center;
     cursor: pointer;
     font-size: 11px;
-    transition: all 0.2s ease;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
     box-shadow: 0 0 6px rgba(0, 230, 118, 0.2);
 }
 
@@ -2747,7 +2789,7 @@ textarea::placeholder {
     cursor: pointer;
     padding: 6px 12px;
     border-radius: 6px;
-    transition: all 0.3s ease;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
 }
 
 .login-tab-btn:hover {
@@ -2859,7 +2901,7 @@ textarea::placeholder {
     cursor: pointer;
     font-family: 'Poppins', sans-serif;
     outline: none;
-    transition: all 0.3s ease;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
 }
 
 .assignee-select-wrapper select:focus {
@@ -2944,7 +2986,7 @@ textarea::placeholder {
 
 /* Segmentos de filtros de pertenencia */
 .filter-segment-btn {
-    transition: all 0.2s ease;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
 }
 
 .filter-segment-btn.active {
@@ -3287,7 +3329,7 @@ i[class*=" fa-"] {
     --glass-bg-base: rgba(255, 255, 255, 0.45);
     --glass-bg-nested: rgba(255, 255, 255, 0.70);
     --glass-bg-deep: rgba(255, 255, 255, 0.30);
-    --glass-blur: blur(15px);
+    --glass-blur: blur(8px) !important !important;
     --glass-border: 1px solid rgba(255, 255, 255, 0.6);
     --glass-border-subtle: 1px solid rgba(255, 255, 255, 0.35);
     --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
@@ -3422,7 +3464,13 @@ html, body {
     border-radius: var(--glass-radius-xl) !important;
     background: var(--glass-bg-base) !important;
     backdrop-filter: var(--glass-blur) !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     -webkit-backdrop-filter: var(--glass-blur) !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     border: var(--glass-border) !important;
     box-shadow: var(--glass-shadow-elevated),
                 inset 0 1px 0 0 rgba(255, 255, 255, 0.4) !important;
@@ -3446,7 +3494,13 @@ html, body {
 .tab-section {
     background: var(--glass-bg-base) !important;
     backdrop-filter: var(--glass-blur) !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     -webkit-backdrop-filter: var(--glass-blur) !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     border: var(--glass-border) !important;
     border-radius: var(--glass-radius-xl) !important;
     box-shadow: var(--glass-shadow-elevated),
@@ -3468,7 +3522,13 @@ html, body {
 .glass-panel {
     background: var(--glass-bg-base) !important;
     backdrop-filter: var(--glass-blur) !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     -webkit-backdrop-filter: var(--glass-blur) !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     border: var(--glass-border) !important;
     border-radius: var(--glass-radius-lg) !important;
     box-shadow: var(--glass-shadow) !important;
@@ -3476,20 +3536,36 @@ html, body {
 
 /* ---- 4. LOGIN GLASSMORPHISM ---- */
 .login-overlay {
-    background: rgba(15, 23, 42, 0.3) !important;
-    backdrop-filter: var(--glass-blur) !important;
-    -webkit-backdrop-filter: var(--glass-blur) !important;
+    position: fixed !important;
+    inset: 0 !important;
+    background: rgba(15, 23, 42, 0.7) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    z-index: 9998 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
 }
 
 .login-box {
-    background: var(--glass-bg-base) !important;
-    backdrop-filter: var(--glass-blur) !important;
-    -webkit-backdrop-filter: var(--glass-blur) !important;
-    border: var(--glass-border) !important;
-    border-radius: var(--glass-radius-xl) !important;
-    box-shadow: var(--glass-shadow-elevated),
-                inset 0 1px 0 0 rgba(255, 255, 255, 0.5) !important;
+    background: #FFFFFF !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-radius: 24px !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+    z-index: 9999 !important;
+    position: relative !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
     padding: 40px !important;
+    width: 90% !important;
+    max-width: 400px !important;
+    text-align: center !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
 }
 
 .login-tab-btn {
@@ -3500,8 +3576,14 @@ html, body {
     font-weight: 600 !important;
     padding: 10px 20px !important;
     backdrop-filter: none !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     -webkit-backdrop-filter: none !important;
-    transition: all 0.3s ease !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
 }
 
 .login-tab-btn.active {
@@ -3521,13 +3603,19 @@ html, body {
 .chart-container {
     background: rgba(255, 255, 255, 0.90) !important;
     backdrop-filter: none !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     -webkit-backdrop-filter: none !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     border: var(--glass-border) !important;
     border-radius: var(--glass-radius-lg) !important;
     box-shadow: var(--glass-shadow),
                 inset 0 1px 0 0 rgba(255, 255, 255, 0.5) !important;
     padding: 24px !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
 }
 
 .morning-briefing-card:hover,
@@ -3548,7 +3636,13 @@ html, body {
 .insight-item {
     background: rgba(255, 255, 255, 0.90) !important;
     backdrop-filter: none !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     -webkit-backdrop-filter: none !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     border: var(--glass-border-subtle) !important;
     border-radius: var(--glass-radius-sm) !important;
     padding: 12px !important;
@@ -3569,7 +3663,13 @@ html, body {
 .kanban-column {
     background: rgba(255, 255, 255, 0.90) !important;
     backdrop-filter: none !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     -webkit-backdrop-filter: none !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     border: var(--glass-border) !important;
     border-radius: var(--glass-radius-lg) !important;
     box-shadow: var(--glass-shadow),
@@ -3585,13 +3685,19 @@ html, body {
 .lead-card {
     background: rgba(255, 255, 255, 0.90) !important;
     backdrop-filter: none !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     -webkit-backdrop-filter: none !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     border: 1px solid rgba(255, 255, 255, 0.8) !important;
     border-radius: var(--glass-radius-md) !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
     margin-bottom: 12px !important;
     padding: 16px !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
 }
 
 .lead-card:hover {
@@ -3605,7 +3711,13 @@ html, body {
 .inbox-layout {
     background: var(--glass-bg-nested) !important;
     backdrop-filter: var(--glass-blur) !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     -webkit-backdrop-filter: var(--glass-blur) !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     border: var(--glass-border) !important;
     border-radius: var(--glass-radius-lg) !important;
     box-shadow: var(--glass-shadow),
@@ -3621,7 +3733,13 @@ html, body {
     background: transparent !important;
     border-right: var(--glass-border-subtle) !important;
     backdrop-filter: none !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     -webkit-backdrop-filter: none !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     width: 320px !important;
     min-width: 320px !important;
     max-width: 320px !important;
@@ -3639,14 +3757,26 @@ html, body {
     overflow: hidden !important;
     background: var(--glass-bg-deep) !important;
     backdrop-filter: none !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     -webkit-backdrop-filter: none !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     flex: 1 !important;
 }
 
 .chat-header {
     background: rgba(255, 255, 255, 0.90) !important;
     backdrop-filter: none !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     -webkit-backdrop-filter: none !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     border-bottom: var(--glass-border-subtle) !important;
     flex-shrink: 0 !important;
 }
@@ -3658,7 +3788,13 @@ html, body {
     position: relative !important;
     background: var(--glass-bg-base, rgba(255, 255, 255, 0.95)) !important;
     backdrop-filter: none !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     -webkit-backdrop-filter: none !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     border-top: var(--glass-border-subtle) !important;
     padding: 15px 20px !important;
     display: flex !important; /* Asegúrate de que no esté oculta */
@@ -3670,7 +3806,7 @@ html, body {
 
 .convo-card {
     border-bottom: var(--glass-border-subtle) !important;
-    transition: all 0.2s ease !important;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
 }
 
 .convo-card:hover {
@@ -3693,11 +3829,20 @@ html, body {
     gap: 16px !important;
     padding: 20px !important;
     box-sizing: border-box !important;
-}
+
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    will-change: scroll-position;}
 
 .chat-bubble {
     backdrop-filter: none !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     -webkit-backdrop-filter: none !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     border-radius: 20px !important;
     padding: 12px 18px !important;
     width: fit-content !important;
@@ -3769,7 +3914,7 @@ button,
     justify-content: center !important;
     gap: 8px !important;
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2) !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
 }
 
 button:hover,
@@ -3803,7 +3948,7 @@ button:active,
     font-weight: 600 !important;
     padding: 12px 24px !important;
     margin: 4px 12px !important;
-    transition: all 0.3s ease !important;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
     border: 1px solid transparent !important;
     display: flex !important;
     align-items: center !important;
@@ -3812,7 +3957,7 @@ button:active,
 
 .menu-item i {
     color: var(--text-body) !important;
-    transition: all 0.3s ease !important;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
 }
 
 .menu-item:hover {
@@ -3848,7 +3993,7 @@ button:active,
     font-weight: 600 !important;
     font-size: 11px !important;
     cursor: pointer !important;
-    transition: all 0.2s ease !important;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
 }
 
 .filter-segment-btn.active,
@@ -3888,8 +4033,14 @@ select {
     font-size: 13px !important;
     font-weight: 500 !important;
     backdrop-filter: none !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     -webkit-backdrop-filter: none !important;
-    transition: all 0.25s ease !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
     outline: none !important;
 }
 
@@ -3918,10 +4069,16 @@ select:focus {
     background: rgba(255, 255, 255, 0.90) !important;
     border: 1px solid rgba(255, 255, 255, 0.5) !important;
     backdrop-filter: none !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     -webkit-backdrop-filter: none !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     color: #111827 !important;
     cursor: pointer !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
 }
 
@@ -3951,14 +4108,26 @@ select:focus {
 .modal-overlay {
     background-color: rgba(15, 23, 42, 0.4) !important;
     backdrop-filter: var(--glass-blur) !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     -webkit-backdrop-filter: var(--glass-blur) !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
 }
 
 .glass-modal,
 .jira-modal-content {
     background: var(--glass-bg-base) !important;
     backdrop-filter: var(--glass-blur) !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     -webkit-backdrop-filter: var(--glass-blur) !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     border: var(--glass-border) !important;
     border-radius: var(--glass-radius-xl) !important;
     box-shadow: var(--glass-shadow-elevated),
@@ -3975,7 +4144,13 @@ select:focus {
 .notifications-panel {
     background: var(--glass-bg-base) !important;
     backdrop-filter: var(--glass-blur) !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     -webkit-backdrop-filter: var(--glass-blur) !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
+    perspective: 1000px !important;
     border: var(--glass-border) !important;
     border-radius: var(--glass-radius-lg) !important;
     box-shadow: var(--glass-shadow-elevated) !important;
@@ -4005,4 +4180,34 @@ select:focus {
     transform: translateY(-4px) !important;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
     border-color: rgba(0, 0, 0, 0.15) !important;
+}
+
+/* ==========================================================================
+   16. LOGIN PREMIUM — FONDO INMERSIVO + OCULTAMIENTO FORZADO
+   ========================================================================== */
+
+/* Fondo de pantalla completa con imagen corporativa + oscurecimiento 40% */
+#login-screen {
+    position: fixed !important;
+    inset: 0 !important;
+    background:
+        linear-gradient(rgba(15, 23, 42, 0.4), rgba(15, 23, 42, 0.4)),
+        url('../assets/bg-premium.png') no-repeat center center !important;
+    background-size: cover !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    z-index: 9998 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    transform: translateZ(0) !important;
+}
+
+/* Clase destructora — gana a cualquier display:flex !important */
+.force-hide-modal {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    z-index: -999 !important;
 }
