@@ -3310,461 +3310,545 @@ i[class*=" fa-"] {
 .carousel-card-btn:active {
     transform: scale(0.97);
 }
+
 /* ==========================================================================
-   IDENTIDAD VISUAL V6.0.0 — SOFT UI / CLEAN MINIMALISM (Apple-Inspired)
-   Tipografía: Inter · Fondos Claros · Sombras Difuminadas · Botones Animados
+   IDENTIDAD VISUAL V7.1.0 — HYPER-REALISTIC GLASSMORPHISM
+   Frosted Glass · Floating Panels · Black Pills · Inter Typography
    ========================================================================== */
 
-/* ---- 1. TIPOGRAFÍA PREMIUM ---- */
-*, *::before, *::after {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif !important;
+/* ---- 0. GLASS VARIABLES ---- */
+:root {
+    --glass-bg-base: rgba(255, 255, 255, 0.45);
+    --glass-bg-nested: rgba(255, 255, 255, 0.70);
+    --glass-bg-deep: rgba(255, 255, 255, 0.30);
+    --glass-blur: blur(40px);
+    --glass-border: 1px solid rgba(255, 255, 255, 0.6);
+    --glass-border-subtle: 1px solid rgba(255, 255, 255, 0.35);
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+    --glass-shadow-elevated: 0 16px 48px 0 rgba(31, 38, 135, 0.08);
+    --glass-radius-xl: 32px;
+    --glass-radius-lg: 24px;
+    --glass-radius-md: 16px;
+    --glass-radius-sm: 12px;
+    --pill-bg: #000000;
+    --pill-color: #FFFFFF;
+    --text-heading: #000000;
+    --text-body: #4B5563;
+    --text-muted-glass: #6B7280;
 }
 
-h1, h2, h3, h4, .welcome-heading, .logo, .stat-value, .column-header h3 {
+/* ---- 1. TIPOGRAFÍA PREMIUM SIN CORROMPER ICONOS ---- */
+body, 
+input, 
+select, 
+textarea, 
+button, 
+.btn, 
+.logo, 
+.subdomain-text, 
+.convo-name, 
+.convo-msg,
+.welcome-heading,
+.stat-value,
+.column-header h3,
+.briefing-text h3,
+.details-card h3,
+.insight-item div,
+.chat-bubble p {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+/* Evitar que FontAwesome sea afectado por herencias tipográficas */
+.fa, .fas, .far, .fal, .fad, .fab, [class*="fa-"], i {
+    font-family: 'Font Awesome 6 Free', 'Font Awesome 6 Brands', 'Font Awesome 5 Free', 'Font Awesome 5 Brands' !important;
+    font-weight: 900 !important;
+    font-style: normal !important;
+}
+
+/* Encabezados y Textos */
+h1, h2, h3, h4, .welcome-heading, .stat-value, .column-header h3, .briefing-text h3 {
+    color: #000000 !important;
     font-weight: 700 !important;
-    color: #111827 !important;
-    letter-spacing: -0.02em !important;
+    letter-spacing: -0.025em !important;
 }
 
-p, span, label, .convo-msg, .briefing-text p, .bubble-meta, .convo-time {
-    font-weight: 400 !important;
-    color: #6B7280 !important;
-}
-
-.logo {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
-    font-weight: 800 !important;
-    letter-spacing: -1.5px !important;
-    color: #111827 !important;
-}
-
-.logo span {
-    color: #03DAC6 !important;
-}
-
-/* ---- 2. FONDO GLOBAL ---- */
-body {
-    background-color: #F3F4F6 !important;
-    background-image: none !important;
-    color: #111827 !important;
-}
-
-body, #crm-layout, .app-layout {
-    background-color: #F3F4F6 !important;
-    background-image: none !important;
-    background: #F3F4F6 !important;
-}
-
-/* ---- 3. LOGIN — Experiencia Premium desde el Acceso ---- */
-.login-overlay {
-    background: linear-gradient(160deg, #F3F4F6 0%, #E5E7EB 40%, #F9FAFB 100%) !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-}
-
-.login-box {
-    background-color: #FFFFFF !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    border: 1px solid rgba(0, 0, 0, 0.04) !important;
-    border-radius: 28px !important;
-    box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.08),
-                0 0 0 1px rgba(0, 0, 0, 0.02) !important;
-    padding: 40px !important;
-}
-
-.login-subtitle {
-    color: #9CA3AF !important;
+p, span, label, .convo-msg, .briefing-text p, .bubble-meta, .convo-time, .details-desc, .color-desc, .insight-item div {
+    color: #4B5563 !important;
     font-weight: 500 !important;
 }
 
+/* Color por defecto de iconos */
+.fa, .fas, .far, .fal, .fad, .fab, i {
+    color: #111827 !important;
+    -webkit-font-smoothing: antialiased !important;
+    -moz-osx-font-smoothing: grayscale !important;
+}
+
+/* Iconos en fondos oscuros o botones */
+button i,
+.btn i,
+.btn-primary i,
+.btn-neon i,
+.carousel-card-btn i,
+.chat-send-btn i,
+.btn-add-lead-inline i,
+.menu-item.active i,
+.chat-bubble.ai i {
+    color: #FFFFFF !important;
+}
+
+/* Conservar colores de iconos de estadísticas y mañana */
+.stat-icon i,
+.briefing-icon i {
+    color: inherit !important;
+}
+
+/* Logo */
+.logo {
+    font-weight: 800 !important;
+    letter-spacing: -1.5px !important;
+    color: #000000 !important;
+}
+
+.logo span {
+    color: #000000 !important;
+}
+
+/* ---- 2. FONDO GLOBAL CON IMAGEN PREMIUM ---- */
+body {
+    background: url('../assets/bg-premium.png') no-repeat center center fixed !important;
+    background-size: cover !important;
+    min-height: 100vh !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* ---- 3. FLOATING PANELS LAYOUT ---- */
+.app-layout {
+    display: flex !important;
+    background: transparent !important;
+    min-height: 100vh !important;
+    box-sizing: border-box !important;
+    padding: 20px !important;
+    gap: 20px !important;
+}
+
+.sidebar-left {
+    position: fixed !important;
+    left: 20px !important;
+    top: 20px !important;
+    bottom: 20px !important;
+    height: calc(100vh - 40px) !important;
+    width: 260px !important;
+    margin: 0 !important;
+    border-radius: var(--glass-radius-xl) !important;
+    background: var(--glass-bg-base) !important;
+    backdrop-filter: var(--glass-blur) !important;
+    -webkit-backdrop-filter: var(--glass-blur) !important;
+    border: var(--glass-border) !important;
+    box-shadow: var(--glass-shadow-elevated),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.4) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    z-index: 200 !important;
+}
+
+.main-content {
+    flex: 1 !important;
+    margin-left: 280px !important; /* Sidebar width (260px) + gap offset (20px) */
+    padding: 0 !important;
+    min-height: calc(100vh - 40px) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 20px !important;
+    background: transparent !important;
+}
+
+/* Cada sección SPA se convierte en un Floating Panel de Cristal */
+.tab-section {
+    background: var(--glass-bg-base) !important;
+    backdrop-filter: var(--glass-blur) !important;
+    -webkit-backdrop-filter: var(--glass-blur) !important;
+    border: var(--glass-border) !important;
+    border-radius: var(--glass-radius-xl) !important;
+    box-shadow: var(--glass-shadow-elevated),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.4) !important;
+    padding: 30px !important;
+    min-height: calc(100vh - 40px) !important;
+    box-sizing: border-box !important;
+    display: none;
+}
+
+.tab-section.active {
+    display: block !important;
+}
+
+/* Glass panel base class override */
+.glass-panel {
+    background: var(--glass-bg-base) !important;
+    backdrop-filter: var(--glass-blur) !important;
+    -webkit-backdrop-filter: var(--glass-blur) !important;
+    border: var(--glass-border) !important;
+    border-radius: var(--glass-radius-lg) !important;
+    box-shadow: var(--glass-shadow) !important;
+}
+
+/* ---- 4. LOGIN GLASSMORPHISM ---- */
+.login-overlay {
+    background: rgba(15, 23, 42, 0.3) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+}
+
+.login-box {
+    background: var(--glass-bg-base) !important;
+    backdrop-filter: var(--glass-blur) !important;
+    -webkit-backdrop-filter: var(--glass-blur) !important;
+    border: var(--glass-border) !important;
+    border-radius: var(--glass-radius-xl) !important;
+    box-shadow: var(--glass-shadow-elevated),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.5) !important;
+    padding: 40px !important;
+}
+
 .login-tab-btn {
-    background-color: #F3F4F6 !important;
-    color: #6B7280 !important;
-    border: none !important;
-    border-radius: 12px !important;
+    background: rgba(255, 255, 255, 0.3) !important;
+    color: var(--text-body) !important;
+    border: var(--glass-border-subtle) !important;
+    border-radius: var(--glass-radius-sm) !important;
     font-weight: 600 !important;
     padding: 10px 20px !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
     transition: all 0.3s ease !important;
 }
 
 .login-tab-btn.active {
-    background-color: #FFFFFF !important;
-    color: #111827 !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+    background: var(--pill-bg) !important;
+    color: var(--pill-color) !important;
+    border-color: transparent !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
 }
 
-.login-help {
-    color: #9CA3AF !important;
+/* ---- 5. NESTED GLASS CARDS (DASHBOARD) ---- */
+.morning-briefing-card,
+.stat-card,
+.details-card,
+#ai-insights-widget,
+.tag-manage-card,
+.pipeline-summary-card {
+    background: var(--glass-bg-nested) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: var(--glass-border) !important;
+    border-radius: var(--glass-radius-lg) !important;
+    box-shadow: var(--glass-shadow),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.5) !important;
+    padding: 24px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-.login-help code {
-    background-color: #F3F4F6 !important;
-    color: #374151 !important;
-    border-radius: 6px !important;
-    padding: 3px 8px !important;
-    border: 1px solid #E5E7EB !important;
-}
-
-/* ---- 4. CONTENEDORES Y TARJETAS — Soft UI ---- */
-.sidebar-left {
-    background-color: #FFFFFF !important;
-    border-right: 1px solid rgba(0, 0, 0, 0.04) !important;
-    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.03) !important;
-}
-
-.sidebar-header {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
-}
-
-.kanban-column {
-    background-color: #FFFFFF !important;
-    border: 1px solid rgba(0, 0, 0, 0.02) !important;
-    border-radius: 24px !important;
-    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05) !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-}
-
-.column-header {
-    border-bottom: 2px solid #F3F4F6 !important;
-}
-
-.inbox-sidebar {
-    background-color: #FFFFFF !important;
-    border-right: 1px solid rgba(0, 0, 0, 0.04) !important;
-}
-
-.chat-container {
-    background-color: #F9FAFB !important;
-}
-
-.chat-header {
-    background-color: #FFFFFF !important;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
-}
-
-.glass-modal {
-    background-color: #FFFFFF !important;
-    border: 1px solid rgba(0, 0, 0, 0.02) !important;
-    border-radius: 28px !important;
-    box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.12) !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-}
-
-.modal-body {
-    background-color: #FFFFFF !important;
-    border: 1px solid rgba(0, 0, 0, 0.04) !important;
-    border-radius: 20px !important;
-    box-shadow: none !important;
-}
-
-.modal-overlay {
-    background-color: rgba(17, 24, 39, 0.3) !important;
-    backdrop-filter: blur(8px) !important;
-    -webkit-backdrop-filter: blur(8px) !important;
-}
-
-.jira-modal-content {
-    background-color: #FFFFFF !important;
-    border: 1px solid rgba(0, 0, 0, 0.02) !important;
-    border-radius: 24px !important;
-    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08) !important;
-}
-
-/* Dashboard Cards */
-.morning-briefing-card {
-    background-color: #FFFFFF !important;
-    border: 1px solid rgba(0, 0, 0, 0.02) !important;
-    border-radius: 24px !important;
-    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05) !important;
-    backdrop-filter: none !important;
+.morning-briefing-card:hover,
+.stat-card:hover,
+.details-card:hover,
+#ai-insights-widget:hover,
+.tag-manage-card:hover,
+.pipeline-summary-card:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: var(--glass-shadow-elevated) !important;
 }
 
 .morning-briefing-card::before {
-    background-color: #111827 !important;
-    border-radius: 4px !important;
-}
-
-.stat-card {
-    background-color: #FFFFFF !important;
-    border: 1px solid rgba(0, 0, 0, 0.02) !important;
-    border-radius: 24px !important;
-    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05) !important;
-}
-
-.details-card {
-    background-color: #FFFFFF !important;
-    border: 1px solid rgba(0, 0, 0, 0.02) !important;
-    border-radius: 20px !important;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04) !important;
-}
-
-.pipeline-summary-card {
-    background-color: #FFFFFF !important;
-    border: 1px solid rgba(0, 0, 0, 0.02) !important;
-    border-radius: 24px !important;
-    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05) !important;
-}
-
-/* Lead Cards */
-.lead-card {
-    background-color: #FFFFFF !important;
-    border: 1px solid rgba(0, 0, 0, 0.03) !important;
-    border-radius: 16px !important;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
-}
-
-.lead-card:hover {
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08) !important;
-    transform: translateY(-2px) !important;
-}
-
-/* Conversation Cards */
-.convo-card {
-    border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
-}
-
-.convo-card:hover {
-    background-color: #F9FAFB !important;
-}
-
-.convo-card.active {
-    background-color: #F3F4F6 !important;
-    border-left: 3px solid #111827 !important;
-}
-
-.convo-name {
-    color: #111827 !important;
-    font-weight: 600 !important;
-}
-
-/* Tag Manage Cards */
-.tag-manage-card {
-    background-color: #FFFFFF !important;
-    border: 1px solid rgba(0, 0, 0, 0.02) !important;
-    border-radius: 16px !important;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04) !important;
-}
-
-/* AI Insights Widget */
-#ai-insights-widget {
-    background-color: #FFFFFF !important;
-    border: 1px solid rgba(0, 0, 0, 0.02) !important;
-    border-radius: 24px !important;
-    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05) !important;
+    background: var(--pill-bg) !important;
 }
 
 .insight-item {
-    background-color: #F9FAFB !important;
-    border: 1px solid rgba(0, 0, 0, 0.03) !important;
-    border-radius: 12px !important;
+    background: rgba(255, 255, 255, 0.5) !important;
+    border: var(--glass-border-subtle) !important;
+    border-radius: var(--glass-radius-sm) !important;
+    padding: 12px !important;
 }
 
-.insight-item:hover {
-    background-color: #F3F4F6 !important;
-    border-color: rgba(0, 0, 0, 0.06) !important;
+/* ---- 6. KANBAN BOARD & COLUMNS ---- */
+.kanban-board {
+    display: flex !important;
+    gap: 20px !important;
+    overflow-x: auto !important;
+    padding-bottom: 10px !important;
+    align-items: flex-start !important;
 }
 
-/* ---- 5. SIDEBAR MENU ACTIVO — Apple Overview Style ---- */
-.menu-item {
-    border-radius: 12px !important;
-    color: #6B7280 !important;
-    font-weight: 500 !important;
-    transition: all 0.3s ease !important;
-    border: 1px solid transparent !important;
+.kanban-column {
+    background: var(--glass-bg-nested) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: var(--glass-border) !important;
+    border-radius: var(--glass-radius-lg) !important;
+    box-shadow: var(--glass-shadow),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.4) !important;
+    padding: 20px !important;
+    width: 280px !important;
+    flex-shrink: 0 !important;
 }
 
-.menu-item:hover {
-    background-color: #F3F4F6 !important;
-    color: #111827 !important;
+.lead-card {
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.8) !important;
+    border-radius: var(--glass-radius-md) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
+    margin-bottom: 12px !important;
+    padding: 16px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-.menu-item.active {
-    background-color: #FFFFFF !important;
-    color: #111827 !important;
-    font-weight: 600 !important;
-    border: 1px solid rgba(0, 0, 0, 0.04) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+.lead-card:hover {
+    background: #ffffff !important;
+    transform: translateY(-3px) scale(1.02) !important;
+    box-shadow: 0 12px 24px rgba(31, 38, 135, 0.08) !important;
+    border-color: rgba(255, 255, 255, 1) !important;
 }
 
-.menu-item.active i {
-    color: #111827 !important;
+/* ---- 7. INBOX & CHAT ---- */
+.inbox-layout {
+    background: var(--glass-bg-nested) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: var(--glass-border) !important;
+    border-radius: var(--glass-radius-lg) !important;
+    box-shadow: var(--glass-shadow),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.4) !important;
+    display: flex !important;
+    overflow: hidden !important;
 }
 
-/* ---- 6. BURBUJAS DE CHAT — Clean & Readable ---- */
-.chat-bubble {
+.inbox-sidebar {
+    background: transparent !important;
+    border-right: var(--glass-border-subtle) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    border-radius: 18px !important;
+}
+
+.chat-container {
+    background: var(--glass-bg-deep) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.chat-header {
+    background: var(--glass-bg-nested) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border-bottom: var(--glass-border-subtle) !important;
+}
+
+.chat-input-area {
+    background: var(--glass-bg-nested) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border-top: var(--glass-border-subtle) !important;
+}
+
+.convo-card {
+    border-bottom: var(--glass-border-subtle) !important;
+    transition: all 0.2s ease !important;
+}
+
+.convo-card:hover {
+    background: rgba(255, 255, 255, 0.4) !important;
+}
+
+.convo-card.active {
+    background: rgba(255, 255, 255, 0.6) !important;
+    border-left: 4px solid var(--pill-bg) !important;
+}
+
+/* ---- 8. CHAT BUBBLES ---- */
+.chat-bubble {
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border-radius: 20px !important;
+    padding: 12px 18px !important;
 }
 
 .chat-bubble.ai {
-    background-color: #111827 !important;
-    border: none !important;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
+    background: rgba(0, 0, 0, 0.8) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
 }
 
-.chat-bubble.ai,
 .chat-bubble.ai p,
-.chat-bubble.ai .subtitle {
+.chat-bubble.ai span,
+.chat-bubble.ai div {
     color: #FFFFFF !important;
 }
 
 .chat-bubble.human {
-    background-color: #FFFFFF !important;
-    border: 1px solid rgba(0, 0, 0, 0.06) !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
-    color: #111827 !important;
+    background: var(--glass-bg-nested) !important;
+    border: var(--glass-border) !important;
+    color: #000000 !important;
+    box-shadow: var(--glass-shadow) !important;
 }
 
-.chat-bubble.human p {
-    color: #111827 !important;
+.chat-bubble.human p,
+.chat-bubble.human span,
+.chat-bubble.human div {
+    color: #000000 !important;
 }
 
 .chat-bubble.customer {
-    background-color: #F3F4F6 !important;
-    border: 1px solid rgba(0, 0, 0, 0.04) !important;
-    color: #111827 !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+    background: var(--glass-bg-base) !important;
+    border: var(--glass-border-subtle) !important;
+    color: #000000 !important;
+    box-shadow: var(--glass-shadow) !important;
 }
 
-.chat-bubble.customer p {
-    color: #374151 !important;
+.chat-bubble.customer p,
+.chat-bubble.customer span,
+.chat-bubble.customer div {
+    color: #4B5563 !important;
 }
 
-.chat-bubble.chat-bubble-carousel {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-}
-
-/* Chat Input Area */
-.chat-input-area {
-    background-color: #FFFFFF !important;
-    border-top: 1px solid rgba(0, 0, 0, 0.04) !important;
-}
-
-/* ---- 7. CAROUSEL CARD — Override to Soft UI ---- */
-.carousel-card {
-    background: #FFFFFF !important;
-    border: 1px solid rgba(0, 0, 0, 0.03) !important;
-    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.06) !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-}
-
-.carousel-card:hover {
-    box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.1) !important;
-}
-
-/* ---- 8. BOTONES — Negro Base + Hover Animado Corporativo ---- */
-
-/* Keyframe para el degradado animado */
-@keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-}
-
-/* Base de todos los botones */
+/* ---- 9. BLACK PILL ACCENTS (BUTTONS & MENUS) ---- */
 button,
 .btn,
 .btn-primary,
 .btn-neon,
 .carousel-card-btn,
 .chat-send-btn,
-#channel-submit-btn {
-    background-color: #111827 !important;
-    color: #FFFFFF !important;
-    border-radius: 16px !important;
-    padding: 10px 20px !important;
-    border: none !important;
+#channel-submit-btn,
+.btn-add-lead-inline {
+    background: var(--pill-bg) !important;
+    color: var(--pill-color) !important;
+    border-radius: 9999px !important; /* Total circular pill */
+    padding: 10px 24px !important;
+    border: 1px solid transparent !important;
     font-weight: 600 !important;
-    font-family: 'Inter', -apple-system, sans-serif !important;
+    font-size: 13px !important;
     cursor: pointer !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     gap: 8px !important;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08) !important;
-    text-shadow: none !important;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-/* Hover Animado Corporativo con Degradado Muebleo */
 button:hover,
 .btn:hover,
 .btn-primary:hover,
 .btn-neon:hover,
 .carousel-card-btn:hover,
 .chat-send-btn:hover,
-#channel-submit-btn:hover {
-    background: linear-gradient(135deg, #03DAC6 0%, #BB86FC 50%, #FF0266 100%) !important;
-    background-size: 200% 200% !important;
-    animation: gradientShift 3s ease infinite !important;
-    transform: translateY(-3px) scale(1.02) !important;
-    box-shadow: 0 10px 25px rgba(187, 134, 252, 0.4) !important;
+#channel-submit-btn:hover,
+.btn-add-lead-inline:hover {
+    background: #232329 !important;
+    transform: translateY(-2px) scale(1.02) !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
     color: #FFFFFF !important;
-    border: none !important;
 }
 
-/* Click de Botones */
 button:active,
 .btn:active,
 .btn-primary:active,
 .btn-neon:active,
 .carousel-card-btn:active,
 .chat-send-btn:active {
-    transform: translateY(0) scale(1) !important;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08) !important;
+    transform: translateY(0) scale(0.98) !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15) !important;
 }
 
-/* Botones compactos que no deben crecer */
-.chat-media-btn,
-.audio-play-btn,
-.file-download-btn,
-.modal-close-btn {
-    padding: 6px 10px !important;
-    border-radius: 10px !important;
-    background-color: #F3F4F6 !important;
-    color: #6B7280 !important;
-    box-shadow: none !important;
-    border: 1px solid rgba(0, 0, 0, 0.04) !important;
+/* Sidebar Active Menu Items as Black Pills */
+.menu-item {
+    border-radius: 9999px !important;
+    color: var(--text-body) !important;
+    font-weight: 600 !important;
+    padding: 12px 24px !important;
+    margin: 4px 12px !important;
+    transition: all 0.3s ease !important;
+    border: 1px solid transparent !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
 }
 
-.chat-media-btn:hover,
-.audio-play-btn:hover,
-.file-download-btn:hover,
-.modal-close-btn:hover {
-    background: #E5E7EB !important;
-    color: #111827 !important;
-    transform: translateY(-1px) !important;
-    animation: none !important;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06) !important;
+.menu-item i {
+    color: var(--text-body) !important;
+    transition: all 0.3s ease !important;
 }
 
-/* Login Tab Buttons — No gradient hover */
-.login-tab-btn:hover {
-    background-color: #E5E7EB !important;
-    color: #111827 !important;
-    animation: none !important;
-    transform: none !important;
-    box-shadow: none !important;
+.menu-item:hover {
+    background: rgba(255, 255, 255, 0.3) !important;
+    color: var(--text-heading) !important;
 }
 
-/* ---- 9. INPUTS — Clean Minimal ---- */
+.menu-item:hover i {
+    color: var(--text-heading) !important;
+}
+
+.menu-item.active {
+    background: var(--pill-bg) !important;
+    color: var(--pill-color) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+}
+
+.menu-item.active i {
+    color: var(--pill-color) !important;
+}
+
+/* Segment/Filter selector pills */
+.filter-segment-btn,
+.inbox-filter-btn {
+    border-radius: 9999px !important;
+    padding: 8px 18px !important;
+    background: rgba(255, 255, 255, 0.3) !important;
+    border: var(--glass-border-subtle) !important;
+    color: var(--text-body) !important;
+    font-weight: 600 !important;
+    font-size: 11px !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+
+.filter-segment-btn.active,
+.inbox-filter-btn.active {
+    background: var(--pill-bg) !important;
+    color: var(--pill-color) !important;
+    border-color: transparent !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* ---- 10. CAROUSEL CARDS ---- */
+.carousel-card {
+    background: var(--glass-bg-nested) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: var(--glass-border) !important;
+    border-radius: 20px !important;
+    box-shadow: var(--glass-shadow-elevated),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.5) !important;
+}
+
+.carousel-card:hover {
+    background: rgba(255, 255, 255, 0.85) !important;
+    box-shadow: 0 16px 36px rgba(31, 38, 135, 0.1) !important;
+}
+
+/* ---- 11. FROSTED GLASS INPUTS ---- */
 input,
 textarea,
 select {
-    background-color: #F9FAFB !important;
-    border: 1px solid #E5E7EB !important;
-    color: #111827 !important;
-    border-radius: 12px !important;
-    padding: 10px 14px !important;
-    font-family: 'Inter', -apple-system, sans-serif !important;
-    font-size: 14px !important;
+    background: rgba(255, 255, 255, 0.5) !important;
+    border: var(--glass-border-subtle) !important;
+    color: #000000 !important;
+    border-radius: var(--glass-radius-md) !important;
+    padding: 10px 16px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
     transition: all 0.25s ease !important;
     outline: none !important;
 }
@@ -3772,27 +3856,92 @@ select {
 input:focus,
 textarea:focus,
 select:focus {
-    background-color: #FFFFFF !important;
-    border-color: #111827 !important;
-    color: #111827 !important;
-    box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.06) !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+    border: 1px solid rgba(0, 0, 0, 0.3) !important;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05) !important;
 }
 
-input::placeholder,
-textarea::placeholder {
-    color: #9CA3AF !important;
-    font-weight: 400 !important;
-}
-
-/* Checkbox & Radio — Accent to Dark */
-input[type="checkbox"],
-input[type="radio"] {
-    accent-color: #111827 !important;
+/* ---- 12. CIRCULAR GLASS BUTTONS FOR ICONS ---- */
+.chat-media-btn,
+.audio-play-btn,
+.file-download-btn,
+.modal-close-btn,
+.noti-bell-btn,
+.theme-toggle {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 38px !important;
+    height: 38px !important;
     padding: 0 !important;
-    border-radius: 4px !important;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.4) !important;
+    border: 1px solid rgba(255, 255, 255, 0.5) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    color: #111827 !important;
+    cursor: pointer !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
 }
 
-/* ---- 10. SCROLLBARS — Ultra Subtle ---- */
+.chat-media-btn:hover,
+.audio-play-btn:hover,
+.file-download-btn:hover,
+.modal-close-btn:hover,
+.noti-bell-btn:hover,
+.theme-toggle:hover {
+    background: rgba(255, 255, 255, 0.7) !important;
+    transform: translateY(-2px) scale(1.05) !important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08) !important;
+}
+
+.chat-media-btn i,
+.audio-play-btn i,
+.file-download-btn i,
+.modal-close-btn i,
+.noti-bell-btn i,
+.theme-toggle i {
+    color: #111827 !important;
+    font-size: 15px !important;
+    display: inline-block !important;
+}
+
+/* ---- 13. MODALS & DRAWER ---- */
+.modal-overlay {
+    background-color: rgba(15, 23, 42, 0.4) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+}
+
+.glass-modal,
+.jira-modal-content {
+    background: var(--glass-bg-base) !important;
+    backdrop-filter: var(--glass-blur) !important;
+    -webkit-backdrop-filter: var(--glass-blur) !important;
+    border: var(--glass-border) !important;
+    border-radius: var(--glass-radius-xl) !important;
+    box-shadow: var(--glass-shadow-elevated),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.4) !important;
+}
+
+.modal-body {
+    background: var(--glass-bg-nested) !important;
+    border: var(--glass-border-subtle) !important;
+    border-radius: var(--glass-radius-lg) !important;
+    box-shadow: none !important;
+}
+
+.notifications-panel {
+    background: var(--glass-bg-base) !important;
+    backdrop-filter: var(--glass-blur) !important;
+    -webkit-backdrop-filter: var(--glass-blur) !important;
+    border: var(--glass-border) !important;
+    border-radius: var(--glass-radius-lg) !important;
+    box-shadow: var(--glass-shadow-elevated) !important;
+}
+
+/* ---- 14. SCROLLBARS — Glass-thin ---- */
 ::-webkit-scrollbar {
     width: 6px !important;
     height: 6px !important;
@@ -3803,82 +3952,10 @@ input[type="radio"] {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.1) !important;
+    background: rgba(0, 0, 0, 0.15) !important;
     border-radius: 3px !important;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.18) !important;
-}
-
-/* ---- 11. MAIN CONTENT PANEL ---- */
-.main-panel {
-    background-color: #F3F4F6 !important;
-}
-
-.view-header {
-    color: #111827 !important;
-}
-
-/* ---- 12. MISC — Badge, Borders, File Bubbles ---- */
-.badge-count {
-    background-color: #EF4444 !important;
-    color: #FFFFFF !important;
-    border-radius: 10px !important;
-}
-
-.inbox-search input {
-    background-color: #F3F4F6 !important;
-    border: 1px solid #E5E7EB !important;
-}
-
-.inbox-search input:focus {
-    background-color: #FFFFFF !important;
-    border-color: #111827 !important;
-}
-
-.chat-file-bubble {
-    background: #F3F4F6 !important;
-    border: 1px solid rgba(0, 0, 0, 0.04) !important;
-    border-radius: 12px !important;
-}
-
-.subdomain-text {
-    color: #9CA3AF !important;
-}
-
-.sidebar-datetime {
-    color: #9CA3AF !important;
-}
-
-/* Stat icon containers inherit soft look */
-.stat-icon {
-    border-radius: 16px !important;
-}
-
-/* Form group labels */
-.form-group label {
-    color: #374151 !important;
-    font-weight: 600 !important;
-}
-
-/* Section border refinement */
-.column-header {
-    border-bottom-color: #F3F4F6 !important;
-}
-
-/* Notification Panel */
-.notifications-panel {
-    background-color: #FFFFFF !important;
-    border: 1px solid rgba(0, 0, 0, 0.04) !important;
-    border-radius: 20px !important;
-    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1) !important;
-}
-
-/* Assignee select in Jira-style */
-.assignee-select-wrapper select {
-    background-color: #F3F4F6 !important;
-    color: #374151 !important;
-    border: 1px solid #E5E7EB !important;
-    border-radius: 8px !important;
+    background: rgba(0, 0, 0, 0.3) !important;
 }
