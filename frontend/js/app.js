@@ -638,8 +638,18 @@ document.addEventListener('DOMContentLoaded', () => {
         logoutBtn.addEventListener('click', (e) => {
             e.preventDefault();
             if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+                // 1. Limpiar sesión
                 sessionStorage.removeItem('spoke_agent');
-                checkAuth();
+
+                // 2. Desbloquear el overlay de login (quitar la clase que lo forzó oculto)
+                const loginOverlay = document.getElementById('login-screen');
+                if (loginOverlay) {
+                    loginOverlay.classList.remove('force-hide-modal');
+                    loginOverlay.style.removeProperty('display');
+                }
+
+                // 3. Recargar la página para purgar el CRM de memoria y restaurar el login
+                window.location.reload();
             }
         });
     }
