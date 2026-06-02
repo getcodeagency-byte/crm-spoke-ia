@@ -3310,180 +3310,575 @@ i[class*=" fa-"] {
 .carousel-card-btn:active {
     transform: scale(0.97);
 }
-
 /* ==========================================================================
-   NUEVA IDENTIDAD VISUAL: EFECTO CRISTAL Y REDISEÑO DE COMPONENTES (V5.0.0)
+   IDENTIDAD VISUAL V6.0.0 — SOFT UI / CLEAN MINIMALISM (Apple-Inspired)
+   Tipografía: Inter · Fondos Claros · Sombras Difuminadas · Botones Animados
    ========================================================================== */
 
-/* Fondo Global con Degradados Suaves */
-body, #crm-layout {
-    background: radial-gradient(at 0% 0%, rgba(30, 27, 75, 0.4) 0, transparent 50%), 
-                radial-gradient(at 50% 0%, rgba(6, 182, 212, 0.15) 0, transparent 50%), 
-                radial-gradient(at 100% 0%, rgba(0, 230, 118, 0.1) 0, transparent 50%), 
-                #0f172a !important;
-    background-attachment: fixed !important;
+/* ---- 1. TIPOGRAFÍA PREMIUM ---- */
+*, *::before, *::after {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif !important;
 }
 
-/* Efecto Cristal (Glassmorphic) */
-.sidebar-left, 
-.kanban-column, 
-.inbox-sidebar, 
-.chat-container, 
-.glass-modal, 
-.modal-body, 
-.login-box, 
-.jira-modal-content, 
-.lead-card, 
-.morning-briefing-card, 
-.stat-card, 
-.details-card, 
-.pipeline-summary-card, 
-.convo-card, 
-.carousel-card, 
+h1, h2, h3, h4, .welcome-heading, .logo, .stat-value, .column-header h3 {
+    font-weight: 700 !important;
+    color: #111827 !important;
+    letter-spacing: -0.02em !important;
+}
+
+p, span, label, .convo-msg, .briefing-text p, .bubble-meta, .convo-time {
+    font-weight: 400 !important;
+    color: #6B7280 !important;
+}
+
+.logo {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-weight: 800 !important;
+    letter-spacing: -1.5px !important;
+    color: #111827 !important;
+}
+
+.logo span {
+    color: #03DAC6 !important;
+}
+
+/* ---- 2. FONDO GLOBAL ---- */
+body {
+    background-color: #F3F4F6 !important;
+    background-image: none !important;
+    color: #111827 !important;
+}
+
+body, #crm-layout, .app-layout {
+    background-color: #F3F4F6 !important;
+    background-image: none !important;
+    background: #F3F4F6 !important;
+}
+
+/* ---- 3. LOGIN — Experiencia Premium desde el Acceso ---- */
+.login-overlay {
+    background: linear-gradient(160deg, #F3F4F6 0%, #E5E7EB 40%, #F9FAFB 100%) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.login-box {
+    background-color: #FFFFFF !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 1px solid rgba(0, 0, 0, 0.04) !important;
+    border-radius: 28px !important;
+    box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.08),
+                0 0 0 1px rgba(0, 0, 0, 0.02) !important;
+    padding: 40px !important;
+}
+
+.login-subtitle {
+    color: #9CA3AF !important;
+    font-weight: 500 !important;
+}
+
+.login-tab-btn {
+    background-color: #F3F4F6 !important;
+    color: #6B7280 !important;
+    border: none !important;
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+    padding: 10px 20px !important;
+    transition: all 0.3s ease !important;
+}
+
+.login-tab-btn.active {
+    background-color: #FFFFFF !important;
+    color: #111827 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+}
+
+.login-help {
+    color: #9CA3AF !important;
+}
+
+.login-help code {
+    background-color: #F3F4F6 !important;
+    color: #374151 !important;
+    border-radius: 6px !important;
+    padding: 3px 8px !important;
+    border: 1px solid #E5E7EB !important;
+}
+
+/* ---- 4. CONTENEDORES Y TARJETAS — Soft UI ---- */
+.sidebar-left {
+    background-color: #FFFFFF !important;
+    border-right: 1px solid rgba(0, 0, 0, 0.04) !important;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.03) !important;
+}
+
+.sidebar-header {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
+}
+
+.kanban-column {
+    background-color: #FFFFFF !important;
+    border: 1px solid rgba(0, 0, 0, 0.02) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.column-header {
+    border-bottom: 2px solid #F3F4F6 !important;
+}
+
+.inbox-sidebar {
+    background-color: #FFFFFF !important;
+    border-right: 1px solid rgba(0, 0, 0, 0.04) !important;
+}
+
+.chat-container {
+    background-color: #F9FAFB !important;
+}
+
+.chat-header {
+    background-color: #FFFFFF !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
+}
+
+.glass-modal {
+    background-color: #FFFFFF !important;
+    border: 1px solid rgba(0, 0, 0, 0.02) !important;
+    border-radius: 28px !important;
+    box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.12) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.modal-body {
+    background-color: #FFFFFF !important;
+    border: 1px solid rgba(0, 0, 0, 0.04) !important;
+    border-radius: 20px !important;
+    box-shadow: none !important;
+}
+
+.modal-overlay {
+    background-color: rgba(17, 24, 39, 0.3) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+}
+
+.jira-modal-content {
+    background-color: #FFFFFF !important;
+    border: 1px solid rgba(0, 0, 0, 0.02) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Dashboard Cards */
+.morning-briefing-card {
+    background-color: #FFFFFF !important;
+    border: 1px solid rgba(0, 0, 0, 0.02) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05) !important;
+    backdrop-filter: none !important;
+}
+
+.morning-briefing-card::before {
+    background-color: #111827 !important;
+    border-radius: 4px !important;
+}
+
+.stat-card {
+    background-color: #FFFFFF !important;
+    border: 1px solid rgba(0, 0, 0, 0.02) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05) !important;
+}
+
+.details-card {
+    background-color: #FFFFFF !important;
+    border: 1px solid rgba(0, 0, 0, 0.02) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04) !important;
+}
+
+.pipeline-summary-card {
+    background-color: #FFFFFF !important;
+    border: 1px solid rgba(0, 0, 0, 0.02) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Lead Cards */
+.lead-card {
+    background-color: #FFFFFF !important;
+    border: 1px solid rgba(0, 0, 0, 0.03) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04) !important;
+}
+
+.lead-card:hover {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Conversation Cards */
+.convo-card {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.04) !important;
+}
+
+.convo-card:hover {
+    background-color: #F9FAFB !important;
+}
+
+.convo-card.active {
+    background-color: #F3F4F6 !important;
+    border-left: 3px solid #111827 !important;
+}
+
+.convo-name {
+    color: #111827 !important;
+    font-weight: 600 !important;
+}
+
+/* Tag Manage Cards */
+.tag-manage-card {
+    background-color: #FFFFFF !important;
+    border: 1px solid rgba(0, 0, 0, 0.02) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* AI Insights Widget */
+#ai-insights-widget {
+    background-color: #FFFFFF !important;
+    border: 1px solid rgba(0, 0, 0, 0.02) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.05) !important;
+}
+
+.insight-item {
+    background-color: #F9FAFB !important;
+    border: 1px solid rgba(0, 0, 0, 0.03) !important;
+    border-radius: 12px !important;
+}
+
+.insight-item:hover {
+    background-color: #F3F4F6 !important;
+    border-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+/* ---- 5. SIDEBAR MENU ACTIVO — Apple Overview Style ---- */
+.menu-item {
+    border-radius: 12px !important;
+    color: #6B7280 !important;
+    font-weight: 500 !important;
+    transition: all 0.3s ease !important;
+    border: 1px solid transparent !important;
+}
+
+.menu-item:hover {
+    background-color: #F3F4F6 !important;
+    color: #111827 !important;
+}
+
+.menu-item.active {
+    background-color: #FFFFFF !important;
+    color: #111827 !important;
+    font-weight: 600 !important;
+    border: 1px solid rgba(0, 0, 0, 0.04) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+}
+
+.menu-item.active i {
+    color: #111827 !important;
+}
+
+/* ---- 6. BURBUJAS DE CHAT — Clean & Readable ---- */
 .chat-bubble {
-    background: rgba(255, 255, 255, 0.08) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border-radius: 18px !important;
 }
 
-/* Ajustes de color en Light Mode para mantener contraste en Modo Claro */
-[data-theme="light"] .sidebar-left, 
-[data-theme="light"] .kanban-column, 
-[data-theme="light"] .inbox-sidebar, 
-[data-theme="light"] .chat-container, 
-[data-theme="light"] .glass-modal, 
-[data-theme="light"] .modal-body, 
-[data-theme="light"] .login-box, 
-[data-theme="light"] .jira-modal-content, 
-[data-theme="light"] .lead-card, 
-[data-theme="light"] .morning-briefing-card, 
-[data-theme="light"] .stat-card, 
-[data-theme="light"] .details-card, 
-[data-theme="light"] .pipeline-summary-card, 
-[data-theme="light"] .convo-card, 
-[data-theme="light"] .carousel-card, 
-[data-theme="light"] .chat-bubble {
-    background: rgba(255, 255, 255, 0.55) !important;
-    border: 1px solid rgba(0, 0, 0, 0.08) !important;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05) !important;
-    color: #1f2937 !important;
-}
-
-/* Diferenciación sutil para burbujas de chat en glassmorfismo */
 .chat-bubble.ai {
-    border-color: rgba(6, 182, 212, 0.4) !important; /* Borde Cian para la IA */
+    background-color: #111827 !important;
+    border: none !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08) !important;
 }
-.chat-bubble.human {
-    border-color: rgba(0, 230, 118, 0.4) !important; /* Borde Verde para Asesor */
-}
-.chat-bubble.customer {
-    border-color: rgba(255, 255, 255, 0.15) !important; /* Borde Neutro para Cliente */
+
+.chat-bubble.ai,
+.chat-bubble.ai p,
+.chat-bubble.ai .subtitle {
     color: #FFFFFF !important;
 }
 
-/* Sobrescribir estilos de todos los botones de acción a Botones Negros */
-button, 
-.btn, 
-.btn-primary, 
-.btn-neon, 
-.carousel-card-btn, 
-.chat-send-btn, 
-#channel-submit-btn,
-.audio-play-btn,
-.file-download-btn,
-.login-tab-btn {
+.chat-bubble.human {
+    background-color: #FFFFFF !important;
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+    color: #111827 !important;
+}
+
+.chat-bubble.human p {
+    color: #111827 !important;
+}
+
+.chat-bubble.customer {
+    background-color: #F3F4F6 !important;
+    border: 1px solid rgba(0, 0, 0, 0.04) !important;
+    color: #111827 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+}
+
+.chat-bubble.customer p {
+    color: #374151 !important;
+}
+
+.chat-bubble.chat-bubble-carousel {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Chat Input Area */
+.chat-input-area {
+    background-color: #FFFFFF !important;
+    border-top: 1px solid rgba(0, 0, 0, 0.04) !important;
+}
+
+/* ---- 7. CAROUSEL CARD — Override to Soft UI ---- */
+.carousel-card {
+    background: #FFFFFF !important;
+    border: 1px solid rgba(0, 0, 0, 0.03) !important;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.06) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+
+.carousel-card:hover {
+    box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* ---- 8. BOTONES — Negro Base + Hover Animado Corporativo ---- */
+
+/* Keyframe para el degradado animado */
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Base de todos los botones */
+button,
+.btn,
+.btn-primary,
+.btn-neon,
+.carousel-card-btn,
+.chat-send-btn,
+#channel-submit-btn {
     background-color: #111827 !important;
     color: #FFFFFF !important;
-    border-radius: 12px !important;
+    border-radius: 16px !important;
     padding: 10px 20px !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border: none !important;
     font-weight: 600 !important;
-    transition: transform 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease !important;
+    font-family: 'Inter', -apple-system, sans-serif !important;
     cursor: pointer !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     gap: 8px !important;
-    font-family: 'Poppins', sans-serif !important;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15) !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08) !important;
     text-shadow: none !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-/* Hover de Botones */
-button:hover, 
-.btn:hover, 
-.btn-primary:hover, 
-.btn-neon:hover, 
-.carousel-card-btn:hover, 
-.chat-send-btn:hover, 
-#channel-submit-btn:hover,
-.audio-play-btn:hover,
-.file-download-btn:hover {
-    transform: translateY(-2px) !important;
-    background-color: #1F2937 !important;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25) !important;
+/* Hover Animado Corporativo con Degradado Muebleo */
+button:hover,
+.btn:hover,
+.btn-primary:hover,
+.btn-neon:hover,
+.carousel-card-btn:hover,
+.chat-send-btn:hover,
+#channel-submit-btn:hover {
+    background: linear-gradient(135deg, #03DAC6 0%, #BB86FC 50%, #FF0266 100%) !important;
+    background-size: 200% 200% !important;
+    animation: gradientShift 3s ease infinite !important;
+    transform: translateY(-3px) scale(1.02) !important;
+    box-shadow: 0 10px 25px rgba(187, 134, 252, 0.4) !important;
+    color: #FFFFFF !important;
+    border: none !important;
 }
 
 /* Click de Botones */
-button:active, 
-.btn:active, 
-.btn-primary:active, 
-.btn-neon:active, 
-.carousel-card-btn:active, 
+button:active,
+.btn:active,
+.btn-primary:active,
+.btn-neon:active,
+.carousel-card-btn:active,
 .chat-send-btn:active {
-    transform: translateY(0) !important;
+    transform: translateY(0) scale(1) !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.08) !important;
 }
 
-/* Inputs fluidos con enfoque (focus) */
-input, 
-textarea, 
+/* Botones compactos que no deben crecer */
+.chat-media-btn,
+.audio-play-btn,
+.file-download-btn,
+.modal-close-btn {
+    padding: 6px 10px !important;
+    border-radius: 10px !important;
+    background-color: #F3F4F6 !important;
+    color: #6B7280 !important;
+    box-shadow: none !important;
+    border: 1px solid rgba(0, 0, 0, 0.04) !important;
+}
+
+.chat-media-btn:hover,
+.audio-play-btn:hover,
+.file-download-btn:hover,
+.modal-close-btn:hover {
+    background: #E5E7EB !important;
+    color: #111827 !important;
+    transform: translateY(-1px) !important;
+    animation: none !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Login Tab Buttons — No gradient hover */
+.login-tab-btn:hover {
+    background-color: #E5E7EB !important;
+    color: #111827 !important;
+    animation: none !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* ---- 9. INPUTS — Clean Minimal ---- */
+input,
+textarea,
 select {
-    background-color: rgba(255, 255, 255, 0.05) !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
-    color: #FFFFFF !important;
-    border-radius: 8px !important;
-    padding: 8px 12px !important;
-    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
+    background-color: #F9FAFB !important;
+    border: 1px solid #E5E7EB !important;
+    color: #111827 !important;
+    border-radius: 12px !important;
+    padding: 10px 14px !important;
+    font-family: 'Inter', -apple-system, sans-serif !important;
+    font-size: 14px !important;
+    transition: all 0.25s ease !important;
     outline: none !important;
 }
 
-/* Inputs en modo claro */
-[data-theme="light"] input, 
-[data-theme="light"] textarea, 
-[data-theme="light"] select {
-    background-color: rgba(0, 0, 0, 0.03) !important;
-    border: 1px solid rgba(0, 0, 0, 0.1) !important;
-    color: #111827 !important;
-}
-
-/* Inputs en Foco */
-input:focus, 
-textarea:focus, 
+input:focus,
+textarea:focus,
 select:focus {
     background-color: #FFFFFF !important;
     border-color: #111827 !important;
     color: #111827 !important;
-    box-shadow: 0 0 0 2px rgba(17, 24, 39, 0.1) !important;
+    box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.06) !important;
 }
 
-/* Enfoque en modo oscuro para evitar texto invisible */
-body[data-theme="dark"] input:focus, 
-body[data-theme="dark"] textarea:focus, 
-body[data-theme="dark"] select:focus {
-    background-color: #FFFFFF !important;
-    color: #111827 !important;
-    border-color: #000000 !important;
-}
-
-/* Asegurar legibilidad del placeholder en inputs */
-input::placeholder, 
+input::placeholder,
 textarea::placeholder {
-    color: rgba(255, 255, 255, 0.4) !important;
+    color: #9CA3AF !important;
+    font-weight: 400 !important;
 }
 
-[data-theme="light"] input::placeholder, 
-[data-theme="light"] textarea::placeholder {
-    color: rgba(0, 0, 0, 0.4) !important;
+/* Checkbox & Radio — Accent to Dark */
+input[type="checkbox"],
+input[type="radio"] {
+    accent-color: #111827 !important;
+    padding: 0 !important;
+    border-radius: 4px !important;
+}
+
+/* ---- 10. SCROLLBARS — Ultra Subtle ---- */
+::-webkit-scrollbar {
+    width: 6px !important;
+    height: 6px !important;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent !important;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1) !important;
+    border-radius: 3px !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.18) !important;
+}
+
+/* ---- 11. MAIN CONTENT PANEL ---- */
+.main-panel {
+    background-color: #F3F4F6 !important;
+}
+
+.view-header {
+    color: #111827 !important;
+}
+
+/* ---- 12. MISC — Badge, Borders, File Bubbles ---- */
+.badge-count {
+    background-color: #EF4444 !important;
+    color: #FFFFFF !important;
+    border-radius: 10px !important;
+}
+
+.inbox-search input {
+    background-color: #F3F4F6 !important;
+    border: 1px solid #E5E7EB !important;
+}
+
+.inbox-search input:focus {
+    background-color: #FFFFFF !important;
+    border-color: #111827 !important;
+}
+
+.chat-file-bubble {
+    background: #F3F4F6 !important;
+    border: 1px solid rgba(0, 0, 0, 0.04) !important;
+    border-radius: 12px !important;
+}
+
+.subdomain-text {
+    color: #9CA3AF !important;
+}
+
+.sidebar-datetime {
+    color: #9CA3AF !important;
+}
+
+/* Stat icon containers inherit soft look */
+.stat-icon {
+    border-radius: 16px !important;
+}
+
+/* Form group labels */
+.form-group label {
+    color: #374151 !important;
+    font-weight: 600 !important;
+}
+
+/* Section border refinement */
+.column-header {
+    border-bottom-color: #F3F4F6 !important;
+}
+
+/* Notification Panel */
+.notifications-panel {
+    background-color: #FFFFFF !important;
+    border: 1px solid rgba(0, 0, 0, 0.04) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Assignee select in Jira-style */
+.assignee-select-wrapper select {
+    background-color: #F3F4F6 !important;
+    color: #374151 !important;
+    border: 1px solid #E5E7EB !important;
+    border-radius: 8px !important;
 }
