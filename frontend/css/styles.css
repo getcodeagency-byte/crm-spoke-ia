@@ -972,28 +972,36 @@ textarea::placeholder {
     display: inline-block;
 }
 
-.lead-channel-icon i.whatsapp,
-.channel-indicator i.whatsapp {
+.lead-channel-icon i.fa-whatsapp,
+.channel-indicator i.fa-whatsapp,
+.fa-whatsapp {
     color: #25D366 !important;
 }
 
-.lead-channel-icon i.instagram,
-.channel-indicator i.instagram {
+.lead-channel-icon i.fa-instagram,
+.channel-indicator i.fa-instagram,
+.fa-instagram {
+    background: -webkit-linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
     color: #E1306C !important;
 }
 
-.lead-channel-icon i.tiktok,
-.channel-indicator i.tiktok {
+.lead-channel-icon i.fa-tiktok,
+.channel-indicator i.fa-tiktok,
+.fa-tiktok {
     color: #000000 !important;
 }
 
-.lead-channel-icon i.webchat,
-.channel-indicator i.webchat {
+.lead-channel-icon i.fa-comments,
+.channel-indicator i.fa-comments,
+.fa-comments {
     color: #06B6D4 !important;
 }
 
-.lead-channel-icon i.messenger,
-.channel-indicator i.messenger {
+.lead-channel-icon i.fa-facebook-messenger,
+.channel-indicator i.fa-facebook-messenger,
+.fa-facebook-messenger {
     color: #0084FF !important;
 }
 
@@ -3119,7 +3127,7 @@ i[class*=" fa-"] {
 }
 
 /* Carrusel de Productos en el Chat (V4.8.0) */
-.chat-bubble.chat-bubble-carousel {
+.chat-bubble.ai.chat-bubble-carousel {
     max-width: 85% !important;
     background: transparent !important;
     border: none !important;
@@ -3131,6 +3139,9 @@ i[class*=" fa-"] {
     width: 100%;
     margin-top: 8px;
     overflow: hidden;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
 .carousel-container {
@@ -3138,12 +3149,15 @@ i[class*=" fa-"] {
     gap: 16px;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
-    padding: 10px 10px 20px 10px;
-    margin: -10px -10px -20px -10px;
+    padding: 10px 0 !important;
+    margin: 0 !important;
     scrollbar-width: thin;
     scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
 /* Scrollbar sutil para navegadores Webkit */
@@ -3158,157 +3172,109 @@ i[class*=" fa-"] {
     background: transparent;
 }
 
-.carousel-card {
-    flex: 0 0 280px;
-    min-width: 280px;
-    flex-shrink: 0;
-    background: #FFFFFF;
-    border-radius: 24px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-    overflow: hidden;
-    scroll-snap-align: start;
-    display: flex;
-    flex-direction: column;
-    color: #111827;
-    font-family: 'Poppins', sans-serif;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    border: 1px solid rgba(0, 0, 0, 0.03);
-}
-
-.carousel-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.12);
-}
-
-.carousel-card-img-wrapper {
-    position: relative;
-    width: 100%;
-    height: 160px;
-    overflow: hidden;
-    background-color: #F9FAFB;
-}
-
-.carousel-card-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-}
-
-.carousel-card:hover .carousel-card-img {
-    transform: scale(1.05);
-}
-
-.carousel-card-tag {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    background: rgba(0, 0, 0, 0.90) !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    color: #FFFFFF;
-    padding: 6px 12px;
-    border-radius: 9999px;
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.3px;
-    pointer-events: none;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.carousel-card-logo {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: #FFFFFF;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-    pointer-events: none;
-}
-
-.carousel-card-body {
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    flex-grow: 1;
-}
-
-.carousel-card-category {
-    font-size: 10px;
-    font-weight: 600;
-    color: #6B7280;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.carousel-card-title {
-    font-size: 15px;
-    font-weight: 600;
-    color: #111827;
-    margin: 4px 0 2px 0;
-    line-height: 1.3;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.carousel-card-desc {
-    font-size: 12px;
-    font-weight: 400;
-    color: #9CA3AF;
-    margin: 4px 0 16px 0;
-    line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.carousel-card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: auto;
-}
-
-.carousel-card-price {
-    font-size: 13px;
-    font-weight: 600;
-    color: #111827;
-    background: #F3F4F6;
-    padding: 6px 12px;
-    border-radius: 9999px;
-}
-
-.carousel-card-btn {
-    background: #000000;
-    color: #FFFFFF;
-    border: none;
-    border-radius: 9999px;
-    padding: 6px 14px;
-    font-size: 11px;
-    font-weight: 600;
+.product-card {
+    position: relative !important;
+    width: 260px !important; /* Ancho fijo para el carrusel */
+    height: 380px !important; /* Tarjeta alta */
+    border-radius: 24px !important; /* Refinado a 24px */
+    overflow: hidden !important;
+    border: none !important; /* Eliminar el borde blanco grueso */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08) !important;
+    background: #f8f9fa !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-end !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+    font-family: 'Inter', sans-serif !important;
     cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.1s ease;
-    font-family: 'Poppins', sans-serif;
-    display: flex;
-    align-items: center;
-    gap: 4px;
+    scroll-snap-align: start;
 }
 
-.carousel-card-btn:hover {
-    background: #1F2937;
+.product-card:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2) !important;
 }
 
-.carousel-card-btn:active {
-    transform: scale(0.97);
+.product-img {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important; /* Llena todo el espacio sin deformarse */
+    z-index: 0 !important;
+    transition: transform 0.3s ease !important;
+}
+
+.product-card:hover .product-img {
+    transform: scale(1.05) !important;
+}
+
+.product-content {
+    position: absolute !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    padding: 40px 16px 16px 16px !important; /* Suavizado a 40px 16px 16px 16px */
+    background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 50%, transparent 100%) !important; /* Gradiente más sutil */
+    z-index: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    box-sizing: border-box !important;
+}
+
+.product-category {
+    color: rgba(255,255,255,0.8) !important;
+    font-size: 10px !important; /* Reducido a 10px */
+    font-weight: 600 !important;
+    letter-spacing: 1px !important; /* Reducido a 1px */
+    text-transform: uppercase !important;
+    margin: 0 !important;
+    display: block !important;
+}
+
+.product-title {
+    color: #FFFFFF !important;
+    font-size: 18px !important; /* Reducido a 18px */
+    font-weight: 500 !important; /* Reducido a 500 */
+    margin: 4px 0 !important;
+    line-height: 1.2 !important;
+}
+
+.product-price {
+    color: #FFFFFF !important;
+    font-size: 16px !important;
+    font-weight: 700 !important; /* Aumentado a 700 */
+    margin-bottom: 5px !important;
+}
+
+.btn-ver-detalles {
+    background: #FFFFFF !important;
+    color: #111827 !important;
+    border-radius: 12px !important; /* Reducción a 12px */
+    width: auto !important; /* Compacto */
+    padding: 10px 20px !important; /* Compactado */
+    font-weight: 700 !important;
+    font-size: 13px !important; /* Reducido a 13px */
+    align-self: flex-start !important; /* Alineado al inicio */
+    margin-top: 10px !important;
+    text-align: center !important;
+    text-decoration: none !important;
+    border: none !important;
+    cursor: pointer !important;
+    transition: transform 0.2s ease, background-color 0.2s ease !important;
+    display: inline-block !important;
+}
+
+.btn-ver-detalles:hover {
+    transform: scale(1.02) !important;
+    background: #f3f4f6 !important;
+}
+
+.btn-ver-detalles:active {
+    transform: scale(0.98) !important;
 }
 
 /* ==========================================================================
@@ -3418,41 +3384,41 @@ button i,
     color: #03DAC6 !important;
 }
 
-/* ---- 2. FONDO GLOBAL CON IMAGEN PREMIUM ---- */
-body {
-    background: url('../assets/bg-premium.png') no-repeat center center fixed !important;
-    background-size: cover !important;
-    min-height: 100vh !important;
+/* ---- 2. FONDO GLOBAL Y RESETEO DEL BODY ---- */
+* {
+    box-sizing: border-box !important;
+}
+
+html, body {
     margin: 0 !important;
     padding: 0 !important;
-    overflow: hidden !important;
     width: 100vw !important;
     height: 100vh !important;
-    box-sizing: border-box !important;
+    overflow: hidden !important; /* Prohíbe el scroll de toda la ventana */
+    display: flex !important;
 }
 
 /* ---- 3. FLOATING PANELS LAYOUT ---- */
 .app-layout {
     display: flex !important;
-    background: transparent !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    overflow: hidden !important;
+    width: 100% !important;
+    height: 100% !important;
+    padding: 20px !important; /* Espacio para el efecto flotante */
+    gap: 20px !important; /* Separación exacta entre sidebar y contenido */
+    background: url('../assets/bg-premium.png') no-repeat center center fixed !important;
+    background-size: cover !important;
     box-sizing: border-box !important;
-    padding: 0 !important;
-    gap: 0 !important;
+    overflow: hidden !important;
 }
 
-.sidebar-left {
-    position: fixed !important;
-    left: 0 !important;
-    top: 0 !important;
-    bottom: 0 !important;
-    height: calc(100vh - 40px) !important;
-    width: 260px !important;
-    min-width: 260px !important;
-    max-width: 260px !important;
-    margin: 20px 0 20px 20px !important;
+.sidebar-left,
+.sidebar {
+    width: 280px !important;
+    min-width: 280px !important;
+    max-width: 280px !important;
+    flex-shrink: 0 !important; /* Prohíbe que se encoja */
+    height: 100% !important;
+    overflow-y: auto !important;
     border-radius: var(--glass-radius-xl) !important;
     background: var(--glass-bg-base) !important;
     backdrop-filter: var(--glass-blur) !important;
@@ -3466,19 +3432,17 @@ body {
 }
 
 .main-content {
-    flex: 1 !important;
-    margin: 20px 20px 20px 300px !important;
-    padding: 0 !important;
-    height: calc(100vh - 40px) !important;
-    width: calc(100vw - 320px) !important;
+    flex: 1 1 0% !important; /* Toma exactamente el espacio sobrante, ni un pixel más */
+    min-width: 0 !important; /* Evita que el contenido interno ensanche el div */
+    height: 100% !important;
+    overflow: hidden !important; /* Prohíbe el scroll en el content wrapper */
     display: flex !important;
     flex-direction: column !important;
     background: transparent !important;
     box-sizing: border-box !important;
-    overflow: hidden !important;
 }
 
-/* Cada sección SPA se convierte en un Floating Panel de Cristal */
+/* Cada sección SPA se convierte en un Floating Panel de Cristal con scroll interno */
 .tab-section {
     background: var(--glass-bg-base) !important;
     backdrop-filter: var(--glass-blur) !important;
@@ -3491,7 +3455,8 @@ body {
     height: 100% !important;
     width: 100% !important;
     box-sizing: border-box !important;
-    overflow: hidden !important;
+    overflow-y: auto !important; /* Scroll interno para el dashboard */
+    overflow-x: hidden !important;
     display: none;
 }
 
@@ -3552,7 +3517,8 @@ body {
 .details-card,
 #ai-insights-widget,
 .tag-manage-card,
-.pipeline-summary-card {
+.pipeline-summary-card,
+.chart-container {
     background: rgba(255, 255, 255, 0.90) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
@@ -3569,7 +3535,8 @@ body {
 .details-card:hover,
 #ai-insights-widget:hover,
 .tag-manage-card:hover,
-.pipeline-summary-card:hover {
+.pipeline-summary-card:hover,
+.chart-container:hover {
     transform: translateY(-4px) !important;
     box-shadow: var(--glass-shadow-elevated) !important;
 }
@@ -3665,11 +3632,10 @@ body {
 }
 
 .chat-container, .chat-area {
-    position: relative !important;
     display: flex !important;
     flex-direction: column !important;
     height: 100% !important;
-    width: 100% !important;
+    max-height: 100vh !important;
     overflow: hidden !important;
     background: var(--glass-bg-deep) !important;
     backdrop-filter: none !important;
@@ -3686,16 +3652,14 @@ body {
 }
 
 .chat-input-area {
-    position: absolute !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    height: 80px !important;
-    background: rgba(255, 255, 255, 0.90) !important;
+    flex-shrink: 0 !important;
+    width: 100% !important;
+    min-height: 80px !important;
+    position: relative !important;
+    background: var(--glass-bg-base, rgba(255, 255, 255, 0.95)) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     border-top: var(--glass-border-subtle) !important;
-    flex-shrink: 0 !important;
     padding: 15px 20px !important;
     display: flex !important; /* Asegúrate de que no esté oculta */
     opacity: 1 !important;
@@ -3722,12 +3686,12 @@ body {
 .chat-messages,
 .chat-messages-history,
 #chat-history-container {
+    flex: 1 1 auto !important;
+    overflow-y: auto !important;
     display: flex !important;
     flex-direction: column !important;
     gap: 16px !important;
-    overflow-y: auto !important;
-    height: calc(100% - 150px) !important;
-    padding: 20px 20px 100px 20px !important;
+    padding: 20px !important;
     box-sizing: border-box !important;
 }
 
@@ -3749,9 +3713,9 @@ body {
     align-self: flex-start !important;
 }
 
-.chat-bubble.ai p,
-.chat-bubble.ai span,
-.chat-bubble.ai div {
+.chat-bubble.ai:not(.chat-bubble-carousel) p,
+.chat-bubble.ai:not(.chat-bubble-carousel) span,
+.chat-bubble.ai:not(.chat-bubble-carousel) div {
     color: #FFFFFF !important;
 }
 
@@ -3852,12 +3816,14 @@ button:active,
 }
 
 .menu-item:hover {
-    background: rgba(255, 255, 255, 0.3) !important;
-    color: var(--text-heading) !important;
+    background: #1e1e24 !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
 }
 
-.menu-item:hover i {
-    color: var(--text-heading) !important;
+.menu-item:hover i,
+.menu-item:hover span:not(.badge-count) {
+    color: #FFFFFF !important;
 }
 
 .menu-item.active {
@@ -3866,7 +3832,8 @@ button:active,
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
 }
 
-.menu-item.active i {
+.menu-item.active i,
+.menu-item.active span:not(.badge-count) {
     color: var(--pill-color) !important;
 }
 
@@ -3893,19 +3860,20 @@ button:active,
 }
 
 /* ---- 10. CAROUSEL CARDS ---- */
-.carousel-card {
-    background: rgba(255, 255, 255, 0.90) !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    border: var(--glass-border) !important;
-    border-radius: 20px !important;
-    box-shadow: var(--glass-shadow-elevated),
-                inset 0 1px 0 0 rgba(255, 255, 255, 0.5) !important;
+.product-card {
+    position: relative !important;
+    width: 260px !important;
+    height: 380px !important;
+    border-radius: 24px !important;
+    overflow: hidden !important;
+    border: none !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08) !important;
+    background: #f8f9fa !important;
 }
 
-.carousel-card:hover {
-    background: #ffffff !important;
-    box-shadow: 0 16px 36px rgba(31, 38, 135, 0.1) !important;
+.product-card:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2) !important;
 }
 
 /* ---- 11. FROSTED GLASS INPUTS ---- */
@@ -4030,4 +3998,11 @@ select:focus {
 
 ::-webkit-scrollbar-thumb:hover {
     background: rgba(0, 0, 0, 0.3) !important;
+}
+
+/* ---- 15. INSIGHTS ACCIONABLES ---- */
+.insight-action-card:hover {
+    transform: translateY(-4px) !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
+    border-color: rgba(0, 0, 0, 0.15) !important;
 }

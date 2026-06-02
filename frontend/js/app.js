@@ -1317,26 +1317,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 const productCardsHTML = msg.products.map(prod => {
-                    const imgUrl = prod.imagen || prod.image || prod.img || '';
-                    const fallbackImg = 'https://placehold.co/300x200/f3f4f6/9ca3af?text=No+Image';
-                    const precioFormateado = prod.precio ? Number(prod.precio).toLocaleString('es-CO') : '0';
+                    const imgUrl = prod.imagen || prod.image_url || prod.image || prod.img || prod.thumbnail || '';
+                    const fallbackImg = 'https://via.placeholder.com/260x380?text=No+Image';
+                    const nombre = prod.nombre || prod.title || 'Producto';
+                    const categoria = prod.categoria || prod.category || 'Mobiliario';
+                    
+                    const precio = prod.precio !== undefined ? prod.precio : prod.price;
+                    const precioFormateado = precio ? Number(precio).toLocaleString('es-CO') : null;
+                    const priceText = precioFormateado ? `$${precioFormateado} COP` : 'Consultar Precio';
+                    
+                    const url = prod.url || prod.product_url || prod.link || '#';
                     return `
-                        <div class="carousel-card">
-                            <div class="carousel-card-img-wrapper">
-                                <img class="carousel-card-img" src="${imgUrl || fallbackImg}" alt="${prod.nombre}" onerror="this.src='${fallbackImg}'" />
-                                <span class="carousel-card-tag">Recomendado</span>
-                                <div class="carousel-card-logo">
-                                    <i class="fa-solid fa-cube" style="font-size: 10px; color: #111827;"></i>
-                                </div>
-                            </div>
-                            <div class="carousel-card-body">
-                                <span class="carousel-card-category">${prod.categoria || prod.category || 'Mobiliario'}</span>
-                                <h4 class="carousel-card-title">${prod.nombre}</h4>
-                                <p class="carousel-card-desc">${prod.descripcion || prod.description || 'Producto premium diseñado para tu confort.'}</p>
-                                <div class="carousel-card-footer">
-                                    <span class="carousel-card-price">$${precioFormateado} COP</span>
-                                    <button class="carousel-card-btn" onclick="event.stopPropagation(); alert('Ver detalles: ${prod.nombre}')">Ver Detalles ↗</button>
-                                </div>
+                        <div class="product-card">
+                            <img class="product-img" src="${imgUrl || fallbackImg}" alt="${nombre}" onerror="this.src='${fallbackImg}'" />
+                            <div class="product-content">
+                                <span class="product-category">${categoria}</span>
+                                <h4 class="product-title">${nombre}</h4>
+                                <span class="product-price">${priceText}</span>
+                                <a href="${url}" target="_blank" class="btn-ver-detalles" onclick="event.stopPropagation();">Ver Detalles</a>
                             </div>
                         </div>
                     `;
@@ -3290,6 +3288,75 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // ----------------------------------------------------------------------
+    // Gráfico de Distribución del Pipeline (V3.8)
+    // ----------------------------------------------------------------------
+    function renderizarGraficoPipeline() {
+        const ctx = document.getElementById('pipelineChart');
+        if (!ctx) return;
+
+        // Datos simulados (valores en millones para el ejemplo)
+        const chartData = {
+            labels: ['Alta Prioridad', 'Seguimiento', 'Nuevo / Info', 'Pendiente', 'Conversión (CAPI)'],
+            datasets: [{
+                data: [4.5, 3.2, 2.1, 0.9, 4.5], // Suma: 15.2M
+                backgroundColor: [
+                    '#FF0266', // Magenta
+                    '#BB86FC', // Púrpura
+                    '#03DAC6', // Cian
+                    '#FFAB40', // Naranja
+                    '#4ADE80'  // Verde (Nueva Conversión)
+                ],
+                borderWidth: 0,
+                hoverOffset: 10 // Efecto de expansión al pasar el mouse
+            }]
+        };
+
+        // Calcular el total
+        const totalValue = chartData.datasets[0].data.reduce((a, b) => a + b, 0).toFixed(1);
+
+        const config = {
+            type: 'doughnut',
+            data: chartData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '82%', // Hueco más grande para texto holgado
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { color: '#4B5563', font: { family: "'Inter', sans-serif", size: 12 }, usePointStyle: true, padding: 20 }
+                    },
+                    tooltip: { enabled: false } // Desactivamos el tooltip clásico
+                },
+                onHover: (event, elements) => {
+                    const labelEl = document.getElementById('chart-center-label');
+                    const valueEl = document.getElementById('chart-center-value');
+                    
+                    if (elements && elements.length > 0) {
+                        // El ratón está sobre un segmento
+                        const index = elements[0].index;
+                        labelEl.innerText = chartData.labels[index];
+                        valueEl.innerText = '$' + chartData.datasets[0].data[index] + 'M';
+                        valueEl.style.color = chartData.datasets[0].backgroundColor[index]; // Cambia el color del texto!
+                    } else {
+                        // El ratón salió, vuelve al total
+                        labelEl.innerText = 'Pipeline Total';
+                        valueEl.innerText = '$' + totalValue + 'M';
+                        valueEl.style.color = '#111827';
+                    }
+                }
+            }
+        };
+
+        // Si existe un gráfico previo, lo destruimos para evitar solapamientos
+        if (window.myPipelineChart) {
+            window.myPipelineChart.destroy();
+        }
+        window.myPipelineChart = new Chart(ctx, config);
+    }
+
     // Ejecutar chequeo de sesión e inicialización final del CRM al cargar
     checkAuth();
+    renderizarGraficoPipeline();
 });
