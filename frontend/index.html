@@ -45,6 +45,9 @@
                     <input type="password" id="login-password" placeholder="••••••••" required
                         autocomplete="current-password" />
                 </div>
+                <div style="width: 100%; text-align: right; margin-top: -10px; margin-bottom: 15px;">
+                    <a href="#" id="link-forgot-password" style="font-size: 12px; color: #6B7280; text-decoration: none; font-weight: 500; transition: color 0.2s ease;" onmouseover="this.style.color='#111827'" onmouseout="this.style.color='#6B7280'">¿Olvidaste tu contraseña?</a>
+                </div>
                 <div id="login-error-msg" class="login-error hidden">
                     <i class="fa-solid fa-triangle-exclamation"></i> Credenciales incorrectas.
                 </div>
@@ -1226,8 +1229,8 @@
         </div>
     </div>
 
-    <!-- Audio de Notificación -->
-    <audio id="notification-sound" src="assets/ding.mp3" preload="auto"></audio>
+    <!-- Audio de Notificación (sintetizado vía Web Audio API — sin archivo externo) -->
+    <audio id="notification-sound" preload="none"></audio>
 
     <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

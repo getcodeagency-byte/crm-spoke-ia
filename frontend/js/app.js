@@ -30,6 +30,27 @@ async function guardarMensajeEnSupabase(leadId, sender, content, msgType = 'text
     }
 }
 
+// ==========================================================================
+// 2. RECUPERACIÓN DE CONTRASEÑA — Flujo Supabase
+// ==========================================================================
+
+// Interceptor: cuando el usuario regresa desde el correo de recuperación
+supabaseClient.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'PASSWORD_RECOVERY') {
+        const newPassword = prompt('🔐 Ingresa tu nueva contraseña (mínimo 6 caracteres):');
+        if (newPassword && newPassword.length >= 6) {
+            const { error } = await supabaseClient.auth.updateUser({ password: newPassword });
+            if (error) {
+                alert('❌ Error al actualizar: ' + error.message);
+            } else {
+                alert('✅ ¡Contraseña actualizada con éxito! Ya puedes iniciar sesión con tu nueva clave.');
+            }
+        } else if (newPassword !== null) {
+            alert('⚠️ La contraseña debe tener al menos 6 caracteres.');
+        }
+    }
+});
+
 document.addEventListener('DOMContentLoaded', () => {
 
     // ----------------------------------------------------------------------
@@ -402,6 +423,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const agentDisplayName = document.getElementById('agent-display-name');
     const dashboardWelcome = document.getElementById('dashboard-welcome');
     const logoutBtn = document.getElementById('logout-btn');
+
+    // Enlace "¿Olvidaste tu contraseña?" — Envío de correo de recuperación
+    const linkForgotPassword = document.getElementById('link-forgot-password');
+    if (linkForgotPassword) {
+        linkForgotPassword.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const emailVal = loginEmailInput ? loginEmailInput.value.trim() : '';
+            if (!emailVal) {
+                alert('Por favor, ingresa tu correo electrónico en el campo de arriba y luego haz clic aquí.');
+                if (loginEmailInput) loginEmailInput.focus();
+                return;
+            }
+            try {
+                const { error } = await supabaseClient.auth.resetPasswordForEmail(emailVal, {
+                    redirectTo: window.location.origin + window.location.pathname
+                });
+                if (error) throw error;
+                alert('📧 ¡Revisa tu bandeja de entrada! Te hemos enviado un enlace para restablecer tu contraseña.');
+            } catch (err) {
+                console.error('Error enviando correo de recuperación:', err);
+                alert('Hubo un error al enviar el correo: ' + err.message);
+            }
+        });
+    }
 
     // Cambiar entre pestañas
     if (tabLogin && tabRegister && loginForm && registerForm) {
@@ -1403,6 +1448,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <span class="bubble-meta">${msg.time}</span>
                 `;
             } else if (msg.type === 'audio') {
+                const hasUrl = !!(msg.audioUrl || msg.mediaUrl);
+                const audioSrc = msg.audioUrl || msg.mediaUrl || '';
                 bubble.innerHTML = `
                     ${senderLabel}
                     <div class="chat-audio-bubble">
@@ -1418,35 +1465,40 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span class="wave-bar" style="height: 16px;"></span>
                             <span class="wave-bar" style="height: 12px;"></span>
                         </div>
-                        <span class="audio-duration">${msg.duration}</span>
+                        <span class="audio-duration">${msg.duration || '00:00'}</span>
+                        ${hasUrl ? `<audio style="display:none;" src="${audioSrc}" preload="auto"></audio>` : ''}
                     </div>
                     <span class="bubble-meta">${msg.time}</span>
                 `;
-                const playBtn = bubble.querySelector('.audio-play-btn');
-                const playIcon = playBtn ? playBtn.querySelector('i') : null;
+                const playBtn   = bubble.querySelector('.audio-play-btn');
+                const playIcon  = playBtn ? playBtn.querySelector('i') : null;
+                const audioEl   = bubble.querySelector('audio');
+                const waveBars  = bubble.querySelectorAll('.wave-bar');
+
+                const startWave = () => waveBars.forEach(b => b.style.animation = 'wavePlayAnimation 1.2s infinite alternate');
+                const stopWave  = () => waveBars.forEach(b => b.style.animation = 'none');
+
                 if (playBtn && playIcon) {
-                    playBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        if (playIcon.classList.contains('fa-play')) {
-                            playIcon.className = 'fa-solid fa-pause';
-                            bubble.querySelectorAll('.wave-bar').forEach(bar => {
-                                bar.style.animation = 'wavePlayAnimation 1.2s infinite alternate';
-                            });
-                            setTimeout(() => {
-                                if (playIcon.className === 'fa-solid fa-pause') {
-                                    playIcon.className = 'fa-solid fa-play';
-                                    bubble.querySelectorAll('.wave-bar').forEach(bar => {
-                                        bar.style.animation = 'none';
-                                    });
-                                }
-                            }, 5000);
-                        } else {
-                            playIcon.className = 'fa-solid fa-play';
-                            bubble.querySelectorAll('.wave-bar').forEach(bar => {
-                                bar.style.animation = 'none';
-                            });
-                        }
-                    });
+                    if (audioEl) {
+                        // Reproducción real con el Blob/URL
+                        playBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            if (audioEl.paused) {
+                                audioEl.play().catch(() => {});
+                            } else {
+                                audioEl.pause();
+                            }
+                        });
+                        audioEl.addEventListener('play',  () => { playIcon.className = 'fa-solid fa-pause'; startWave(); });
+                        audioEl.addEventListener('pause', () => { playIcon.className = 'fa-solid fa-play';  stopWave();  });
+                        audioEl.addEventListener('ended', () => { playIcon.className = 'fa-solid fa-play';  stopWave();  });
+                    } else {
+                        // Sin URL disponible — feedback visual de que no hay audio
+                        playBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            playBtn.title = 'Audio no disponible aún';
+                        });
+                    }
                 }
             } else {
                 bubble.innerHTML = `
@@ -1533,127 +1585,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (chatMessageForm) {
-        chatMessageForm.addEventListener('submit', (e) => {
+        chatMessageForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const text = chatInputField.value.trim();
             if (!text) return;
 
             const targetLeadId = activeInboxLeadId;
+            const timeStr = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
 
-            // Enviar mensaje al webhook de n8n (URL de producción)
-            console.log("🚀 Disparando mensaje a n8n...");
-            fetch('https://muebleoia.app.n8n.cloud/webhook/3940b692-d275-434b-82d0-c75e0ec43c07', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    sessionId: targetLeadId,
-                    mensaje: text,
-                    origen: 'CRM Local'
-                })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json().catch(() => ({}));
-            })
-            .then(data => {
-                console.log('Envío exitoso al webhook:', data);
-                
-                const isSimulator = targetLeadId === 'lead-simulador-ia';
-                const targetLead = leadsList.find(l => l.id === targetLeadId);
-                
-                // Soporte para respuesta_ia o mensaje como respuesta (V4.7.0)
-                const replyText = data ? (data.respuesta_ia || data.mensaje) : '';
-                const shouldReply = replyText && (isSimulator || (targetLead && targetLead.ai_chat_status === 'ai_active'));
+            // Registrar en historial local y Supabase
+            if (!chatsHistory[targetLeadId]) chatsHistory[targetLeadId] = [];
+            chatsHistory[targetLeadId].push({ sender: 'human', content: text, time: timeStr });
+            guardarMensajeEnSupabase(targetLeadId, 'human', text, 'text');
 
-                if (shouldReply) {
-                    
-                    // 1. Mostrar indicador de escritura inmediatamente si el usuario sigue en este chat
-                    let typingEl = null;
-                    if (activeInboxLeadId === targetLeadId && chatHistoryContainer) {
-                        typingEl = document.createElement('div');
-                        typingEl.className = 'chat-bubble ai';
-                        typingEl.innerHTML = `
-                            <span class="subtitle" style="font-size: 8px; margin-bottom: 2px; display: block; color: var(--neon-cyan)">[spoke! AI]</span>
-                            <div class="typing-indicator-bubble">
-                                <span class="typing-indicator-dot"></span>
-                                <span class="typing-indicator-dot"></span>
-                                <span class="typing-indicator-dot"></span>
-                            </div>
-                        `;
-                        chatHistoryContainer.appendChild(typingEl);
-                        chatHistoryContainer.scrollTop = chatHistoryContainer.scrollHeight;
-                    }
+            chatInputField.value = '';
+            renderInbox();
 
-                    // 2. Simular un retraso para simular que la IA está "escribiendo..."
-                    const delayMs = Math.min(Math.max(replyText.length * 15, 1200), 3000);
-                    
-                    setTimeout(() => {
-                        // Quitar el indicador de escritura si existe
-                        if (typingEl && typingEl.parentNode) {
-                            typingEl.parentNode.removeChild(typingEl);
-                        }
+            // Disparar webhook n8n con payload estandarizado (solo texto)
+            await enviarAlWebhook({ sessionId: targetLeadId, mensaje: text, tipo: 'texto', mediaUrl: null });
 
-                        // Agregar mensaje al historial de chat del cliente correspondiente
-                        const timeStr = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
-                        if (!chatsHistory[targetLeadId]) {
-                            chatsHistory[targetLeadId] = [];
-                        }
-
-                        // Bifurcación visual: ¿es un array JSON de productos? (V4.6.0)
-                        let parsedProducts = null;
-                        let leadingText = '';
-                        try {
-                            const jsonMatch = replyText.match(/\[\s*\{[\s\S]*\}\s*\]/);
-                            if (jsonMatch) {
-                                const cleanJSON = jsonMatch[0];
-                                const parsed = JSON.parse(cleanJSON);
-                                if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].nombre && (parsed[0].precio !== undefined)) {
-                                    parsedProducts = parsed;
-                                    const jsonStartIndex = replyText.indexOf(cleanJSON);
-                                    leadingText = replyText.substring(0, jsonStartIndex).trim();
-                                }
-                            }
-                        } catch (e) {
-                            console.log("La respuesta de la IA no es un JSON de productos, se almacena como texto plano.");
-                        }
-
-                        if (parsedProducts) {
-                            chatsHistory[targetLeadId].push({
-                                sender: 'ai',
-                                type: 'carousel',
-                                products: parsedProducts,
-                                content: leadingText,
-                                time: timeStr
-                            });
-                            // Guardar en Supabase en segundo plano
-                            guardarMensajeEnSupabase(targetLeadId, 'ai', leadingText || '', 'carousel', parsedProducts);
-                        } else {
-                            chatsHistory[targetLeadId].push({
-                                sender: 'ai',
-                                content: replyText,
-                                time: timeStr
-                            });
-                            // Guardar en Supabase en segundo plano
-                            guardarMensajeEnSupabase(targetLeadId, 'ai', replyText, 'text');
-                        }
-
-                        // Re-renderizar si el usuario sigue en el mismo chat
-                        if (activeInboxLeadId === targetLeadId) {
-                            renderInbox();
-                            renderActiveChat();
-                        }
-                    }, delayMs);
-                }
-            })
-            .catch(error => {
-                console.error('Error al enviar al webhook:', error);
-            });
-
-            // Si está activo el control de la IA, pausarlo automáticamente al enviar y asignar al humano (excepto simulador)
+            // Auto-pausa IA si estaba activa
             const activeLead = leadsList.find(l => l.id === activeInboxLeadId);
             if (activeLead && activeLead.id !== 'lead-simulador-ia' && activeLead.ai_chat_status === 'ai_active') {
                 activeLead.ai_chat_status = 'human_paused';
@@ -1666,32 +1617,172 @@ document.addEventListener('DOMContentLoaded', () => {
                     aiControlStatusText.className = 'status-paused';
                 }
                 const chatAssigneeSelect = document.getElementById('chat-assignee-select');
-                if (chatAssigneeSelect) {
-                    chatAssigneeSelect.value = myUuid;
-                }
+                if (chatAssigneeSelect) chatAssigneeSelect.value = myUuid;
                 renderKanban();
             }
+        });
+    }
 
-            const timeStr = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
-            if (!chatsHistory[activeInboxLeadId]) {
-                chatsHistory[activeInboxLeadId] = [];
-            }
-            
-            chatsHistory[activeInboxLeadId].push({
-                sender: 'human',
-                content: text,
-                time: timeStr
+    // ===========================================================================
+    // FUNCIÓN MAESTRA DE ENVÍO MULTIMEDIA AL WEBHOOK n8n
+    // Sube archivo a Supabase Storage (si hay), obtiene URL pública y dispara el
+    // webhook con el JSON estandarizado: { sessionId, mensaje, tipo, mediaUrl }
+    // ===========================================================================
+    async function uploadToSupabaseStorage(file) {
+        const ext = file.name.split('.').pop();
+        const uniqueName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const filePath = `chat-media/${uniqueName}`;
+
+        const { error: uploadError } = await supabaseClient
+            .storage
+            .from('crm-media')
+            .upload(filePath, file, { contentType: file.type, upsert: false });
+
+        if (uploadError) {
+            console.error('❌ Error subiendo archivo a Supabase Storage:', uploadError.message);
+            return null;
+        }
+
+        const { data } = supabaseClient.storage.from('crm-media').getPublicUrl(filePath);
+        return data?.publicUrl || null;
+    }
+
+    async function enviarAlWebhook({ sessionId, mensaje, tipo, mediaUrl }) {
+        const WEBHOOK_URL = 'https://muebleoia.app.n8n.cloud/webhook/3940b692-d275-434b-82d0-c75e0ec43c07';
+        console.log(`🚀 Disparando webhook n8n | tipo: ${tipo} | mediaUrl: ${mediaUrl || 'N/A'}`);
+        try {
+            const response = await fetch(WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sessionId, mensaje, tipo, mediaUrl, origen: 'CRM Local' })
             });
 
-            // Guardar en Supabase en segundo plano
-            guardarMensajeEnSupabase(activeInboxLeadId, 'human', text, 'text');
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const data = await response.json().catch(() => ({}));
+            console.log('✅ Webhook n8n respondió:', data);
 
-            chatInputField.value = '';
+            // Procesar respuesta de IA si aplica
+            const targetLead = leadsList.find(l => l.id === sessionId);
+            const isSimulator = sessionId === 'lead-simulador-ia';
+            const replyText = data ? (data.respuesta_ia || data.mensaje) : '';
+            const shouldReply = replyText && (isSimulator || (targetLead && targetLead.ai_chat_status === 'ai_active'));
+
+            if (shouldReply) {
+                let typingEl = null;
+                if (activeInboxLeadId === sessionId && chatHistoryContainer) {
+                    typingEl = document.createElement('div');
+                    typingEl.className = 'chat-bubble ai';
+                    typingEl.innerHTML = `
+                        <span class="subtitle" style="font-size:8px;margin-bottom:2px;display:block;color:var(--neon-cyan)">[spoke! AI]</span>
+                        <div class="typing-indicator-bubble">
+                            <span class="typing-indicator-dot"></span>
+                            <span class="typing-indicator-dot"></span>
+                            <span class="typing-indicator-dot"></span>
+                        </div>`;
+                    chatHistoryContainer.appendChild(typingEl);
+                    chatHistoryContainer.scrollTop = chatHistoryContainer.scrollHeight;
+                }
+
+                const delayMs = Math.min(Math.max(replyText.length * 15, 1200), 3000);
+                setTimeout(() => {
+                    if (typingEl && typingEl.parentNode) typingEl.parentNode.removeChild(typingEl);
+                    const timeStr = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+                    if (!chatsHistory[sessionId]) chatsHistory[sessionId] = [];
+
+                    let parsedProducts = null;
+                    let leadingText = '';
+                    try {
+                        const jsonMatch = replyText.match(/\[\s*\{[\s\S]*\}\s*\]/);
+                        if (jsonMatch) {
+                            const parsed = JSON.parse(jsonMatch[0]);
+                            if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].nombre && parsed[0].precio !== undefined) {
+                                parsedProducts = parsed;
+                                leadingText = replyText.substring(0, replyText.indexOf(jsonMatch[0])).trim();
+                            }
+                        }
+                    } catch (e) { /* respuesta de texto plano */ }
+
+                    if (parsedProducts) {
+                        chatsHistory[sessionId].push({ sender: 'ai', type: 'carousel', products: parsedProducts, content: leadingText, time: timeStr });
+                        guardarMensajeEnSupabase(sessionId, 'ai', leadingText || '', 'carousel', parsedProducts);
+                    } else {
+                        chatsHistory[sessionId].push({ sender: 'ai', content: replyText, time: timeStr });
+                        guardarMensajeEnSupabase(sessionId, 'ai', replyText, 'text');
+                    }
+
+                    if (activeInboxLeadId === sessionId) { renderInbox(); renderActiveChat(); }
+                }, delayMs);
+            }
+        } catch (err) {
+            console.error('❌ Error al enviar al webhook n8n:', err);
+        }
+    }
+
+    // 3. Envío de Archivos y Fotos en el Chat
+    // (Los click handlers definitivos están consolidados abajo junto a handoverToHuman)
+
+    if (chatFileInput) {
+        chatFileInput.addEventListener('change', async (e) => {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
+            const file = files[0];
+            const targetLeadId = activeInboxLeadId;
+            const sizeStr = file.size > 1024 * 1024
+                ? (file.size / (1024 * 1024)).toFixed(1) + ' MB'
+                : (file.size / 1024).toFixed(0) + ' KB';
+            const timeStr = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+
+            // 1. Subir a Supabase Storage
+            const mediaUrl = await uploadToSupabaseStorage(file);
+
+            // 2. Registrar en historial local
+            if (!chatsHistory[targetLeadId]) chatsHistory[targetLeadId] = [];
+            chatsHistory[targetLeadId].push({ sender: 'human', type: 'file', fileName: file.name, fileSize: sizeStr, mediaUrl, time: timeStr });
+
+            // 3. Guardar en Supabase DB
+            guardarMensajeEnSupabase(targetLeadId, 'human', file.name, 'file', { mediaUrl, fileSize: sizeStr });
+
+            // 4. Clasificación dinámica por MIME type real del archivo
+            let tipo;
+            if (file.type.startsWith('image/'))      tipo = 'imagen';
+            else if (file.type.startsWith('audio/')) tipo = 'audio';
+            else                                     tipo = 'documento';
+            await enviarAlWebhook({ sessionId: targetLeadId, mensaje: '', tipo, mediaUrl });
+
+            chatFileInput.value = '';
             renderInbox();
         });
     }
 
-    // Autopausa de control de IA cuando el humano enfoca o hace clic en los inputs del chat
+    if (chatImgInput) {
+        chatImgInput.addEventListener('change', async (e) => {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
+            const file = files[0];
+            const targetLeadId = activeInboxLeadId;
+            const timeStr = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+
+            // 1. Subir a Supabase Storage y obtener URL pública real
+            const mediaUrl = await uploadToSupabaseStorage(file);
+
+            // 2. Preview local mientras la URL real ya está disponible
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                if (!chatsHistory[targetLeadId]) chatsHistory[targetLeadId] = [];
+                chatsHistory[targetLeadId].push({ sender: 'human', type: 'image', imgUrl: mediaUrl || event.target.result, time: timeStr });
+                renderInbox();
+            };
+            reader.readAsDataURL(file);
+
+            // 3. Guardar en Supabase DB
+            if (mediaUrl) guardarMensajeEnSupabase(targetLeadId, 'human', '', 'image', { mediaUrl });
+
+            // 4. Disparar webhook n8n con tipo "imagen"
+            await enviarAlWebhook({ sessionId: targetLeadId, mensaje: '', tipo: 'imagen', mediaUrl });
+
+            chatImgInput.value = '';
+        });
+    }
     function handoverToHuman() {
         const activeLead = leadsList.find(l => l.id === activeInboxLeadId);
         if (activeLead && activeLead.ai_chat_status === 'ai_active') {
@@ -1737,15 +1828,21 @@ document.addEventListener('DOMContentLoaded', () => {
     if (chatInputField) {
         chatInputField.addEventListener('focus', handoverToHuman);
     }
-    if (chatBtnClip) {
-        chatBtnClip.addEventListener('click', handoverToHuman);
+    // chatBtnClip: handover + abrir selector de archivo (UN solo listener)
+    if (chatBtnClip && chatFileInput) {
+        chatBtnClip.addEventListener('click', () => {
+            handoverToHuman();
+            chatFileInput.click();
+        });
     }
-    if (chatBtnImage) {
-        chatBtnImage.addEventListener('click', handoverToHuman);
+    // chatBtnImage: handover + abrir selector de imagen (UN solo listener)
+    if (chatBtnImage && chatImgInput) {
+        chatBtnImage.addEventListener('click', () => {
+            handoverToHuman();
+            chatImgInput.click();
+        });
     }
-    if (chatBtnMic) {
-        chatBtnMic.addEventListener('click', handoverToHuman);
-    }
+    // chatBtnMic: handoverToHuman se llama internamente en el handler de MediaRecorder
     if (chatBtnAiAssist) {
         chatBtnAiAssist.addEventListener('click', () => {
             // Activar pausa silenciosa de control de IA si estaba activa
@@ -2709,75 +2806,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 3. Envío de Archivos y Fotos en el Chat
+    // (Handlers de archivos eliminados aquí — los definitivos con Supabase Storage
+    //  están consolidados arriba en el bloque de enviarAlWebhook)
 
-    if (chatBtnClip && chatFileInput) {
-        chatBtnClip.addEventListener('click', () => {
-            chatFileInput.click();
-        });
-    }
-
-    if (chatBtnImage && chatImgInput) {
-        chatBtnImage.addEventListener('click', () => {
-            chatImgInput.click();
-        });
-    }
-
-    if (chatFileInput) {
-        chatFileInput.addEventListener('change', (e) => {
-            const files = e.target.files;
-            if (files.length === 0) return;
-            const file = files[0];
-            const sizeStr = file.size > 1024 * 1024 
-                ? (file.size / (1024 * 1024)).toFixed(1) + ' MB'
-                : (file.size / 1024).toFixed(0) + ' KB';
-                
-            const timeStr = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
-            
-            if (!chatsHistory[activeInboxLeadId]) {
-                chatsHistory[activeInboxLeadId] = [];
-            }
-            
-            chatsHistory[activeInboxLeadId].push({
-                sender: 'human',
-                type: 'file',
-                fileName: file.name,
-                fileSize: sizeStr,
-                time: timeStr
-            });
-            
-            chatFileInput.value = '';
-            renderInbox();
-        });
-    }
-
-    if (chatImgInput) {
-        chatImgInput.addEventListener('change', (e) => {
-            const files = e.target.files;
-            if (files.length === 0) return;
-            const file = files[0];
-            
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const timeStr = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
-                
-                if (!chatsHistory[activeInboxLeadId]) {
-                    chatsHistory[activeInboxLeadId] = [];
-                }
-                
-                chatsHistory[activeInboxLeadId].push({
-                    sender: 'human',
-                    type: 'image',
-                    imgUrl: event.target.result,
-                    time: timeStr
-                });
-                
-                renderInbox();
-            };
-            reader.readAsDataURL(file);
-            chatImgInput.value = '';
-        });
-    }
 
     // 4. Meta Capi Conversion Toggle Listener
     const conversionToggle = document.getElementById('jira-conversion-toggle');
@@ -2894,61 +2925,119 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 6. Lógica de Notas de Voz (V2.9)
-    
+    // 6. Notas de Voz — MediaRecorder Real (reescritura completa)
+    let mediaRecorder = null;
+    let audioChunks = [];
+    let micStream = null;
+
     if (chatBtnMic) {
-        chatBtnMic.addEventListener('click', () => {
-            if (!isRecording) {
-                // Iniciar Grabación
-                isRecording = true;
-                chatBtnMic.classList.add('recording');
-                chatBtnMic.style.color = 'var(--neon-magenta)';
-                chatBtnMic.style.borderColor = 'var(--neon-magenta)';
-                chatBtnMic.innerHTML = '<i class="fa-solid fa-square"></i>';
-                
-                if (chatInputField) chatInputField.classList.add('hidden');
-                if (chatRecordingStatus) chatRecordingStatus.classList.remove('hidden');
-                if (chatSendBtn) chatSendBtn.disabled = true;
-                
-                recordingSeconds = 0;
-                if (recordingTimer) recordingTimer.textContent = '00:00';
-                
-                recordingInterval = setInterval(() => {
-                    recordingSeconds++;
-                    const minutes = Math.floor(recordingSeconds / 60);
-                    const seconds = recordingSeconds % 60;
-                    if (recordingTimer) recordingTimer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                }, 1000);
-            } else {
-                // Detener Grabación y Enviar
+        chatBtnMic.disabled = false; // habilitar el botón
+
+        chatBtnMic.addEventListener('click', async () => {
+
+            // ── DETENER grabación en curso ────────────────────────────────
+            if (isRecording) {
                 isRecording = false;
                 clearInterval(recordingInterval);
+
+                // Pedir al MediaRecorder que pare (dispara onstop)
+                if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                    mediaRecorder.stop();
+                }
+
+                // Restaurar UI del botón
                 chatBtnMic.classList.remove('recording');
                 chatBtnMic.style.color = '';
                 chatBtnMic.style.borderColor = '';
                 chatBtnMic.innerHTML = '<i class="fa-solid fa-microphone"></i>';
-                
                 if (chatInputField) chatInputField.classList.remove('hidden');
                 if (chatRecordingStatus) chatRecordingStatus.classList.add('hidden');
-                if (chatSendBtn) chatSendBtn.disabled = chatInputField.value.trim() === '';
-                
-                const finalDuration = recordingTimer.textContent;
-                
-                // Inyectar nota de voz en el chat activo
+                if (chatSendBtn) chatSendBtn.disabled = false;
+                return;
+            }
+
+            // ── INICIAR grabación ─────────────────────────────────────────
+            try {
+                micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            } catch (err) {
+                alert('No se pudo acceder al micrófono. Verifica los permisos del navegador.\n' + err.message);
+                return;
+            }
+
+            // Elegir el MIME type más compatible
+            const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
+                ? 'audio/webm;codecs=opus'
+                : MediaRecorder.isTypeSupported('audio/webm')
+                    ? 'audio/webm'
+                    : MediaRecorder.isTypeSupported('audio/ogg;codecs=opus')
+                        ? 'audio/ogg;codecs=opus'
+                        : '';
+
+            audioChunks = [];
+            mediaRecorder = new MediaRecorder(micStream, mimeType ? { mimeType } : {});
+
+            // Recolectar datos cada 250 ms → garantiza audioChunks llenos
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data && e.data.size > 0) audioChunks.push(e.data);
+            };
+
+            mediaRecorder.onstop = async () => {
+                // Liberar el micrófono
+                micStream.getTracks().forEach(t => t.stop());
+
+                const finalMime = mediaRecorder.mimeType || mimeType || 'audio/webm';
+                const blob = new Blob(audioChunks, { type: finalMime });
+                const blobUrl = URL.createObjectURL(blob);
+                const finalDuration = recordingTimer ? recordingTimer.textContent : '00:00';
                 const timeStr = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
-                if (!chatsHistory[activeInboxLeadId]) {
-                    chatsHistory[activeInboxLeadId] = [];
-                }
-                
-                chatsHistory[activeInboxLeadId].push({
+                const targetLeadId = activeInboxLeadId;
+
+                // 1. Preview inmediato en el chat (el asesor escucha antes de enviar)
+                if (!chatsHistory[targetLeadId]) chatsHistory[targetLeadId] = [];
+                chatsHistory[targetLeadId].push({
                     sender: 'human',
                     type: 'audio',
+                    audioUrl: blobUrl,   // URL temporal para preview
                     duration: finalDuration,
                     time: timeStr
                 });
-                
                 renderInbox();
-            }
+
+                // 2. Subir a Supabase Storage en segundo plano
+                const ext = finalMime.includes('ogg') ? 'ogg' : 'webm';
+                const audioFile = new File([blob], `voice-note-${Date.now()}.${ext}`, { type: finalMime });
+                const mediaUrl = await uploadToSupabaseStorage(audioFile);
+
+                // 3. Guardar en Supabase DB
+                guardarMensajeEnSupabase(targetLeadId, 'human', '', 'audio', { mediaUrl, duration: finalDuration });
+
+                // 4. Disparar webhook n8n
+                await enviarAlWebhook({ sessionId: targetLeadId, mensaje: '', tipo: 'audio', mediaUrl });
+            };
+
+            // Iniciar captura con timeslice de 250 ms
+            mediaRecorder.start(250);
+            isRecording = true;
+            handoverToHuman();
+
+            // UI de grabación activa
+            chatBtnMic.classList.add('recording');
+            chatBtnMic.style.color = 'var(--neon-magenta)';
+            chatBtnMic.style.borderColor = 'var(--neon-magenta)';
+            chatBtnMic.innerHTML = '<i class="fa-solid fa-square"></i>';
+            if (chatInputField) chatInputField.classList.add('hidden');
+            if (chatRecordingStatus) chatRecordingStatus.classList.remove('hidden');
+            if (chatSendBtn) chatSendBtn.disabled = true;
+
+            // Cronómetro visual
+            recordingSeconds = 0;
+            if (recordingTimer) recordingTimer.textContent = '00:00';
+            recordingInterval = setInterval(() => {
+                recordingSeconds++;
+                const m = Math.floor(recordingSeconds / 60).toString().padStart(2, '0');
+                const s = (recordingSeconds % 60).toString().padStart(2, '0');
+                if (recordingTimer) recordingTimer.textContent = `${m}:${s}`;
+            }, 1000);
         });
     }
 
