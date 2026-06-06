@@ -5,9 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
-    <title>spoke! — CRM Inteligente Multi-Tenant</title>
+    <title>Jamia — CRM Inteligente Multi-Tenant</title>
     <!-- Google Fonts: Inter + Poppins -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap"
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -46,7 +47,10 @@
                         autocomplete="current-password" />
                 </div>
                 <div style="width: 100%; text-align: right; margin-top: -10px; margin-bottom: 15px;">
-                    <a href="#" id="link-forgot-password" style="font-size: 12px; color: #6B7280; text-decoration: none; font-weight: 500; transition: color 0.2s ease;" onmouseover="this.style.color='#111827'" onmouseout="this.style.color='#6B7280'">¿Olvidaste tu contraseña?</a>
+                    <a href="#" id="link-forgot-password"
+                        style="font-size: 12px; color: #6B7280; text-decoration: none; font-weight: 500; transition: color 0.2s ease;"
+                        onmouseover="this.style.color='#111827'" onmouseout="this.style.color='#6B7280'">¿Olvidaste tu
+                        contraseña?</a>
                 </div>
                 <div id="login-error-msg" class="login-error hidden">
                     <i class="fa-solid fa-triangle-exclamation"></i> Credenciales incorrectas.
@@ -88,9 +92,9 @@
     <div class="app-layout hidden" id="crm-layout">
 
         <!-- MENÚ LATERAL IZQUIERDO (SIDEBAR) -->
-        <aside class="sidebar-left">
+        <aside class="sidebar-left glass-sidebar">
             <div class="sidebar-header">
-                <span class="logo">spoke<span class="brand-accent">!</span></span>
+                <span class="logo">s<span class="logo-text-fade">poke</span><span class="brand-accent">!</span></span>
                 <span class="subdomain-text">muebleo.spoke-ia.com</span>
                 <div class="sidebar-datetime" id="sidebar-datetime">
                     <i class="fa-regular fa-clock"></i> <span id="sidebar-time-text">Cargando...</span>
@@ -98,33 +102,42 @@
             </div>
 
             <nav class="sidebar-menu">
-                <a href="#" class="menu-item active" data-target="view-dashboard">
-                    <i class="fa-solid fa-chart-simple"></i> <span>Dashboard</span>
+                <a href="#" class="menu-item sidebar-item active" data-target="view-dashboard">
+                    <span class="icon"><i class="fa-solid fa-chart-simple"></i></span>
+                    <span class="menu-text">Dashboard</span>
                 </a>
-                <a href="#" class="menu-item" data-target="view-kanban">
-                    <i class="fa-solid fa-columns"></i> <span>Tablero Kanban</span>
+                <a href="#" class="menu-item sidebar-item" data-target="view-kanban">
+                    <span class="icon"><i class="fa-solid fa-columns"></i></span>
+                    <span class="menu-text">Tablero Kanban</span>
                 </a>
-                <a href="#" class="menu-item" data-target="view-inbox">
-                    <i class="fa-solid fa-envelope"></i> <span>Bandeja Entrada</span>
+                <a href="#" class="menu-item sidebar-item" data-target="view-inbox">
+                    <span class="icon"><i class="fa-solid fa-envelope"></i></span>
+                    <span class="menu-text">Bandeja Entrada</span>
                     <span class="badge-count">1</span>
                 </a>
-                <a href="#" class="menu-item" data-target="view-channels">
-                    <i class="fa-solid fa-plug"></i> <span>Canales</span>
+                <a href="#" class="menu-item sidebar-item" data-target="view-channels">
+                    <span class="icon"><i class="fa-solid fa-plug"></i></span>
+                    <span class="menu-text">Canales</span>
                 </a>
-                <a href="#" class="menu-item" data-target="view-broadcasts">
-                    <i class="fa-solid fa-bullhorn"></i> <span>Difusiones</span>
+                <a href="#" class="menu-item sidebar-item" data-target="view-broadcasts">
+                    <span class="icon"><i class="fa-solid fa-bullhorn"></i></span>
+                    <span class="menu-text">Difusiones</span>
                 </a>
-                <a href="#" class="menu-item" data-target="view-catalogue">
-                    <i class="fa-solid fa-store"></i> <span>Catálogo</span>
+                <a href="#" class="menu-item sidebar-item" data-target="view-catalogue">
+                    <span class="icon"><i class="fa-solid fa-store"></i></span>
+                    <span class="menu-text">Catálogo</span>
                 </a>
-                <a href="#" class="menu-item" data-target="view-tags">
-                    <i class="fa-solid fa-tags"></i> <span>Etiquetas</span>
+                <a href="#" class="menu-item sidebar-item" data-target="view-tags">
+                    <span class="icon"><i class="fa-solid fa-tags"></i></span>
+                    <span class="menu-text">Etiquetas</span>
                 </a>
-                <a href="#" class="menu-item" data-target="view-ai">
-                    <i class="fa-solid fa-robot"></i> <span>Configuración IA</span>
+                <a href="#" class="menu-item sidebar-item" data-target="view-ai">
+                    <span class="icon"><i class="fa-solid fa-robot"></i></span>
+                    <span class="menu-text">Configuración IA</span>
                 </a>
-                <a href="#" class="menu-item" data-target="view-settings">
-                    <i class="fa-solid fa-gear"></i> <span>Ajustes</span>
+                <a href="#" class="menu-item sidebar-item" data-target="view-settings">
+                    <span class="icon"><i class="fa-solid fa-gear"></i></span>
+                    <span class="menu-text">Ajustes</span>
                 </a>
             </nav>
 
@@ -183,177 +196,231 @@
                         <span class="subtitle">Resumen Ejecutivo</span>
                         <h1 class="welcome-heading" id="dashboard-welcome">¡Hola, Asesor!</h1>
                     </div>
-
                 </header>
 
-                <!-- AI Insights & Recomendaciones (V3.9 - Action-Oriented) -->
-                <div class="ai-insights-section" style="margin-bottom: 30px;">
-                    <h3 style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; color: #000000; margin-bottom: 15px;">AI Insights & Recomendaciones</h3>
-                    <div class="ai-insights-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
-                        <!-- Tarjeta 1 -->
-                        <div class="insight-action-card glass-panel" style="background: #ffffff !important; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; border: var(--glass-border) !important; box-shadow: var(--glass-shadow); transition: all 0.3s ease; cursor: pointer;" onclick="document.querySelector('[data-target=view-inbox]').click()">
+                <div class="dashboard-grid">
+                    <!-- Morning Briefing (Bento Card) -->
+                    <div class="bento-card span-3 briefing-bento">
+                        <div class="card-header">
                             <div>
-                                <div style="display: flex; gap: 10px; align-items: flex-start; margin-bottom: 12px;">
-                                    <div style="background: rgba(16, 185, 129, 0.1); padding: 8px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                                        <i class="fa-solid fa-lightbulb" style="color: #10B981; font-size: 16px;"></i>
-                                    </div>
-                                    <div style="font-size: 13px; font-weight: 700; color: #111827; margin-top: 3px;">Cierre Prioritario</div>
-                                </div>
-                                <p style="font-size: 12px; color: #4B5563; line-height: 1.5; margin-bottom: 15px;">
-                                    La IA sugiere contactar a <strong>Andrés Mendoza</strong>. Lleva 9 días en la etapa "Cotizado" y coincide con un ticket promedio alto.
-                                </p>
-                            </div>
-                            <div style="font-size: 12px; font-weight: 700; color: #000000; display: flex; align-items: center; gap: 5px; margin-top: auto;">
-                                Ir al chat <i class="fa-solid fa-arrow-right" style="font-size: 10px; color: inherit !important;"></i>
+                                <p class="kpi-title"><i class="fa-solid fa-wand-magic-sparkles"></i> Morning Briefing de Inteligencia Artificial</p>
+                                <p class="kpi-subtitle">Resumen de leads de hoy</p>
                             </div>
                         </div>
+                        <p class="briefing-desc">La IA ha procesado <strong>14 leads</strong> para ti hoy. <strong>4 leads</strong> han sido clasificados como de "Alta Prioridad" y se ha pausado la IA para atención humana inmediata debido a solicitudes urgentes de cotización.</p>
+                        <button class="btn-neon" onclick="document.querySelector('[data-target=view-kanban]').click()">Ver Leads</button>
+                    </div>
 
-                        <!-- Tarjeta 2 -->
-                        <div class="insight-action-card glass-panel" style="background: #ffffff !important; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; border: var(--glass-border) !important; box-shadow: var(--glass-shadow); transition: all 0.3s ease; cursor: pointer;">
+                    <!-- Stats Card 1: Alta Prioridad -->
+                    <div class="bento-card border-magenta">
+                        <div class="card-header">
                             <div>
-                                <div style="display: flex; gap: 10px; align-items: flex-start; margin-bottom: 12px;">
-                                    <div style="background: rgba(239, 68, 68, 0.1); padding: 8px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                                        <i class="fa-solid fa-triangle-exclamation" style="color: #EF4444; font-size: 16px;"></i>
-                                    </div>
-                                    <div style="font-size: 13px; font-weight: 700; color: #111827; margin-top: 3px;">Despacho en Vencimiento</div>
-                                </div>
-                                <p style="font-size: 12px; color: #4B5563; line-height: 1.5; margin-bottom: 15px;">
-                                    Hoy vence el despacho de <strong>Jorge Valenzuela</strong> (Silla Ergonómica). Asegúrate de realizar el seguimiento logístico.
-                                </p>
+                                <p class="kpi-title">Alta Prioridad</p>
+                                <p class="kpi-subtitle">Leads calificados con urgencia</p>
                             </div>
-                            <div style="font-size: 12px; font-weight: 700; color: #EF4444; display: flex; align-items: center; gap: 5px; margin-top: auto;">
-                                Revisar despacho <i class="fa-solid fa-arrow-right" style="font-size: 10px; color: inherit !important;"></i>
-                            </div>
+                            <div class="stat-icon magenta"><i class="fa-solid fa-fire"></i></div>
                         </div>
+                        <h2 class="kpi-value">4 Leads</h2>
+                        <div class="kpi-trend positive">↗ Atención requerida</div>
+                    </div>
 
-                        <!-- Tarjeta 3 -->
-                        <div class="insight-action-card glass-panel" style="background: #ffffff !important; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; border: var(--glass-border) !important; box-shadow: var(--glass-shadow); transition: all 0.3s ease; cursor: pointer;">
+                    <!-- Stats Card 2: En Seguimiento -->
+                    <div class="bento-card border-purple">
+                        <div class="card-header">
                             <div>
-                                <div style="display: flex; gap: 10px; align-items: flex-start; margin-bottom: 12px;">
-                                    <div style="background: rgba(6, 182, 212, 0.1); padding: 8px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
-                                        <i class="fa-solid fa-bell" style="color: #06B6D4; font-size: 16px;"></i>
-                                    </div>
-                                    <div style="font-size: 13px; font-weight: 700; color: #111827; margin-top: 3px;">Próxima Entrega</div>
-                                </div>
-                                <p style="font-size: 12px; color: #4B5563; line-height: 1.5; margin-bottom: 15px;">
-                                    <strong>Liliana Gomez</strong> está a 5 días de su despacho. Su orden está lista en bodega.
-                                </p>
+                                <p class="kpi-title">En Seguimiento</p>
+                                <p class="kpi-subtitle">Prospectos en negociación</p>
                             </div>
-                            <div style="font-size: 12px; font-weight: 700; color: #06B6D4; display: flex; align-items: center; gap: 5px; margin-top: auto;">
-                                Ver estado <i class="fa-solid fa-arrow-right" style="font-size: 10px; color: inherit !important;"></i>
-                            </div>
+                            <div class="stat-icon purple"><i class="fa-solid fa-arrows-spin"></i></div>
                         </div>
+                        <h2 class="kpi-value">8 Leads</h2>
+                        <div class="kpi-trend positive">↗ Crecimiento activo</div>
                     </div>
-                </div>
 
-                <!-- Morning Briefing Banner -->
-                <div class="morning-briefing-card glass-panel">
-                    <div class="briefing-icon">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i>
-                    </div>
-                    <div class="briefing-text">
-                        <h3>Morning Briefing de Inteligencia Artificial</h3>
-                        <p>La IA ha procesado <strong>14 leads</strong> para ti hoy. <strong>4 leads</strong> han sido
-                            clasificados como de "Alta Prioridad" y se ha pausado la IA para atención humana inmediata
-                            debido a solicitudes urgentes de cotización.</p>
-                    </div>
-                    <button class="btn-neon" onclick="document.querySelector('[data-target=view-kanban]').click()">Ver
-                        Leads</button>
-                </div>
-
-                <!-- Tarjetas de Estadísticas -->
-                <div class="stats-grid">
-                    <div class="stat-card glass-panel border-magenta">
-                        <div class="stat-icon magenta"><i class="fa-solid fa-fire"></i></div>
-                        <div class="stat-info">
-                            <span class="stat-label">Alta Prioridad</span>
-                            <span class="stat-value">4 Leads</span>
-                        </div>
-                    </div>
-                    <div class="stat-card glass-panel border-purple">
-                        <div class="stat-icon purple"><i class="fa-solid fa-arrows-spin"></i></div>
-                        <div class="stat-info">
-                            <span class="stat-label">En Seguimiento</span>
-                            <span class="stat-value">8 Leads</span>
-                        </div>
-                    </div>
-                    <div class="stat-card glass-panel border-cyan">
-                        <div class="stat-icon cyan"><i class="fa-solid fa-user-plus"></i></div>
-                        <div class="stat-info">
-                            <span class="stat-label">Nuevos Leads (Hoy)</span>
-                            <span class="stat-value">14 Leads</span>
-                        </div>
-                    </div>
-                    <div class="stat-card glass-panel border-green">
-                        <div class="stat-icon green"><i class="fa-solid fa-hand-holding-dollar"></i></div>
-                        <div class="stat-info">
-                            <span class="stat-label">Presupuesto Estimado</span>
-                            <span class="stat-value">$10.7M COP</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Gráfico de Distribución del Pipeline (V3.8) -->
-                <!-- Gráfico de Distribución del Pipeline (V3.8) -->
-                <div class="chart-container" style="position: relative; height: 350px; width: 100%; padding: 25px; display: flex; flex-direction: column; align-items: center; margin-bottom: 35px; box-sizing: border-box;">
-                    <h3 style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; color: #000000; margin-bottom: 15px; width: 100%; text-align: left;">Distribución del Pipeline</h3>
-                    <div class="chart-wrapper" style="position: relative; width: 100%; height: 250px; display: flex; justify-content: center; align-items: center;">
-                        <canvas id="pipelineChart"></canvas>
-                        <div id="chart-center-text" style="position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; pointer-events: none; padding-bottom: 35px; transition: opacity 0.3s ease;">
-                            <span id="chart-center-label" style="display: block; font-size: 14px; color: #6B7280; font-weight: 500;">Pipeline Total</span>
-                            <span id="chart-center-value" style="display: block; font-size: 28px; color: #111827; font-weight: 800; font-family: 'Inter', sans-serif; line-height: 1.2;">$15.2M</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Sección: Paleta de Etiquetas -->
-                <div class="dashboard-details-grid">
-                    <div class="details-card glass-panel">
-                        <h3>Paleta de Etiquetas Inteligentes (n8n Tagger)</h3>
-                        <p class="details-desc">La IA clasifica automáticamente las conversaciones entrantes utilizando
-                            el siguiente código cromático optimizado:</p>
-                        <div class="color-palette-list">
-                            <div class="palette-item">
-                                <span class="color-badge badge-magenta">Alta Prioridad</span>
-                                <span class="color-desc">Magenta (#FF0266) - Prospectos con intención de pago o handover
-                                    urgente.</span>
+                    <!-- Stats Card 3: Nuevos Leads -->
+                    <div class="bento-card border-cyan">
+                        <div class="card-header">
+                            <div>
+                                <p class="kpi-title">Nuevos Leads (Hoy)</p>
+                                <p class="kpi-subtitle">Ingresados en las últimas 24h</p>
                             </div>
-                            <div class="palette-item">
-                                <span class="color-badge badge-purple">Seguimiento</span>
-                                <span class="color-desc">Púrpura (#BB86FC) - Conversación fluida que requiere
-                                    seguimiento comercial periódico.</span>
+                            <div class="stat-icon cyan"><i class="fa-solid fa-user-plus"></i></div>
+                        </div>
+                        <h2 class="kpi-value">14 Leads</h2>
+                        <div class="kpi-trend positive">↗ 100% automatizado</div>
+                    </div>
+
+                    <!-- Stats Card 4: Presupuesto Estimado -->
+                    <div class="bento-card border-green">
+                        <div class="card-header">
+                            <div>
+                                <p class="kpi-title">Presupuesto Estimado</p>
+                                <p class="kpi-subtitle">Valor total de las cotizaciones</p>
                             </div>
-                            <div class="palette-item">
-                                <span class="color-badge badge-cyan">Nuevo / Info</span>
-                                <span class="color-desc">Cian (#03DAC6) - Clientes nuevos buscando información general
-                                    de inventario.</span>
+                            <div class="stat-icon green"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+                        </div>
+                        <h2 class="kpi-value">$10.7M COP</h2>
+                        <div class="kpi-trend positive">↗ Valor de pipeline</div>
+                    </div>
+
+                    <!-- Ventas del Mes (User Requested Example) -->
+                    <div class="bento-card">
+                        <div class="card-header">
+                            <div>
+                                <p class="kpi-title">Ventas del Mes</p>
+                                <p class="kpi-subtitle">Muebles entregados</p>
                             </div>
-                            <div class="palette-item">
-                                <span class="color-badge badge-orange">Pendiente</span>
-                                <span class="color-desc">Naranja (#FFAB40) - Leads en pausa esperando cotización de
-                                    producción a medida.</span>
+                        </div>
+                        <h2 class="kpi-value">$17,900</h2>
+                        <div class="kpi-trend positive">↗ +80% esta semana</div>
+                    </div>
+
+                    <!-- Compradores Activos (User Requested Example) -->
+                    <div class="bento-card">
+                        <div class="card-header">
+                            <div>
+                                <p class="kpi-title">Compradores Activos</p>
+                                <p class="kpi-subtitle">Clientes con compras recurrentes</p>
+                            </div>
+                        </div>
+                        <h2 class="kpi-value">179</h2>
+                        <div class="kpi-trend positive">↗ 44% hoy</div>
+                    </div>
+
+                    <!-- Pipeline Chart -->
+                    <div class="bento-card span-2 pipeline-bento">
+                        <div class="card-header">
+                            <div>
+                                <p class="kpi-title">Distribución del Pipeline</p>
+                                <p class="kpi-subtitle">Estado comercial por etapa</p>
+                            </div>
+                        </div>
+                        <div class="chart-wrapper" style="position: relative; width: 100%; height: 250px; display: flex; justify-content: center; align-items: center;">
+                            <canvas id="pipelineChart"></canvas>
+                            <div id="chart-center-text" style="position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; pointer-events: none; padding-bottom: 35px; transition: opacity 0.3s ease;">
+                                <span id="chart-center-label" style="display: block; font-size: 14px; color: #6B7280; font-weight: 500;">Pipeline Total</span>
+                                <span id="chart-center-value" style="display: block; font-size: 28px; color: #111827; font-weight: 800; font-family: 'Inter', sans-serif; line-height: 1.2;">$15.2M</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="details-card glass-panel">
-                        <h3>Estado Omnicanal de n8n</h3>
-                        <div class="n8n-status-box">
-                            <div class="n8n-status-item">
+                    <!-- Estado n8n -->
+                    <div class="bento-card">
+                        <div class="card-header">
+                            <div>
+                                <p class="kpi-title">Estado Omnicanal n8n</p>
+                                <p class="kpi-subtitle">Monitoreo de integraciones activas</p>
+                            </div>
+                        </div>
+                        <div class="n8n-status-box" style="display: flex; flex-direction: column; gap: 14px;">
+                            <div class="n8n-status-item" style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #374151;">
                                 <span>Servidor VPS Hostinger</span>
-                                <span class="status-indicator online"></span>
+                                <span class="status-indicator online" style="width: 8px; height: 8px; border-radius: 50%; background-color: #10B981; box-shadow: 0 0 6px #10B981;"></span>
                             </div>
-                            <div class="n8n-status-item">
+                            <div class="n8n-status-item" style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #374151;">
                                 <span>WhatsApp Cloud API Hook</span>
-                                <span class="status-indicator online"></span>
+                                <span class="status-indicator online" style="width: 8px; height: 8px; border-radius: 50%; background-color: #10B981; box-shadow: 0 0 6px #10B981;"></span>
                             </div>
-                            <div class="n8n-status-item">
+                            <div class="n8n-status-item" style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #374151;">
                                 <span>Shopify / WooCommerce Sync</span>
-                                <span class="status-indicator online"></span>
+                                <span class="status-indicator online" style="width: 8px; height: 8px; border-radius: 50%; background-color: #10B981; box-shadow: 0 0 6px #10B981;"></span>
                             </div>
-                            <div class="n8n-status-item">
+                            <div class="n8n-status-item" style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #374151;">
                                 <span>LLM Orquestación (Multi-IA)</span>
-                                <span class="status-indicator online"></span>
+                                <span class="status-indicator online" style="width: 8px; height: 8px; border-radius: 50%; background-color: #10B981; box-shadow: 0 0 6px #10B981;"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Insights & Recomendaciones -->
+                    <div class="bento-card span-3 insights-bento">
+                        <div class="card-header" style="margin-bottom: 8px;">
+                            <div>
+                                <p class="kpi-title">AI Insights & Recomendaciones</p>
+                                <p class="kpi-subtitle">Sugerencias automáticas para mejorar ventas</p>
+                            </div>
+                        </div>
+                        <div class="ai-insights-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; width: 100%;">
+                            <!-- Tarjeta 1 -->
+                            <div class="insight-action-card" style="background: #ffffff !important; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(0, 0, 0, 0.05); box-shadow: 0 4px 12px rgba(0,0,0,0.02); transition: all 0.3s ease; cursor: pointer;" onclick="document.querySelector('[data-target=view-inbox]').click()">
+                                <div>
+                                    <div style="display: flex; gap: 10px; align-items: flex-start; margin-bottom: 12px;">
+                                        <div style="background: rgba(16, 185, 129, 0.1); padding: 8px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fa-solid fa-lightbulb" style="color: #10B981; font-size: 16px;"></i>
+                                        </div>
+                                        <div style="font-size: 13px; font-weight: 700; color: #111827; margin-top: 3px;">Cierre Prioritario</div>
+                                    </div>
+                                    <p style="font-size: 12px; color: #4B5563; line-height: 1.5; margin-bottom: 15px;">
+                                        La IA sugiere contactar a <strong>Andrés Mendoza</strong>. Lleva 9 días en la etapa "Cotizado" y coincide con un ticket promedio alto.
+                                    </p>
+                                </div>
+                                <div style="font-size: 12px; font-weight: 700; color: #000000; display: flex; align-items: center; gap: 5px; margin-top: auto;">
+                                    Ir al chat <i class="fa-solid fa-arrow-right" style="font-size: 10px; color: inherit !important;"></i>
+                                </div>
+                            </div>
+
+                            <!-- Tarjeta 2 -->
+                            <div class="insight-action-card" style="background: #ffffff !important; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(0, 0, 0, 0.05); box-shadow: 0 4px 12px rgba(0,0,0,0.02); transition: all 0.3s ease; cursor: pointer;">
+                                <div>
+                                    <div style="display: flex; gap: 10px; align-items: flex-start; margin-bottom: 12px;">
+                                        <div style="background: rgba(239, 68, 68, 0.1); padding: 8px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fa-solid fa-triangle-exclamation" style="color: #EF4444; font-size: 16px;"></i>
+                                        </div>
+                                        <div style="font-size: 13px; font-weight: 700; color: #111827; margin-top: 3px;">Despacho en Vencimiento</div>
+                                    </div>
+                                    <p style="font-size: 12px; color: #4B5563; line-height: 1.5; margin-bottom: 15px;">
+                                        Hoy vence el despacho de <strong>Jorge Valenzuela</strong> (Silla Ergonómica). Asegúrate de realizar el seguimiento logístico.
+                                    </p>
+                                </div>
+                                <div style="font-size: 12px; font-weight: 700; color: #EF4444; display: flex; align-items: center; gap: 5px; margin-top: auto;">
+                                    Revisar despacho <i class="fa-solid fa-arrow-right" style="font-size: 10px; color: inherit !important;"></i>
+                                </div>
+                            </div>
+
+                            <!-- Tarjeta 3 -->
+                            <div class="insight-action-card" style="background: #ffffff !important; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid rgba(0, 0, 0, 0.05); box-shadow: 0 4px 12px rgba(0,0,0,0.02); transition: all 0.3s ease; cursor: pointer;">
+                                <div>
+                                    <div style="display: flex; gap: 10px; align-items: flex-start; margin-bottom: 12px;">
+                                        <div style="background: rgba(6, 182, 212, 0.1); padding: 8px; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fa-solid fa-bell" style="color: #06B6D4; font-size: 16px;"></i>
+                                        </div>
+                                        <div style="font-size: 13px; font-weight: 700; color: #111827; margin-top: 3px;">Próxima Entrega</div>
+                                    </div>
+                                    <p style="font-size: 12px; color: #4B5563; line-height: 1.5; margin-bottom: 15px;">
+                                        <strong>Liliana Gomez</strong> está a 5 días de su despacho. Su orden está lista en bodega.
+                                    </p>
+                                </div>
+                                <div style="font-size: 12px; font-weight: 700; color: #06B6D4; display: flex; align-items: center; gap: 5px; margin-top: auto;">
+                                    Ver estado <i class="fa-solid fa-arrow-right" style="font-size: 10px; color: inherit !important;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paleta de Etiquetas Inteligentes -->
+                    <div class="bento-card span-3">
+                        <div class="card-header">
+                            <div>
+                                <p class="kpi-title">Paleta de Etiquetas Inteligentes</p>
+                                <p class="kpi-subtitle">Código de clasificación automatizado n8n</p>
+                            </div>
+                        </div>
+                        <div class="color-palette-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; width: 100%;">
+                            <div class="palette-item" style="display: flex; flex-direction: column; gap: 4px;">
+                                <span class="color-badge badge-magenta" style="width: fit-content; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; background: rgba(255, 2, 102, 0.1); color: #FF0266;">Alta Prioridad</span>
+                                <span class="color-desc" style="font-size: 11px; color: #4B5563; line-height: 1.4;">Prospectos con intención de pago o requerimiento urgente.</span>
+                            </div>
+                            <div class="palette-item" style="display: flex; flex-direction: column; gap: 4px;">
+                                <span class="color-badge badge-purple" style="width: fit-content; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; background: rgba(187, 134, 252, 0.1); color: #BB86FC;">Seguimiento</span>
+                                <span class="color-desc" style="font-size: 11px; color: #4B5563; line-height: 1.4;">Conversación fluida que requiere seguimiento comercial periódico.</span>
+                            </div>
+                            <div class="palette-item" style="display: flex; flex-direction: column; gap: 4px;">
+                                <span class="color-badge badge-cyan" style="width: fit-content; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; background: rgba(3, 218, 198, 0.1); color: #03DAC6;">Nuevo / Info</span>
+                                <span class="color-desc" style="font-size: 11px; color: #4B5563; line-height: 1.4;">Clientes nuevos que consultan información general.</span>
+                            </div>
+                            <div class="palette-item" style="display: flex; flex-direction: column; gap: 4px;">
+                                <span class="color-badge badge-orange" style="width: fit-content; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; background: rgba(255, 171, 64, 0.1); color: #FFAB40;">Pendiente</span>
+                                <span class="color-desc" style="font-size: 11px; color: #4B5563; line-height: 1.4;">Prospectos esperando cotización de mobiliario a medida.</span>
                             </div>
                         </div>
                     </div>
@@ -515,12 +582,15 @@
                         </div>
                     </div>
 
+                    <div id="resizer" class="resizer"></div>
+
                     <!-- Detalles del Chat Activo (Derecha) -->
                     <div class="chat-container">
                         <div class="chat-header">
                             <div class="chat-header-info">
                                 <h3 id="chat-active-name">Carlos Giraldo</h3>
-                                <span id="chat-active-status" class="channel-indicator whatsapp"><i class="fa-brands fa-whatsapp" style="color: #25D366;"></i> WhatsApp</span>
+                                <span id="chat-active-status" class="channel-indicator whatsapp"><i
+                                        class="fa-brands fa-whatsapp" style="color: #25D366;"></i> WhatsApp</span>
                             </div>
                             <div class="chat-header-control">
                                 <!-- Selector de Asesor Asignado (V3.5) -->
@@ -560,7 +630,8 @@
                                 <button type="button" id="chat-btn-mic" class="chat-media-btn"
                                     title="Grabar Nota de Voz" disabled><i class="fa-solid fa-microphone"></i></button>
                                 <button type="button" id="chat-btn-ai-assist" class="chat-media-btn ai-assist"
-                                    title="Asistencia de IA (Sugerir)"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
+                                    title="Asistencia de IA (Sugerir)"><i
+                                        class="fa-solid fa-wand-magic-sparkles"></i></button>
                             </div>
                             <input type="file" id="chat-file-input" style="display:none;" />
                             <input type="file" id="chat-img-input" style="display:none;" accept="image/*" />
@@ -895,7 +966,8 @@
                         <div class="details-card"
                             style="border: 1px solid var(--border-color); padding: 20px; border-radius: 8px; text-align: center; background: var(--bg-card); display: flex; flex-direction: column; align-items: center; justify-content: space-between; min-height: 220px;">
                             <div>
-                                <i class="fa-brands fa-whatsapp" style="color: #25D366; font-size: 40px; margin-bottom: 10px; display: inline-block;"></i>
+                                <i class="fa-brands fa-whatsapp"
+                                    style="color: #25D366; font-size: 40px; margin-bottom: 10px; display: inline-block;"></i>
                                 <h4>WhatsApp Cloud API</h4>
                                 <p
                                     style="font-size: 11px; color: var(--text-secondary); margin-top: 5px; margin-bottom: 10px;">
@@ -909,7 +981,8 @@
                         <div class="details-card"
                             style="border: 1px solid var(--border-color); padding: 20px; border-radius: 8px; text-align: center; background: var(--bg-card); display: flex; flex-direction: column; align-items: center; justify-content: space-between; min-height: 220px;">
                             <div>
-                                <i class="fa-brands fa-facebook-messenger" style="color: #0084FF; font-size: 40px; margin-bottom: 10px; display: inline-block;"></i>
+                                <i class="fa-brands fa-facebook-messenger"
+                                    style="color: #0084FF; font-size: 40px; margin-bottom: 10px; display: inline-block;"></i>
                                 <h4>FB Messenger</h4>
                                 <p
                                     style="font-size: 11px; color: var(--text-secondary); margin-top: 5px; margin-bottom: 10px;">
@@ -924,7 +997,8 @@
                         <div class="details-card"
                             style="border: 1px solid var(--border-color); padding: 20px; border-radius: 8px; text-align: center; background: var(--bg-card); display: flex; flex-direction: column; align-items: center; justify-content: space-between; min-height: 220px;">
                             <div>
-                                <i class="fa-brands fa-tiktok" style="color: #000000; font-size: 40px; margin-bottom: 10px; display: inline-block;"></i>
+                                <i class="fa-brands fa-tiktok"
+                                    style="color: #000000; font-size: 40px; margin-bottom: 10px; display: inline-block;"></i>
                                 <h4>TikTok Business</h4>
                                 <p
                                     style="font-size: 11px; color: var(--text-secondary); margin-top: 5px; margin-bottom: 10px;">
@@ -938,7 +1012,8 @@
                         <div class="details-card"
                             style="border: 1px solid var(--border-color); padding: 20px; border-radius: 8px; text-align: center; background: var(--bg-card); display: flex; flex-direction: column; align-items: center; justify-content: space-between; min-height: 220px;">
                             <div>
-                                <i class="fa-solid fa-comments" style="color: #06B6D4; font-size: 40px; margin-bottom: 10px; display: inline-block;"></i>
+                                <i class="fa-solid fa-comments"
+                                    style="color: #06B6D4; font-size: 40px; margin-bottom: 10px; display: inline-block;"></i>
                                 <h4>Webchat Widget</h4>
                                 <p
                                     style="font-size: 11px; color: var(--text-secondary); margin-top: 5px; margin-bottom: 10px;">
@@ -1074,7 +1149,8 @@
                         </div>
                         <div class="jira-detail-item">
                             <span class="detail-label">Canal de Contacto</span>
-                            <span id="jira-channel" class="channel-indicator whatsapp"><i class="fa-brands fa-whatsapp" style="color: #25D366;"></i> WhatsApp</span>
+                            <span id="jira-channel" class="channel-indicator whatsapp"><i class="fa-brands fa-whatsapp"
+                                    style="color: #25D366;"></i> WhatsApp</span>
                         </div>
                         <div class="jira-detail-item">
                             <span class="detail-label">Presupuesto Estimado</span>
@@ -1114,7 +1190,8 @@
                 </div>
             </div>
             <div class="jira-modal-footer">
-                <button id="jira-go-to-chat-btn" class="btn-primary"><i class="fa-solid fa-comment-dots"></i> Ir al Chat</button>
+                <button id="jira-go-to-chat-btn" class="btn-primary"><i class="fa-solid fa-comment-dots"></i> Ir al
+                    Chat</button>
                 <button id="jira-save-btn" class="btn-primary"><i class="fa-solid fa-floppy-disk"></i> Guardar
                     Cambios</button>
             </div>
@@ -1133,7 +1210,8 @@
                 <div class="lead-preview-info">
                     <p class="lead-preview-name"><i class="fa-solid fa-user"></i> <strong id="notif-name">Stiven
                             Castro</strong></p>
-                    <p class="lead-preview-channel"><i class="fa-brands fa-whatsapp" style="color: #25D366;"></i> WhatsApp</p>
+                    <p class="lead-preview-channel"><i class="fa-brands fa-whatsapp" style="color: #25D366;"></i>
+                        WhatsApp</p>
                     <p class="lead-preview-desc">La IA detectó una alta intención de compra e infirió un presupuesto
                         estimado.</p>
                     <div class="lead-preview-budget" id="notif-budget">$2,500,000.00 COP</div>
@@ -1234,6 +1312,30 @@
 
     <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Widget de Chat Web Flotante -->
+    <div id="muebleo-chat-widget">
+        <div id="muebleo-chat-window" class="hidden">
+            <div class="chat-header">
+                <div class="header-info">
+                    <span class="status-dot"></span>
+                    <h4>María - Muebleo</h4>
+                </div>
+                <button id="close-chat-btn">✖</button>
+            </div>
+            <div id="web-chat-messages" class="chat-body">
+                <div class="web-bubble web-ia">¡Hola! Soy María. ¿En qué espacio de tu casa estás pensando hoy?</div>
+            </div>
+            <div class="chat-footer">
+                <input type="text" id="web-chat-input" placeholder="Escribe tu mensaje...">
+                <button id="web-send-btn">Enviar</button>
+            </div>
+        </div>
+        
+        <button id="muebleo-chat-fab">
+            <span class="fab-icon">💬</span>
+        </button>
+    </div>
 
     <!-- App Logic -->
     <script src="js/app.js"></script>

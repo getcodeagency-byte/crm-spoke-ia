@@ -1371,33 +1371,67 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const history = chatsHistory[activeInboxLeadId] || [];
         history.forEach(msg => {
+            const senderClassMap = {
+                customer: 'bubble-cliente',
+                human: 'bubble-asesor',
+                ai: 'bubble-ia'
+            };
+            const senderClass = senderClassMap[msg.sender] || msg.sender;
+
+            const rowClassMap = {
+                customer: 'row-cliente',
+                human: 'row-asesor',
+                ai: 'row-ia'
+            };
+            const rowClass = rowClassMap[msg.sender] || '';
+
+            let avatarSrc = '';
+            if (msg.sender === 'ai') {
+                avatarSrc = './assets/ai-avatar.png';
+            } else if (msg.sender === 'human') {
+                const currentAgent = JSON.parse(sessionStorage.getItem('spoke_agent') || '{}');
+                avatarSrc = currentAgent.avatar || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23374151'><circle cx='12' cy='12' r='12' fill='%23D1D5DB'/><path d='M12 14c-4.418 0-8 2.582-8 6v1h16v-1c0-3.418-3.582-6-8-6zm0-1c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z'/></svg>";
+            } else {
+                avatarSrc = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236B7280'><circle cx='12' cy='12' r='12' fill='%23E5E7EB'/><path d='M12 14c-4.418 0-8 2.582-8 6v1h16v-1c0-3.418-3.582-6-8-6zm0-1c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z'/></svg>";
+            }
+
+            const createMessageRow = (bubbleElement) => {
+                const row = document.createElement('div');
+                row.className = `message-row ${rowClass}`;
+                
+                const avatarImg = document.createElement('img');
+                avatarImg.className = 'avatar';
+                avatarImg.src = avatarSrc;
+                avatarImg.alt = msg.sender === 'ai' ? 'IA' : msg.sender;
+                avatarImg.onerror = function() { this.style.display = 'none'; };
+                avatarImg.setAttribute('onerror', "this.style.display='none'");
+                
+                row.appendChild(avatarImg);
+                row.appendChild(bubbleElement);
+                return row;
+            };
+
             const bubble = document.createElement('div');
             bubble.className = msg.type === 'carousel'
-                ? `chat-bubble ${msg.sender} chat-bubble-carousel`
-                : `chat-bubble ${msg.sender}`;
-            
-            let senderLabel = '';
-            if (msg.sender === 'ai') senderLabel = '<span class="subtitle" style="font-size: 8px; margin-bottom: 2px; display: block; color: var(--neon-cyan)">[spoke! AI]</span>';
-            if (msg.sender === 'human') senderLabel = '<span class="subtitle" style="font-size: 8px; margin-bottom: 2px; display: block; color: var(--neon-green)">[Asesor]</span>';
+                ? `chat-bubble ${msg.sender} ${senderClass} chat-bubble-carousel`
+                : `chat-bubble ${msg.sender} ${senderClass}`;
 
             if (msg.type === 'carousel') {
                 // Renderizar burbuja de texto previa si existe
                 if (msg.content && msg.content.trim()) {
                     const textBubble = document.createElement('div');
-                    textBubble.className = `chat-bubble ${msg.sender}`;
+                    textBubble.className = `chat-bubble ${msg.sender} ${senderClass}`;
                     textBubble.innerHTML = `
-                        ${senderLabel}
                         <p>${msg.content}</p>
                         <span class="bubble-meta">${msg.time}</span>
                     `;
-                    chatHistoryContainer.appendChild(textBubble);
+                    chatHistoryContainer.appendChild(createMessageRow(textBubble));
                 }
 
                 const productCardsHTML = msg.products.map(prod => {
                     const imgUrl = prod.imagen || prod.image_url || prod.image || prod.img || prod.thumbnail || '';
                     const fallbackImg = 'https://via.placeholder.com/260x380?text=No+Image';
                     const nombre = prod.nombre || prod.title || 'Producto';
-                    const categoria = prod.categoria || prod.category || 'Mobiliario';
                     
                     const precio = prod.precio !== undefined ? prod.precio : prod.price;
                     const precioFormateado = precio ? Number(precio).toLocaleString('es-CO') : null;
@@ -1406,19 +1440,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     const url = prod.url || prod.product_url || prod.link || '#';
                     return `
                         <div class="product-card">
-                            <img class="product-img" src="${imgUrl || fallbackImg}" alt="${nombre}" onerror="this.src='${fallbackImg}'" />
-                            <div class="product-content">
-                                <span class="product-category">${categoria}</span>
-                                <h4 class="product-title">${nombre}</h4>
-                                <span class="product-price">${priceText}</span>
-                                <a href="${url}" target="_blank" class="btn-ver-detalles" onclick="event.stopPropagation();">Ver Detalles</a>
+                            <div class="card-img-container">
+                                <img src="${imgUrl || fallbackImg}" alt="${nombre}" onerror="this.src='${fallbackImg}'">
+                            </div>
+                            <div class="card-info">
+                                <h3 class="card-title">${nombre}</h3>
+                                <p class="card-desc">Diseño exclusivo de Muebleo</p>
+                                <div class="card-bottom">
+                                    <span class="card-price">${priceText}</span>
+                                    <button class="card-buy-btn" onclick="window.open('${url}', '_blank'); event.stopPropagation();">Ver Producto <span>↗</span></button>
+                                </div>
                             </div>
                         </div>
                     `;
                 }).join('');
 
                 bubble.innerHTML = `
-                    ${senderLabel}
                     <div class="carousel-wrapper">
                         <div class="carousel-container">
                             ${productCardsHTML}
@@ -1426,9 +1463,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <span class="bubble-meta">${msg.time}</span>
                 `;
+                chatHistoryContainer.appendChild(createMessageRow(bubble));
             } else if (msg.type === 'file') {
                 bubble.innerHTML = `
-                    ${senderLabel}
                     <div class="chat-file-bubble">
                         <div class="file-icon"><i class="fa-solid fa-file-pdf"></i></div>
                         <div class="file-info">
@@ -1439,19 +1476,19 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <span class="bubble-meta">${msg.time}</span>
                 `;
+                chatHistoryContainer.appendChild(createMessageRow(bubble));
             } else if (msg.type === 'image') {
                 bubble.innerHTML = `
-                    ${senderLabel}
                     <div class="chat-image-bubble">
                         <img src="${msg.imgUrl}" alt="Imagen enviada" class="chat-sent-image" onclick="window.open(this.src)" />
                     </div>
                     <span class="bubble-meta">${msg.time}</span>
                 `;
+                chatHistoryContainer.appendChild(createMessageRow(bubble));
             } else if (msg.type === 'audio') {
                 const hasUrl = !!(msg.audioUrl || msg.mediaUrl);
                 const audioSrc = msg.audioUrl || msg.mediaUrl || '';
                 bubble.innerHTML = `
-                    ${senderLabel}
                     <div class="chat-audio-bubble">
                         <button class="audio-play-btn" type="button"><i class="fa-solid fa-play"></i></button>
                         <div class="audio-waveform">
@@ -1500,14 +1537,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
                     }
                 }
+                chatHistoryContainer.appendChild(createMessageRow(bubble));
             } else {
                 bubble.innerHTML = `
-                    ${senderLabel}
                     <p>${msg.content}</p>
                     <span class="bubble-meta">${msg.time}</span>
                 `;
+                chatHistoryContainer.appendChild(createMessageRow(bubble));
             }
-            chatHistoryContainer.appendChild(bubble);
         });
 
         chatHistoryContainer.scrollTop = chatHistoryContainer.scrollHeight;
@@ -1647,9 +1684,62 @@ document.addEventListener('DOMContentLoaded', () => {
         return data?.publicUrl || null;
     }
 
+    function showAITypingIndicator() {
+        const container = document.getElementById('chat-history-container');
+        if (!container) return null;
+
+        const row = document.createElement('div');
+        row.className = 'message-row row-ia';
+
+        const avatarImg = document.createElement('img');
+        avatarImg.className = 'avatar';
+        avatarImg.src = './assets/ai-avatar.png';
+        avatarImg.alt = 'IA';
+        avatarImg.onerror = function() { this.style.display = 'none'; };
+        avatarImg.setAttribute('onerror', "this.style.display='none'");
+
+        const typingEl = document.createElement('div');
+        typingEl.className = 'typing-indicator';
+        typingEl.innerHTML = `
+            <span></span>
+            <span></span>
+            <span></span>
+        `;
+
+        row.appendChild(avatarImg);
+        row.appendChild(typingEl);
+
+        container.appendChild(row);
+        container.scrollTop = container.scrollHeight;
+        return row;
+    }
+
+    function removeAITypingIndicator(indicatorEl) {
+        if (indicatorEl && indicatorEl.parentNode) {
+            indicatorEl.parentNode.removeChild(indicatorEl);
+        } else {
+            const fallbacks = document.querySelectorAll('.message-row.row-ia');
+            fallbacks.forEach(el => {
+                if (el.querySelector('.typing-indicator') && el.parentNode) {
+                    el.parentNode.removeChild(el);
+                }
+            });
+        }
+    }
+
     async function enviarAlWebhook({ sessionId, mensaje, tipo, mediaUrl }) {
         const WEBHOOK_URL = 'https://muebleoia.app.n8n.cloud/webhook/3940b692-d275-434b-82d0-c75e0ec43c07';
         console.log(`🚀 Disparando webhook n8n | tipo: ${tipo} | mediaUrl: ${mediaUrl || 'N/A'}`);
+        
+        let typingEl = null;
+        const targetLead = leadsList.find(l => l.id === sessionId);
+        const isSimulator = sessionId === 'lead-simulador-ia';
+        const isAIActive = isSimulator || (targetLead && targetLead.ai_chat_status === 'ai_active');
+        
+        if (isAIActive && activeInboxLeadId === sessionId) {
+            typingEl = showAITypingIndicator();
+        }
+
         try {
             const response = await fetch(WEBHOOK_URL, {
                 method: 'POST',
@@ -1657,63 +1747,54 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ sessionId, mensaje, tipo, mediaUrl, origen: 'CRM Local' })
             });
 
+            if (typingEl) {
+                removeAITypingIndicator(typingEl);
+                typingEl = null;
+            }
+
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
             const data = await response.json().catch(() => ({}));
             console.log('✅ Webhook n8n respondió:', data);
 
             // Procesar respuesta de IA si aplica
-            const targetLead = leadsList.find(l => l.id === sessionId);
-            const isSimulator = sessionId === 'lead-simulador-ia';
             const replyText = data ? (data.respuesta_ia || data.mensaje) : '';
             const shouldReply = replyText && (isSimulator || (targetLead && targetLead.ai_chat_status === 'ai_active'));
 
             if (shouldReply) {
-                let typingEl = null;
-                if (activeInboxLeadId === sessionId && chatHistoryContainer) {
-                    typingEl = document.createElement('div');
-                    typingEl.className = 'chat-bubble ai';
-                    typingEl.innerHTML = `
-                        <span class="subtitle" style="font-size:8px;margin-bottom:2px;display:block;color:var(--neon-cyan)">[spoke! AI]</span>
-                        <div class="typing-indicator-bubble">
-                            <span class="typing-indicator-dot"></span>
-                            <span class="typing-indicator-dot"></span>
-                            <span class="typing-indicator-dot"></span>
-                        </div>`;
-                    chatHistoryContainer.appendChild(typingEl);
-                    chatHistoryContainer.scrollTop = chatHistoryContainer.scrollHeight;
+                const timeStr = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+                if (!chatsHistory[sessionId]) chatsHistory[sessionId] = [];
+
+                let parsedProducts = null;
+                let leadingText = '';
+                try {
+                    const jsonMatch = replyText.match(/\[\s*\{[\s\S]*\}\s*\]/);
+                    if (jsonMatch) {
+                        const parsed = JSON.parse(jsonMatch[0]);
+                        if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].nombre && parsed[0].precio !== undefined) {
+                            parsedProducts = parsed;
+                            leadingText = replyText.substring(0, replyText.indexOf(jsonMatch[0])).trim();
+                        }
+                    }
+                } catch (e) { /* respuesta de texto plano */ }
+
+                if (parsedProducts) {
+                    chatsHistory[sessionId].push({ sender: 'ai', type: 'carousel', products: parsedProducts, content: leadingText, time: timeStr });
+                    guardarMensajeEnSupabase(sessionId, 'ai', leadingText || '', 'carousel', parsedProducts);
+                } else {
+                    chatsHistory[sessionId].push({ sender: 'ai', content: replyText, time: timeStr });
+                    guardarMensajeEnSupabase(sessionId, 'ai', replyText, 'text');
                 }
 
-                const delayMs = Math.min(Math.max(replyText.length * 15, 1200), 3000);
-                setTimeout(() => {
-                    if (typingEl && typingEl.parentNode) typingEl.parentNode.removeChild(typingEl);
-                    const timeStr = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
-                    if (!chatsHistory[sessionId]) chatsHistory[sessionId] = [];
-
-                    let parsedProducts = null;
-                    let leadingText = '';
-                    try {
-                        const jsonMatch = replyText.match(/\[\s*\{[\s\S]*\}\s*\]/);
-                        if (jsonMatch) {
-                            const parsed = JSON.parse(jsonMatch[0]);
-                            if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].nombre && parsed[0].precio !== undefined) {
-                                parsedProducts = parsed;
-                                leadingText = replyText.substring(0, replyText.indexOf(jsonMatch[0])).trim();
-                            }
-                        }
-                    } catch (e) { /* respuesta de texto plano */ }
-
-                    if (parsedProducts) {
-                        chatsHistory[sessionId].push({ sender: 'ai', type: 'carousel', products: parsedProducts, content: leadingText, time: timeStr });
-                        guardarMensajeEnSupabase(sessionId, 'ai', leadingText || '', 'carousel', parsedProducts);
-                    } else {
-                        chatsHistory[sessionId].push({ sender: 'ai', content: replyText, time: timeStr });
-                        guardarMensajeEnSupabase(sessionId, 'ai', replyText, 'text');
-                    }
-
-                    if (activeInboxLeadId === sessionId) { renderInbox(); renderActiveChat(); }
-                }, delayMs);
+                if (activeInboxLeadId === sessionId) { 
+                    renderInbox(); 
+                    renderActiveChat(); 
+                }
             }
         } catch (err) {
+            if (typingEl) {
+                removeAITypingIndicator(typingEl);
+                typingEl = null;
+            }
             console.error('❌ Error al enviar al webhook n8n:', err);
         }
     }
@@ -3475,6 +3556,159 @@ document.addEventListener('DOMContentLoaded', () => {
             window.myPipelineChart.destroy();
         }
         window.myPipelineChart = new Chart(ctx, config);
+    }
+
+    // ----------------------------------------------------------------------
+    // Divisor arrastrable (Resizable Sidebar) tipo WhatsApp Web
+    // ----------------------------------------------------------------------
+    const resizer = document.getElementById('resizer');
+    const leftPanel = document.querySelector('.inbox-sidebar');
+
+    if (resizer && leftPanel) {
+        // Cargar el ancho guardado de localStorage para persistencia premium
+        const savedWidth = localStorage.getItem('spoke_sidebar_width');
+        if (savedWidth) {
+            leftPanel.style.width = savedWidth + 'px';
+        }
+
+        resizer.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            const startX = e.clientX;
+            const startWidth = leftPanel.offsetWidth;
+            
+            resizer.classList.add('is-dragging');
+            document.body.style.userSelect = 'none';
+            document.body.style.cursor = 'col-resize';
+
+            const onMouseMove = (e) => {
+                const newWidth = startWidth + (e.clientX - startX);
+                const minW = 240;
+                const maxW = 480;
+                const clampedWidth = Math.min(maxW, Math.max(minW, newWidth));
+                
+                leftPanel.style.width = clampedWidth + 'px';
+                localStorage.setItem('spoke_sidebar_width', clampedWidth);
+            };
+
+            const onMouseUp = () => {
+                resizer.classList.remove('is-dragging');
+                document.body.style.userSelect = '';
+                document.body.style.cursor = '';
+                
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+            };
+
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+        });
+    }
+
+    // ----------------------------------------------------------------------
+    // 19. Live Web Chat Widget
+    // ----------------------------------------------------------------------
+    const widgetFab = document.getElementById("muebleo-chat-fab");
+    const widgetWindow = document.getElementById("muebleo-chat-window");
+    const widgetCloseBtn = document.getElementById("close-chat-btn");
+    const widgetSendBtn = document.getElementById("web-send-btn");
+    const widgetInput = document.getElementById("web-chat-input");
+    const widgetChatBody = document.getElementById("web-chat-messages");
+
+    if (widgetFab && widgetWindow) {
+        // Abrir y cerrar el chat
+        widgetFab.addEventListener("click", () => widgetWindow.classList.remove("hidden"));
+        widgetCloseBtn.addEventListener("click", () => widgetWindow.classList.add("hidden"));
+
+        // Función principal para enviar el mensaje
+        async function sendMessageFromWeb() {
+            const input = widgetInput;
+            const chatBody = widgetChatBody;
+            const text = input.value.trim();
+            if (!text) return;
+
+            // 1. Mostrar mensaje en el widget web al instante
+            const userMsg = document.createElement("div");
+            userMsg.className = "web-bubble web-user";
+            userMsg.textContent = text;
+            chatBody.appendChild(userMsg);
+            input.value = "";
+            chatBody.scrollTop = chatBody.scrollHeight;
+
+            // 2. GUARDAR EN SUPABASE (HUMAN)
+            const targetLeadId = 'lead-3'; // Carlos Giraldo, origen/canal 'webchat'
+            const timeStr = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+            if (!chatsHistory[targetLeadId]) chatsHistory[targetLeadId] = [];
+            chatsHistory[targetLeadId].push({ sender: 'human', content: text, time: timeStr });
+            
+            await guardarMensajeEnSupabase(targetLeadId, 'human', text, 'text');
+            
+            if (activeInboxLeadId === targetLeadId) {
+                renderInbox();
+                renderActiveChat();
+            }
+
+            // 3. Mostrar indicador visual temporal de la IA
+            const typingIndicator = document.createElement("div");
+            typingIndicator.className = "web-bubble web-ia typing-indicator";
+            typingIndicator.innerHTML = "<span>.</span><span>.</span><span>.</span>";
+            chatBody.appendChild(typingIndicator);
+            chatBody.scrollTop = chatBody.scrollHeight;
+
+            // 4. CONEXIÓN CON N8N
+            const webhookUrl = "https://muebleoia.app.n8n.cloud/webhook-test/webchat-muebleo";
+            
+            try {
+                const response = await fetch(webhookUrl, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ mensaje: text })
+                });
+
+                const data = await response.json();
+                
+                // Remover los 3 puntitos
+                if (chatBody.contains(typingIndicator)) {
+                    chatBody.removeChild(typingIndicator);
+                }
+
+                if (data && data.respuesta) {
+                    // 5. Mostrar la respuesta real en el widget web
+                    const iaMsg = document.createElement("div");
+                    iaMsg.className = "web-bubble web-ia";
+                    iaMsg.textContent = data.respuesta;
+                    chatBody.appendChild(iaMsg);
+
+                    // 6. GUARDAR EN SUPABASE (AI)
+                    const replyTimeStr = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+                    if (!chatsHistory[targetLeadId]) chatsHistory[targetLeadId] = [];
+                    chatsHistory[targetLeadId].push({ sender: 'ai', content: data.respuesta, time: replyTimeStr });
+                    
+                    await guardarMensajeEnSupabase(targetLeadId, 'ai', data.respuesta, 'text');
+                    
+                    if (activeInboxLeadId === targetLeadId) {
+                        renderInbox();
+                        renderActiveChat();
+                    }
+                }
+            } catch (error) {
+                console.error("Error de conexión con n8n:", error);
+                if (chatBody.contains(typingIndicator)) {
+                    chatBody.removeChild(typingIndicator);
+                }
+                const errorMsg = document.createElement("div");
+                errorMsg.className = "web-bubble web-ia";
+                errorMsg.textContent = "Lo siento, mi conexión falló un momento. ¿Puedes repetirlo?";
+                chatBody.appendChild(errorMsg);
+            }
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        widgetSendBtn.addEventListener("click", sendMessageFromWeb);
+        widgetInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") sendMessageFromWeb();
+        });
     }
 
     // Ejecutar chequeo de sesión e inicialización final del CRM al cargar
