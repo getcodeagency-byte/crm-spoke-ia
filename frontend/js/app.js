@@ -1757,7 +1757,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('✅ Webhook n8n respondió:', data);
 
             // Procesar respuesta de IA si aplica
-            const replyText = data ? (data.respuesta_ia || data.mensaje) : '';
+            const replyText = data ? (data.respuesta || data.output || data.response || data.text || data.respuesta_ia || data.mensaje || '') : '';
             const shouldReply = replyText && (isSimulator || (targetLead && targetLead.ai_chat_status === 'ai_active'));
 
             if (shouldReply) {
@@ -1779,10 +1779,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (parsedProducts) {
                     chatsHistory[sessionId].push({ sender: 'ai', type: 'carousel', products: parsedProducts, content: leadingText, time: timeStr });
-                    guardarMensajeEnSupabase(sessionId, 'ai', leadingText || '', 'carousel', parsedProducts);
+                    await guardarMensajeEnSupabase(sessionId, 'ai', leadingText || '', 'carousel', parsedProducts);
                 } else {
                     chatsHistory[sessionId].push({ sender: 'ai', content: replyText, time: timeStr });
-                    guardarMensajeEnSupabase(sessionId, 'ai', replyText, 'text');
+                    await guardarMensajeEnSupabase(sessionId, 'ai', replyText, 'text');
                 }
 
                 if (activeInboxLeadId === sessionId) { 
@@ -3655,7 +3655,7 @@ document.addEventListener('DOMContentLoaded', () => {
             chatBody.scrollTop = chatBody.scrollHeight;
 
             // 4. CONEXIÓN CON N8N
-            const webhookUrl = "https://muebleoia.app.n8n.cloud/webhook-test/webchat-muebleo";
+            const webhookUrl = "https://muebleoia.app.n8n.cloud/webhook/webchat-muebleo";
             
             try {
                 const response = await fetch(webhookUrl, {
