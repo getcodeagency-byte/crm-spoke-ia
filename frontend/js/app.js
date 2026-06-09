@@ -1429,9 +1429,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 const productCardsHTML = msg.products.map(prod => {
-                    const imgUrl = prod.imagen || prod.image_url || prod.image || prod.img || prod.thumbnail || '';
+                    const imgUrl = prod.imagen || prod.image || prod.image_url || prod.url || prod.img || prod.thumbnail || '';
                     const fallbackImg = 'https://via.placeholder.com/260x380?text=No+Image';
-                    const nombre = prod.nombre || prod.title || 'Producto';
+                    const nombre = prod.nombre || prod.name || prod.titulo || prod.title || 'Producto';
                     
                     const precio = prod.precio !== undefined ? prod.precio : prod.price;
                     const precioFormateado = precio ? Number(precio).toLocaleString('es-CO') : null;
@@ -1539,11 +1539,78 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 chatHistoryContainer.appendChild(createMessageRow(bubble));
             } else {
-                bubble.innerHTML = `
-                    <p>${msg.content}</p>
-                    <span class="bubble-meta">${msg.time}</span>
-                `;
-                chatHistoryContainer.appendChild(createMessageRow(bubble));
+                let parsedProducts = null;
+                let textOnly = msg.content || '';
+
+                if (msg.sender === 'ai' && textOnly) {
+                    try {
+                        const jsonMatch = textOnly.match(/\[\s*\{[\s\S]*\}\s*\]/);
+                        if (jsonMatch) {
+                            const parsed = JSON.parse(jsonMatch[0]);
+                            if (Array.isArray(parsed) && parsed.length > 0) {
+                                parsedProducts = parsed;
+                                textOnly = textOnly.replace(jsonMatch[0], '').trim();
+                            }
+                        }
+                    } catch (e) {
+                        console.error("Error al parsear productos en renderActiveChat:", e);
+                    }
+                }
+
+                if (parsedProducts) {
+                    if (textOnly) {
+                        const textBubble = document.createElement('div');
+                        textBubble.className = `chat-bubble ${msg.sender} ${senderClass}`;
+                        textBubble.innerHTML = `
+                            <p>${textOnly}</p>
+                            <span class="bubble-meta">${msg.time}</span>
+                        `;
+                        chatHistoryContainer.appendChild(createMessageRow(textBubble));
+                    }
+
+                    const productCardsHTML = parsedProducts.map(prod => {
+                        const imgUrl = prod.imagen || prod.image || prod.image_url || prod.url || prod.img || prod.thumbnail || '';
+                        const fallbackImg = 'https://via.placeholder.com/260x380?text=No+Image';
+                        const nombre = prod.nombre || prod.name || prod.titulo || prod.title || 'Producto';
+                        const precio = prod.precio !== undefined ? prod.precio : prod.price;
+                        const precioFormateado = precio ? Number(precio).toLocaleString('es-CO') : null;
+                        const priceText = precioFormateado ? `$${precioFormateado} COP` : 'Consultar Precio';
+                        const url = prod.url || prod.product_url || prod.link || '#';
+                        return `
+                            <div class="product-card">
+                                <div class="card-img-container">
+                                    <img src="${imgUrl || fallbackImg}" alt="${nombre}" onerror="this.src='${fallbackImg}'">
+                                </div>
+                                <div class="card-info">
+                                    <h3 class="card-title">${nombre}</h3>
+                                    <p class="card-desc">Diseño exclusivo de Muebleo</p>
+                                    <div class="card-bottom">
+                                        <span class="card-price">${priceText}</span>
+                                        <button class="card-buy-btn" onclick="window.open('${url}', '_blank'); event.stopPropagation();">Ver Producto <span>↗</span></button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+
+                    const carouselBubble = document.createElement('div');
+                    carouselBubble.className = `chat-bubble ${msg.sender} ${senderClass} chat-bubble-carousel`;
+                    carouselBubble.innerHTML = `
+                        <div class="carousel-wrapper">
+                            <div class="carousel-container">
+                                ${productCardsHTML}
+                            </div>
+                        </div>
+                        <span class="bubble-meta">${msg.time}</span>
+                    `;
+                    chatHistoryContainer.appendChild(createMessageRow(carouselBubble));
+                } else {
+                    bubble.innerHTML = `
+                        <p>${msg.content || ''}</p>
+                        <span class="bubble-meta">${msg.time}</span>
+                    `;
+                    chatHistoryContainer.appendChild(createMessageRow(bubble));
+                }
             }
         });
 
@@ -3619,6 +3686,75 @@ document.addEventListener('DOMContentLoaded', () => {
         widgetFab.addEventListener("click", () => widgetWindow.classList.remove("hidden"));
         widgetCloseBtn.addEventListener("click", () => widgetWindow.classList.add("hidden"));
 
+        // Función para renderizar mensajes y carruseles en el widget web
+        function renderWidgetMessage(sender, replyText) {
+            const chatBody = widgetChatBody;
+            if (sender === 'user') {
+                const userMsg = document.createElement("div");
+                userMsg.className = "web-bubble web-user";
+                userMsg.textContent = replyText;
+                chatBody.appendChild(userMsg);
+            } else {
+                let parsedProducts = null;
+                let textOnly = replyText;
+
+                try {
+                    const jsonMatch = replyText.match(/\[\s*\{[\s\S]*\}\s*\]/);
+                    if (jsonMatch) {
+                        const parsed = JSON.parse(jsonMatch[0]);
+                        if (Array.isArray(parsed) && parsed.length > 0) {
+                            parsedProducts = parsed;
+                            textOnly = replyText.replace(jsonMatch[0], '').trim();
+                        }
+                    }
+                } catch (e) {
+                    console.error("Error al parsear productos del webchat:", e);
+                }
+
+                if (textOnly) {
+                    const iaMsg = document.createElement("div");
+                    iaMsg.className = "web-bubble web-ia";
+                    iaMsg.textContent = textOnly;
+                    chatBody.appendChild(iaMsg);
+                }
+
+                if (parsedProducts && parsedProducts.length > 0) {
+                    const productos = parsedProducts;
+                    console.log("Productos extraídos:", productos);
+
+                    const carouselContainer = document.createElement("div");
+                    carouselContainer.className = "web-carousel-container";
+
+                    productos.forEach(prod => {
+                        const imgUrl = prod.imagen || prod.image || prod.image_url || prod.url || prod.img || prod.thumbnail || 'https://via.placeholder.com/150?text=No+Image';
+                        const nombre = prod.nombre || prod.name || prod.titulo || prod.title || 'Producto';
+                        const precio = prod.precio !== undefined ? prod.precio : prod.price;
+                        const precioFormateado = precio ? Number(precio).toLocaleString('es-CO') : null;
+                        const priceText = precioFormateado ? `$${precioFormateado}` : 'Consultar Precio';
+                        const url = prod.url || prod.product_url || prod.link || '#';
+
+                        const productCard = document.createElement("div");
+                        productCard.className = "web-product-card";
+                        productCard.onclick = () => window.open(url, '_blank');
+
+                        productCard.innerHTML = `
+                            <div class="web-card-img-container">
+                                <img src="${imgUrl}" alt="${nombre}">
+                            </div>
+                            <div class="web-card-info">
+                                <h4 class="web-card-title">${nombre}</h4>
+                                <span class="web-card-price">${priceText}</span>
+                            </div>
+                        `;
+                        carouselContainer.appendChild(productCard);
+                    });
+
+                    chatBody.appendChild(carouselContainer);
+                }
+            }
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
         // Función principal para enviar el mensaje
         async function sendMessageFromWeb() {
             const input = widgetInput;
@@ -3627,12 +3763,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!text) return;
 
             // 1. Mostrar mensaje en el widget web al instante
-            const userMsg = document.createElement("div");
-            userMsg.className = "web-bubble web-user";
-            userMsg.textContent = text;
-            chatBody.appendChild(userMsg);
+            renderWidgetMessage('user', text);
             input.value = "";
-            chatBody.scrollTop = chatBody.scrollHeight;
 
             // 2. GUARDAR EN SUPABASE (HUMAN)
             const targetLeadId = 'lead-3'; // Carlos Giraldo, origen/canal 'webchat'
@@ -3674,18 +3806,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 if (data && data.respuesta) {
+                    // Extraer posibles productos y separar el texto
+                    let parsedProducts = null;
+                    let textOnly = data.respuesta;
+                    try {
+                        const jsonMatch = data.respuesta.match(/\[\s*\{[\s\S]*\}\s*\]/);
+                        if (jsonMatch) {
+                            const parsed = JSON.parse(jsonMatch[0]);
+                            if (Array.isArray(parsed) && parsed.length > 0) {
+                                parsedProducts = parsed;
+                                textOnly = data.respuesta.replace(jsonMatch[0], '').trim();
+                            }
+                        }
+                    } catch (e) {
+                        console.error("Error al parsear respuesta IA:", e);
+                    }
+
                     // 5. Mostrar la respuesta real en el widget web
-                    const iaMsg = document.createElement("div");
-                    iaMsg.className = "web-bubble web-ia";
-                    iaMsg.textContent = data.respuesta;
-                    chatBody.appendChild(iaMsg);
+                    renderWidgetMessage('ai', data.respuesta);
 
                     // 6. GUARDAR EN SUPABASE (AI)
                     const replyTimeStr = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
                     if (!chatsHistory[targetLeadId]) chatsHistory[targetLeadId] = [];
-                    chatsHistory[targetLeadId].push({ sender: 'ai', content: data.respuesta, time: replyTimeStr });
                     
-                    await guardarMensajeEnSupabase(targetLeadId, 'ai', data.respuesta, 'text');
+                    if (parsedProducts) {
+                        chatsHistory[targetLeadId].push({ sender: 'ai', type: 'carousel', products: parsedProducts, content: textOnly, time: replyTimeStr });
+                        await guardarMensajeEnSupabase(targetLeadId, 'ai', textOnly || '', 'carousel', parsedProducts);
+                    } else {
+                        chatsHistory[targetLeadId].push({ sender: 'ai', content: data.respuesta, time: replyTimeStr });
+                        await guardarMensajeEnSupabase(targetLeadId, 'ai', data.respuesta, 'text');
+                    }
                     
                     if (activeInboxLeadId === targetLeadId) {
                         renderInbox();
