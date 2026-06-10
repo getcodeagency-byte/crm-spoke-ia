@@ -1313,29 +1313,8 @@
     <!-- Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <!-- Widget de Chat Web Flotante -->
-    <div id="muebleo-chat-widget">
-        <div id="muebleo-chat-window" class="hidden">
-            <div class="chat-header">
-                <div class="header-info">
-                    <span class="status-dot"></span>
-                    <h4>María - Muebleo</h4>
-                </div>
-                <button id="close-chat-btn">✖</button>
-            </div>
-            <div id="web-chat-messages" class="chat-body">
-                <div class="web-bubble web-ia">¡Hola! Soy María. ¿En qué espacio de tu casa estás pensando hoy?</div>
-            </div>
-            <div class="chat-footer">
-                <input type="text" id="web-chat-input" placeholder="Escribe tu mensaje...">
-                <button id="web-send-btn">Enviar</button>
-            </div>
-        </div>
-        
-        <button id="muebleo-chat-fab">
-            <span class="fab-icon">💬</span>
-        </button>
-    </div>
+    <!-- Widget de Chat Web Flotante (Inyección Dinámica) -->
+    <script src="js/widget-loader.js"></script>
 
     <!-- App Logic -->
     <script src="js/app.js"></script>

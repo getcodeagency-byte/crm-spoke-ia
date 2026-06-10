@@ -1615,6 +1615,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         chatHistoryContainer.scrollTop = chatHistoryContainer.scrollHeight;
+
+        // Sincronizar el widget si está en el chat de Carlos Giraldo (lead-3)
+        if (activeInboxLeadId === 'lead-3' && window.spokeCRM && typeof window.spokeCRM.syncWidgetHistory === 'function') {
+            window.spokeCRM.syncWidgetHistory();
+        }
     }
 
     function clearActiveChat() {
@@ -3672,194 +3677,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ----------------------------------------------------------------------
-    // 19. Live Web Chat Widget
+    // 19. Live Web Chat Widget (Refactored to widget-loader.js)
     // ----------------------------------------------------------------------
-    const widgetFab = document.getElementById("muebleo-chat-fab");
-    const widgetWindow = document.getElementById("muebleo-chat-window");
-    const widgetCloseBtn = document.getElementById("close-chat-btn");
-    const widgetSendBtn = document.getElementById("web-send-btn");
-    const widgetInput = document.getElementById("web-chat-input");
-    const widgetChatBody = document.getElementById("web-chat-messages");
-
-    if (widgetFab && widgetWindow) {
-        // Abrir y cerrar el chat
-        widgetFab.addEventListener("click", () => widgetWindow.classList.remove("hidden"));
-        widgetCloseBtn.addEventListener("click", () => widgetWindow.classList.add("hidden"));
-
-        // Función para renderizar mensajes y carruseles en el widget web
-        function renderWidgetMessage(sender, replyText) {
-            const chatBody = widgetChatBody;
-            if (sender === 'user') {
-                const userMsg = document.createElement("div");
-                userMsg.className = "web-bubble web-user";
-                userMsg.textContent = replyText;
-                chatBody.appendChild(userMsg);
-            } else {
-                let parsedProducts = null;
-                let textOnly = replyText;
-
-                try {
-                    const jsonMatch = replyText.match(/\[\s*\{[\s\S]*\}\s*\]/);
-                    if (jsonMatch) {
-                        const parsed = JSON.parse(jsonMatch[0]);
-                        if (Array.isArray(parsed) && parsed.length > 0) {
-                            parsedProducts = parsed;
-                            textOnly = replyText.replace(jsonMatch[0], '').trim();
-                        }
-                    }
-                } catch (e) {
-                    console.error("Error al parsear productos del webchat:", e);
-                }
-
-                if (textOnly) {
-                    const iaMsg = document.createElement("div");
-                    iaMsg.className = "web-bubble web-ia";
-                    iaMsg.textContent = textOnly;
-                    chatBody.appendChild(iaMsg);
-                }
-
-                if (parsedProducts && parsedProducts.length > 0) {
-                    const productos = parsedProducts;
-                    console.log("Productos extraídos:", productos);
-
-                    const carouselContainer = document.createElement("div");
-                    carouselContainer.className = "web-carousel-container";
-
-                    productos.forEach(prod => {
-                        const imgUrl = prod.imagen || prod.image || prod.image_url || prod.url || prod.img || prod.thumbnail || 'https://via.placeholder.com/150?text=No+Image';
-                        const nombre = prod.nombre || prod.name || prod.titulo || prod.title || 'Producto';
-                        const precio = prod.precio !== undefined ? prod.precio : prod.price;
-                        const precioFormateado = precio ? Number(precio).toLocaleString('es-CO') : null;
-                        const priceText = precioFormateado ? `$${precioFormateado}` : 'Consultar Precio';
-                        const url = prod.url || prod.product_url || prod.link || '#';
-
-                        const productCard = document.createElement("div");
-                        productCard.className = "web-product-card";
-                        productCard.onclick = () => window.open(url, '_blank');
-
-                        productCard.innerHTML = `
-                            <div class="web-card-img-container">
-                                <img src="${imgUrl}" alt="${nombre}">
-                            </div>
-                            <div class="web-card-info">
-                                <h4 class="web-card-title">${nombre}</h4>
-                                <span class="web-card-price">${priceText}</span>
-                            </div>
-                        `;
-                        carouselContainer.appendChild(productCard);
-                    });
-
-                    chatBody.appendChild(carouselContainer);
-                }
+    window.spokeCRM = {
+        get chatsHistory() { return chatsHistory; },
+        set chatsHistory(val) { chatsHistory = val; },
+        get activeInboxLeadId() { return activeInboxLeadId; },
+        set activeInboxLeadId(val) { activeInboxLeadId = val; },
+        renderInbox: () => {
+            if (typeof renderInbox === 'function') renderInbox();
+        },
+        renderActiveChat: () => {
+            if (typeof renderActiveChat === 'function') renderActiveChat();
+        },
+        guardarMensajeEnSupabase: async (leadId, sender, content, msgType, metadata) => {
+            if (typeof guardarMensajeEnSupabase === 'function') {
+                await guardarMensajeEnSupabase(leadId, sender, content, msgType, metadata);
             }
-            chatBody.scrollTop = chatBody.scrollHeight;
         }
-
-        // Función principal para enviar el mensaje
-        async function sendMessageFromWeb() {
-            const input = widgetInput;
-            const chatBody = widgetChatBody;
-            const text = input.value.trim();
-            if (!text) return;
-
-            // 1. Mostrar mensaje en el widget web al instante
-            renderWidgetMessage('user', text);
-            input.value = "";
-
-            // 2. GUARDAR EN SUPABASE (HUMAN)
-            const targetLeadId = 'lead-3'; // Carlos Giraldo, origen/canal 'webchat'
-            const timeStr = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
-            if (!chatsHistory[targetLeadId]) chatsHistory[targetLeadId] = [];
-            chatsHistory[targetLeadId].push({ sender: 'human', content: text, time: timeStr });
-            
-            await guardarMensajeEnSupabase(targetLeadId, 'human', text, 'text');
-            
-            if (activeInboxLeadId === targetLeadId) {
-                renderInbox();
-                renderActiveChat();
-            }
-
-            // 3. Mostrar indicador visual temporal de la IA
-            const typingIndicator = document.createElement("div");
-            typingIndicator.className = "web-bubble web-ia typing-indicator";
-            typingIndicator.innerHTML = "<span>.</span><span>.</span><span>.</span>";
-            chatBody.appendChild(typingIndicator);
-            chatBody.scrollTop = chatBody.scrollHeight;
-
-            // 4. CONEXIÓN CON N8N
-            const webhookUrl = "https://muebleoia.app.n8n.cloud/webhook/webchat-muebleo";
-            
-            try {
-                const response = await fetch(webhookUrl, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ mensaje: text })
-                });
-
-                const data = await response.json();
-                
-                // Remover los 3 puntitos
-                if (chatBody.contains(typingIndicator)) {
-                    chatBody.removeChild(typingIndicator);
-                }
-
-                if (data && data.respuesta) {
-                    // Extraer posibles productos y separar el texto
-                    let parsedProducts = null;
-                    let textOnly = data.respuesta;
-                    try {
-                        const jsonMatch = data.respuesta.match(/\[\s*\{[\s\S]*\}\s*\]/);
-                        if (jsonMatch) {
-                            const parsed = JSON.parse(jsonMatch[0]);
-                            if (Array.isArray(parsed) && parsed.length > 0) {
-                                parsedProducts = parsed;
-                                textOnly = data.respuesta.replace(jsonMatch[0], '').trim();
-                            }
-                        }
-                    } catch (e) {
-                        console.error("Error al parsear respuesta IA:", e);
-                    }
-
-                    // 5. Mostrar la respuesta real en el widget web
-                    renderWidgetMessage('ai', data.respuesta);
-
-                    // 6. GUARDAR EN SUPABASE (AI)
-                    const replyTimeStr = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
-                    if (!chatsHistory[targetLeadId]) chatsHistory[targetLeadId] = [];
-                    
-                    if (parsedProducts) {
-                        chatsHistory[targetLeadId].push({ sender: 'ai', type: 'carousel', products: parsedProducts, content: textOnly, time: replyTimeStr });
-                        await guardarMensajeEnSupabase(targetLeadId, 'ai', textOnly || '', 'carousel', parsedProducts);
-                    } else {
-                        chatsHistory[targetLeadId].push({ sender: 'ai', content: data.respuesta, time: replyTimeStr });
-                        await guardarMensajeEnSupabase(targetLeadId, 'ai', data.respuesta, 'text');
-                    }
-                    
-                    if (activeInboxLeadId === targetLeadId) {
-                        renderInbox();
-                        renderActiveChat();
-                    }
-                }
-            } catch (error) {
-                console.error("Error de conexión con n8n:", error);
-                if (chatBody.contains(typingIndicator)) {
-                    chatBody.removeChild(typingIndicator);
-                }
-                const errorMsg = document.createElement("div");
-                errorMsg.className = "web-bubble web-ia";
-                errorMsg.textContent = "Lo siento, mi conexión falló un momento. ¿Puedes repetirlo?";
-                chatBody.appendChild(errorMsg);
-            }
-            chatBody.scrollTop = chatBody.scrollHeight;
-        }
-
-        widgetSendBtn.addEventListener("click", sendMessageFromWeb);
-        widgetInput.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") sendMessageFromWeb();
-        });
-    }
+    };
 
     // Ejecutar chequeo de sesión e inicialización final del CRM al cargar
     checkAuth();
