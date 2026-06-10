@@ -4793,9 +4793,9 @@ select:focus {
 /* ---- 19. LIVE WEB CHAT WIDGET ---- */
 #muebleo-widget-container {
     position: fixed !important;
-    bottom: 24px !important;
-    right: 24px !important;
-    z-index: 99999 !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    z-index: 999999 !important;
     font-family: 'Poppins', sans-serif !important;
     display: flex !important;
     flex-direction: column !important;
