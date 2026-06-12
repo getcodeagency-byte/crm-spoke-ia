@@ -609,69 +609,74 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     // Procesar envío de Login
     if (loginForm) {
-        loginForm.addEventListener('submit', (e) => {
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = loginEmailInput.value.trim();
             const password = loginPasswordInput.value;
 
-            // Primero verificar en la lista de usuarios registrados en localStorage
-            const registeredUsers = JSON.parse(localStorage.getItem('spoke_registered_users') || '[]');
-            const user = registeredUsers.find(u => u.email === email && u.password === password);
+            // Intentar iniciar sesión primero con Supabase Auth
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
 
-            if (user) {
-                const agentSession = { 
-                    uuid: user.uuid || 'advisor-' + user.email,
-                    name: user.name, 
-                    email: email, 
-                    photo: user.photo 
-                };
-                sessionStorage.setItem('spoke_agent', JSON.stringify(agentSession));
-                if (loginErrorMsg) loginErrorMsg.classList.add('hidden');
-                
-                if (loginEmailInput) loginEmailInput.value = '';
-                if (loginPasswordInput) loginPasswordInput.value = '';
-                
-                console.log("Login exitoso, cargando CRM...");
-                // Blindaje: audio protegido + ocultamiento forzado del modal
-                try {
-                    // Espacio reservado para audio de login si se agrega en el futuro
-                } catch (audioError) {
-                    console.warn("Audio no disponible, continuando flujo...", audioError);
+                if (error) {
+                    console.log("Supabase login falló, intentando base de datos local...");
+                    
+                    // Fallback a base de datos local
+                    const registeredUsers = JSON.parse(localStorage.getItem('spoke_registered_users') || '[]');
+                    const user = registeredUsers.find(u => u.email === email && u.password === password);
+
+                    if (user) {
+                        const agentSession = { 
+                            uuid: user.uuid || 'advisor-' + user.email,
+                            name: user.name, 
+                            email: email, 
+                            photo: user.photo 
+                        };
+                        sessionStorage.setItem('spoke_agent', JSON.stringify(agentSession));
+                        if (loginErrorMsg) loginErrorMsg.classList.add('hidden');
+                        
+                        if (loginEmailInput) loginEmailInput.value = '';
+                        if (loginPasswordInput) loginPasswordInput.value = '';
+                        
+                        const _loginOverlay1 = document.getElementById('login-screen');
+                        if (_loginOverlay1) {
+                            _loginOverlay1.classList.add('force-hide-modal');
+                            _loginOverlay1.style.setProperty('display', 'none', 'important');
+                        }
+                        checkAuth();
+                    } else if (email === 'vendedora@muebleo.com' && password === 'muebleo123') {
+                        // Credenciales semilla por defecto
+                        const agentSession = { 
+                            uuid: 'advisor-vendedora-uuid',
+                            name: 'Vendedora Activa', 
+                            email: email, 
+                            photo: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=100&h=100' 
+                        };
+                        sessionStorage.setItem('spoke_agent', JSON.stringify(agentSession));
+                        if (loginErrorMsg) loginErrorMsg.classList.add('hidden');
+                        
+                        if (loginEmailInput) loginEmailInput.value = '';
+                        if (loginPasswordInput) loginPasswordInput.value = '';
+                        
+                        const _loginOverlay2 = document.getElementById('login-screen');
+                        if (_loginOverlay2) {
+                            _loginOverlay2.classList.add('force-hide-modal');
+                            _loginOverlay2.style.setProperty('display', 'none', 'important');
+                        }
+                        checkAuth();
+                    } else {
+                        if (loginErrorMsg) loginErrorMsg.classList.remove('hidden');
+                    }
+                } else {
+                    console.log("Sesión de Supabase iniciada exitosamente.");
+                    if (loginEmailInput) loginEmailInput.value = '';
+                    if (loginPasswordInput) loginPasswordInput.value = '';
                 }
-                const _loginOverlay1 = document.getElementById('login-screen');
-                if (_loginOverlay1) {
-                    _loginOverlay1.classList.add('force-hide-modal');
-                    _loginOverlay1.style.setProperty('display', 'none', 'important');
-                }
-                checkAuth();
-            } else if (email === 'vendedora@muebleo.com' && password === 'muebleo123') {
-                // Credenciales semilla por defecto
-                const agentSession = { 
-                    uuid: 'advisor-vendedora-uuid',
-                    name: 'Vendedora Activa', 
-                    email: email, 
-                    photo: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=100&h=100' 
-                };
-                sessionStorage.setItem('spoke_agent', JSON.stringify(agentSession));
-                if (loginErrorMsg) loginErrorMsg.classList.add('hidden');
-                
-                if (loginEmailInput) loginEmailInput.value = '';
-                if (loginPasswordInput) loginPasswordInput.value = '';
-                
-                console.log("Login exitoso, cargando CRM...");
-                // Blindaje: audio protegido + ocultamiento forzado del modal
-                try {
-                    // Espacio reservado para audio de login si se agrega en el futuro
-                } catch (audioError) {
-                    console.warn("Audio no disponible, continuando flujo...", audioError);
-                }
-                const _loginOverlay2 = document.getElementById('login-screen');
-                if (_loginOverlay2) {
-                    _loginOverlay2.classList.add('force-hide-modal');
-                    _loginOverlay2.style.setProperty('display', 'none', 'important');
-                }
-                checkAuth();
-            } else {
+            } catch (err) {
+                console.error("Error durante login:", err.message);
                 if (loginErrorMsg) loginErrorMsg.classList.remove('hidden');
             }
         });
@@ -686,7 +691,23 @@ document.addEventListener('DOMContentLoaded', () => {
             const password = regPasswordInput.value;
             const photoFile = regPhotoInput.files[0];
 
-            function saveAndLogin(photoBase64) {
+            async function saveAndLogin(photoBase64) {
+                // Registrar en Supabase Auth
+                try {
+                    await supabaseClient.auth.signUp({
+                        email: email,
+                        password: password,
+                        options: {
+                            data: {
+                                name: name,
+                                avatar_url: photoBase64
+                            }
+                        }
+                    });
+                } catch (signUpErr) {
+                    console.warn("Supabase signUp error:", signUpErr.message);
+                }
+
                 // Guardar usuario registrado en localStorage
                 const registeredUsers = JSON.parse(localStorage.getItem('spoke_registered_users') || '[]');
                 
@@ -746,20 +767,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Botón de Cerrar Sesión
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', (e) => {
+        logoutBtn.addEventListener('click', async (e) => {
             e.preventDefault();
             if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-                // 1. Limpiar sesión
+                // 1. Limpiar sesión de Supabase Auth
+                try {
+                    await supabaseClient.auth.signOut();
+                } catch (signOutErr) {
+                    console.warn("Supabase signOut error:", signOutErr.message);
+                }
+
+                // 2. Limpiar sesión
                 sessionStorage.removeItem('spoke_agent');
 
-                // 2. Desbloquear el overlay de login (quitar la clase que lo forzó oculto)
+                // 3. Desbloquear el overlay de login (quitar la clase que lo forzó oculto)
                 const loginOverlay = document.getElementById('login-screen');
                 if (loginOverlay) {
                     loginOverlay.classList.remove('force-hide-modal');
                     loginOverlay.style.removeProperty('display');
                 }
 
-                // 3. Recargar la página para purgar el CRM de memoria y restaurar el login
+                // 4. Recargar la página para purgar el CRM de memoria y restaurar el login
                 window.location.reload();
             }
         });
@@ -3765,7 +3793,65 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Ejecutar chequeo de sesión e inicialización final del CRM al cargar
-    checkAuth();
-    renderizarGraficoPipeline();
+    // Inicializar sesión de Supabase y luego hacer checkAuth
+    async function inicializarSesionAuth() {
+        try {
+            const { data: { session }, error } = await supabaseClient.auth.getSession();
+            if (error) throw error;
+
+            if (session && session.user) {
+                const user = session.user;
+                const agentSession = { 
+                    uuid: user.id,
+                    name: user.user_metadata?.name || user.email.split('@')[0], 
+                    email: user.email, 
+                    photo: user.user_metadata?.avatar_url || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=100&h=100' 
+                };
+                sessionStorage.setItem('spoke_agent', JSON.stringify(agentSession));
+                
+                const loginOverlay = document.getElementById('login-screen');
+                if (loginOverlay) {
+                    loginOverlay.classList.add('force-hide-modal');
+                    loginOverlay.style.setProperty('display', 'none', 'important');
+                }
+            }
+        } catch (err) {
+            console.error("Error al obtener sesión de Supabase:", err.message);
+        } finally {
+            checkAuth();
+            renderizarGraficoPipeline();
+        }
+    }
+
+    // Configurar listener para cambios de autenticación en Supabase
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+        console.log(`🔑 Evento de Auth de Supabase: ${event}`);
+        if (event === 'SIGNED_IN' && session && session.user) {
+            const user = session.user;
+            const agentSession = { 
+                uuid: user.id,
+                name: user.user_metadata?.name || user.email.split('@')[0], 
+                email: user.email, 
+                photo: user.user_metadata?.avatar_url || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=100&h=100' 
+            };
+            sessionStorage.setItem('spoke_agent', JSON.stringify(agentSession));
+            
+            const loginOverlay = document.getElementById('login-screen');
+            if (loginOverlay) {
+                loginOverlay.classList.add('force-hide-modal');
+                loginOverlay.style.setProperty('display', 'none', 'important');
+            }
+            checkAuth();
+        } else if (event === 'SIGNED_OUT') {
+            sessionStorage.removeItem('spoke_agent');
+            const loginOverlay = document.getElementById('login-screen');
+            if (loginOverlay) {
+                loginOverlay.classList.remove('force-hide-modal');
+                loginOverlay.style.removeProperty('display');
+            }
+            checkAuth();
+        }
+    });
+
+    inicializarSesionAuth();
 });

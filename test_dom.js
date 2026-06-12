@@ -26,11 +26,19 @@ dom.window.sessionStorage.setItem('spoke_agent', JSON.stringify({
     avatar: ''
 }));
 
+// Setup mock Chart
+dom.window.Chart = class MockChart {
+    constructor() {}
+    destroy() {}
+    update() {}
+};
+
 // Setup mock Supabase
 dom.window.supabase = {
     createClient: () => {
         return {
             auth: {
+                getSession: async () => ({ data: { session: null }, error: null }),
                 onAuthStateChange: () => {},
                 updateUser: async () => ({ error: null }),
                 resetPasswordForEmail: async () => ({ error: null }),
@@ -38,6 +46,9 @@ dom.window.supabase = {
             from: () => ({
                 insert: async () => ({ data: [], error: null }),
                 select: () => ({
+                    eq: () => ({
+                        order: async () => ({ data: [], error: null })
+                    }),
                     order: async () => ({ data: [], error: null })
                 })
             }),
