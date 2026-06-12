@@ -13,7 +13,7 @@
     if (!cssOrigin) {
         cssOrigin = window.location.origin;
     }
-    const stylesheetUrl = cssOrigin + '/css/styles.css';
+    const stylesheetUrl = cssOrigin + '/css/widget.css';
 
     // 2. Cargar CSS dinámicamente
     const link = document.createElement("link");
