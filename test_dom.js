@@ -6,6 +6,12 @@ const { JSDOM } = require('jsdom');
 const htmlPath = path.join(__dirname, 'frontend', 'index.html');
 let html = fs.readFileSync(htmlPath, 'utf8');
 
+// Strip external links and scripts that would fail and delay DOMContentLoaded
+html = html.replace(/<link[^>]*href="http[^"]*"[^>]*>/gi, '');
+html = html.replace(/<script[^>]*src="http[^"]*"[^>]*><\/script>/gi, '');
+html = html.replace(/<script[^>]*src="[^"]*widget-loader\.js"[^>]*><\/script>/gi, '');
+html = html.replace(/<script[^>]*src="[^"]*app\.js"[^>]*><\/script>/gi, '');
+
 // We need mock sessionStorage for the scripts to run
 const dom = new JSDOM(html, {
     runScripts: "dangerously",
@@ -19,6 +25,30 @@ dom.window.sessionStorage.setItem('spoke_agent', JSON.stringify({
     name: 'Vendedora Test',
     avatar: ''
 }));
+
+// Setup mock Supabase
+dom.window.supabase = {
+    createClient: () => {
+        return {
+            auth: {
+                onAuthStateChange: () => {},
+                updateUser: async () => ({ error: null }),
+                resetPasswordForEmail: async () => ({ error: null }),
+            },
+            from: () => ({
+                insert: async () => ({ data: [], error: null }),
+                select: () => ({
+                    order: async () => ({ data: [], error: null })
+                })
+            }),
+            storage: {
+                from: () => ({
+                    getPublicUrl: () => ({ data: { publicUrl: 'mockUrl' } })
+                })
+            }
+        };
+    }
+};
 
 // Load JS script in the DOM context
 const jsPath = path.join(__dirname, 'frontend', 'js', 'app.js');

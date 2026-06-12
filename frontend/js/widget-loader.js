@@ -49,6 +49,13 @@
 
     // Inicialización del Widget
     async function initWidget() {
+        // Generar o recuperar ID de visitante único
+        let visitorId = localStorage.getItem('spoke_visitor_id');
+        if (!visitorId) {
+            visitorId = 'visitor-' + Math.random().toString(36).substring(2, 11) + Math.random().toString(36).substring(2, 11);
+            localStorage.setItem('spoke_visitor_id', visitorId);
+        }
+
         // Inyectar Estructura HTML
         const widgetHtml = `
             <div id="muebleo-widget-container">
@@ -86,13 +93,43 @@
         // Guardar mensaje local con fallback y sincronización
         async function localGuardarMensajeEnSupabase(leadId, sender, content, msgType = 'text', metadata = null) {
             if (window.spokeCRM) {
+                // Si el lead no existe en leadsList del CRM, crearlo dinámicamente
+                if (window.spokeCRM.leadsList && !window.spokeCRM.leadsList.some(l => l.id === leadId)) {
+                    const newLead = {
+                        id: leadId,
+                        name: `Visitante Web (${leadId.replace('visitor-', '')})`,
+                        phone: '',
+                        channel_source: 'webchat',
+                        ai_chat_status: 'ai_active',
+                        commercial_stage: 'nuevo',
+                        unread: true,
+                        estimated_budget: 0.00,
+                        quoted_value: 0.00,
+                        avatar_url: 'https://placehold.co/100x100/1e293b/06B6D4?text=WEB',
+                        time_in_stage: 'ahora',
+                        created_at: new Date().toISOString().split('T')[0],
+                        assigned_to: 'advisor-ia-uuid',
+                        delivery_date: '',
+                        observations: 'Lead creado dinámicamente desde chat web.',
+                        attachments: [],
+                        activity_log: [
+                            { time: 'Ahora', author: 'Sistema', content: 'Lead creado e indexado desde el Widget Web.' }
+                        ],
+                        tags: [
+                            { name: 'Nuevo', color: '#03DAC6' }
+                        ]
+                    };
+                    window.spokeCRM.leadsList.unshift(newLead);
+                    if (typeof window.spokeCRM.renderInbox === 'function') window.spokeCRM.renderInbox();
+                }
+
                 const timeStr = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
                 if (!window.spokeCRM.chatsHistory[leadId]) {
                     window.spokeCRM.chatsHistory[leadId] = [];
                 }
                 
-                // Mapear sender para cumplir con estructura CRM (human/ai)
-                const crmSender = sender === 'user' ? 'human' : 'ai';
+                // Mapear sender para cumplir con estructura CRM (customer/ai)
+                const crmSender = sender === 'user' ? 'customer' : 'ai';
                 if (msgType === 'carousel') {
                     window.spokeCRM.chatsHistory[leadId].push({ 
                         sender: crmSender, 
@@ -122,7 +159,7 @@
                     if (typeof window.spokeCRM.renderActiveChat === 'function') window.spokeCRM.renderActiveChat();
                 }
             } else {
-                const crmSender = sender === 'user' ? 'human' : 'ai';
+                const crmSender = sender === 'user' ? 'customer' : 'ai';
                 await saveDirectly(leadId, crmSender, content, msgType, metadata);
             }
         }
@@ -222,7 +259,7 @@
 
         // Cargar historial desde DB
         async function loadHistory() {
-            const targetLeadId = 'lead-3';
+            const targetLeadId = visitorId;
             try {
                 const { data, error } = await supabaseClient
                     .from('chat_history')
@@ -236,7 +273,8 @@
                     const messagesContainer = document.getElementById("muebleo-widget-messages");
                     messagesContainer.innerHTML = '';
                     data.forEach(msg => {
-                        renderWidgetMessage(msg.sender, msg.content, msg.products_data);
+                        const role = (msg.sender === 'customer' || msg.sender === 'human' || msg.sender === 'user') ? 'user' : 'ai';
+                        renderWidgetMessage(role, msg.content, msg.products_data);
                     });
                 }
             } catch (err) {
@@ -245,13 +283,13 @@
         }
 
         // Sincronizador de historial para entorno CRM
-        function syncWidgetHistory() {
-            const targetLeadId = 'lead-3';
+        function syncWidgetHistory(leadId) {
+            const targetLeadId = leadId || visitorId;
             const messagesContainer = document.getElementById("muebleo-widget-messages");
             if (messagesContainer && window.spokeCRM && window.spokeCRM.chatsHistory[targetLeadId]) {
                 messagesContainer.innerHTML = '';
                 window.spokeCRM.chatsHistory[targetLeadId].forEach(msg => {
-                    const role = (msg.sender === 'human' || msg.sender === 'customer' || msg.sender === 'customer') ? 'user' : 'ai';
+                    const role = (msg.sender === 'customer' || msg.sender === 'user') ? 'user' : 'ai';
                     renderWidgetMessage(role, msg.content, msg.products || null);
                 });
             }
@@ -263,9 +301,8 @@
         }
 
         // Carga inicial del historial
-        const targetLeadId = 'lead-3';
-        if (window.spokeCRM && window.spokeCRM.chatsHistory[targetLeadId]) {
-            syncWidgetHistory();
+        if (window.spokeCRM && window.spokeCRM.chatsHistory[visitorId]) {
+            syncWidgetHistory(visitorId);
         } else {
             await loadHistory();
         }
@@ -284,7 +321,7 @@
             input.value = "";
 
             // 2. Guardar en Supabase y sincronizar CRM
-            await localGuardarMensajeEnSupabase(targetLeadId, 'user', text, 'text');
+            await localGuardarMensajeEnSupabase(visitorId, 'user', text, 'text');
 
             // 3. Indicador de escritura IA
             const typingIndicator = document.createElement("div");
@@ -333,9 +370,9 @@
 
                     // 6. Guardar en Supabase y sincronizar CRM
                     if (parsedProducts) {
-                        await localGuardarMensajeEnSupabase(targetLeadId, 'ai', textOnly || '', 'carousel', parsedProducts);
+                        await localGuardarMensajeEnSupabase(visitorId, 'ai', textOnly || '', 'carousel', parsedProducts);
                     } else {
-                        await localGuardarMensajeEnSupabase(targetLeadId, 'ai', responseText, 'text');
+                        await localGuardarMensajeEnSupabase(visitorId, 'ai', responseText, 'text');
                     }
                 }
             } catch (err) {

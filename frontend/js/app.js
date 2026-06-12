@@ -128,33 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 { name: 'Nuevo', color: '#03DAC6' } // Cian
             ]
         },
-        {
-            id: 'lead-3',
-            name: 'Carlos Giraldo',
-            phone: '+573209998877',
-            channel_source: 'webchat',
-            ai_chat_status: 'human_paused', // Handover a humano
-            commercial_stage: 'seguimiento',
-            estimated_budget: 0.00,
-            quoted_value: 4200000.00,
-            avatar_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=100&h=100',
-            time_in_stage: 'hace 5h',
-            created_at: '2026-05-26',
-            assigned_to: 'advisor-ia-uuid',
-            delivery_date: '2026-06-20',
-            observations: 'Cliente busca Comedor Industrial de 6 puestos. Requiere que las patas metálicas sean con acabado mate.',
-            attachments: [
-                { name: 'cotizacion_muebleo_carlos.pdf', size: '245 KB' }
-            ],
-            activity_log: [
-                { time: 'Hace 5h', author: 'n8n AI', content: 'Handover comercial activado debido a solicitud de cotización.' },
-                { time: 'Hace 5h', author: 'Sistema', content: 'Estado cambiado a En Seguimiento.' }
-            ],
-            tags: [
-                { name: 'Seguimiento', color: '#BB86FC' }, // Púrpura
-                { name: 'Pendiente', color: '#FFAB40' } // Naranja
-            ]
-        },
+
         {
             id: 'lead-4',
             name: 'Andrés Mendoza',
@@ -358,11 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Historial de Chats para Inbox
     let chatsHistory = {
-        'lead-3': [
-            { sender: 'customer', content: 'Hola, me gustaría saber si la mesa de comedor de 6 puestos la tienen disponible.', time: '10:05 AM' },
-            { sender: 'ai', content: '¡Hola Carlos! Sí, la tenemos disponible en stock. Su precio es de $3.8M COP y cuenta con envío gratis en Bogotá.', time: '10:06 AM' },
-            { sender: 'customer', content: '¿Tienen opciones de madera más clara para la superficie?', time: '10:12 AM' }
-        ],
+
         'lead-1': [
             { sender: 'customer', content: 'Hola, busco un sofá compacto.', time: '11:15 AM' },
             { sender: 'ai', content: '¡Hola! Te recomiendo nuestro Sofá Nórdico de 3 puestos, es ideal para apartamentos pequeños y está tapizado en lino gris claro.', time: '11:16 AM' }
@@ -507,6 +477,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (typeof loadAIConfig === 'function') loadAIConfig();
             if (typeof loadChannelsStatus === 'function') loadChannelsStatus();
             if (typeof loadCatalogConnections === 'function') loadCatalogConnections();
+            
+            // Cargar conversaciones desde Supabase de manera asíncrona
+            cargarConversacionesDesdeSupabase();
         } else {
             if (loginScreen) {
                 loginScreen.classList.remove('hidden');
@@ -516,6 +489,99 @@ document.addEventListener('DOMContentLoaded', () => {
                 crmLayout.classList.add('hidden');
                 crmLayout.style.display = '';
             }
+        }
+    }
+
+    async function cargarConversacionesDesdeSupabase() {
+        try {
+            console.log("🔄 Cargando conversaciones e historial desde Supabase...");
+            const { data: messages, error } = await supabaseClient
+                .from('chat_history')
+                .select('*')
+                .order('created_at', { ascending: true });
+
+            if (error) throw error;
+
+            if (messages && messages.length > 0) {
+                const grouped = {};
+                messages.forEach(msg => {
+                    if (!grouped[msg.lead_id]) {
+                        grouped[msg.lead_id] = [];
+                    }
+                    grouped[msg.lead_id].push(msg);
+                });
+
+                for (const leadId in grouped) {
+                    const leadMsgs = grouped[leadId];
+
+                    chatsHistory[leadId] = leadMsgs.map(msg => {
+                        let timeStr = 'Ahora';
+                        if (msg.created_at) {
+                            try {
+                                const date = new Date(msg.created_at);
+                                timeStr = date.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+                            } catch (e) {}
+                        }
+                        
+                        const item = {
+                            sender: msg.sender,
+                            content: msg.content,
+                            time: timeStr
+                        };
+                        
+                        if (msg.type === 'carousel') {
+                            item.type = 'carousel';
+                            item.products = msg.products_data;
+                        }
+                        return item;
+                    });
+
+                    const exists = leadsList.some(l => l.id === leadId);
+                    if (!exists && leadId !== 'lead-simulador-ia') {
+                        let createdAtStr = new Date().toISOString().split('T')[0];
+                        if (leadMsgs[0] && leadMsgs[0].created_at) {
+                            try {
+                                createdAtStr = new Date(leadMsgs[0].created_at).toISOString().split('T')[0];
+                            } catch (e) {}
+                        }
+
+                        const lastMsg = leadMsgs[leadMsgs.length - 1];
+                        const isUnread = lastMsg && (lastMsg.sender === 'customer' || lastMsg.sender === 'user');
+
+                        const newLead = {
+                            id: leadId,
+                            name: `Visitante Web (${leadId.replace('visitor-', '')})`,
+                            phone: '',
+                            channel_source: 'webchat',
+                            ai_chat_status: 'ai_active',
+                            commercial_stage: 'nuevo',
+                            unread: isUnread,
+                            estimated_budget: 0.00,
+                            quoted_value: 0.00,
+                            avatar_url: 'https://placehold.co/100x100/1e293b/06B6D4?text=WEB',
+                            time_in_stage: 'ahora',
+                            created_at: createdAtStr,
+                            assigned_to: 'advisor-ia-uuid',
+                            delivery_date: '',
+                            observations: 'Lead cargado dinámicamente desde Supabase.',
+                            attachments: [],
+                            activity_log: [
+                                { time: 'Ahora', author: 'Sistema', content: 'Lead recuperado desde el historial de Supabase.' }
+                            ],
+                            tags: [
+                                { name: 'Nuevo', color: '#03DAC6' }
+                            ]
+                        };
+                        leadsList.unshift(newLead);
+                    }
+                }
+
+                if (typeof renderInbox === 'function') renderInbox();
+                if (typeof renderKanban === 'function') renderKanban();
+                if (typeof renderDashboardStats === 'function') renderDashboardStats();
+            }
+        } catch (e) {
+            console.error("❌ Error al cargar conversaciones desde Supabase:", e.message);
         }
     }
 
@@ -1616,9 +1682,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         chatHistoryContainer.scrollTop = chatHistoryContainer.scrollHeight;
 
-        // Sincronizar el widget si está en el chat de Carlos Giraldo (lead-3)
-        if (activeInboxLeadId === 'lead-3' && window.spokeCRM && typeof window.spokeCRM.syncWidgetHistory === 'function') {
-            window.spokeCRM.syncWidgetHistory();
+        // Sincronizar el widget si el canal del lead activo es webchat
+        if (activeLead && activeLead.channel_source === 'webchat' && window.spokeCRM && typeof window.spokeCRM.syncWidgetHistory === 'function') {
+            window.spokeCRM.syncWidgetHistory(activeInboxLeadId);
         }
     }
 
@@ -3682,6 +3748,8 @@ document.addEventListener('DOMContentLoaded', () => {
     window.spokeCRM = {
         get chatsHistory() { return chatsHistory; },
         set chatsHistory(val) { chatsHistory = val; },
+        get leadsList() { return leadsList; },
+        set leadsList(val) { leadsList = val; },
         get activeInboxLeadId() { return activeInboxLeadId; },
         set activeInboxLeadId(val) { activeInboxLeadId = val; },
         renderInbox: () => {
