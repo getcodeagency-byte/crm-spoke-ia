@@ -374,6 +374,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------------------------
     const loginScreen = document.getElementById('login-screen');
     const crmLayout = document.getElementById('crm-layout');
+
+    // Ocultar contenedores de inmediato para evitar destellos (Race Condition)
+    if (loginScreen) {
+        loginScreen.classList.add('hidden');
+        loginScreen.style.setProperty('display', 'none', 'important');
+    }
+    if (crmLayout) {
+        crmLayout.classList.add('hidden');
+        crmLayout.style.setProperty('display', 'none', 'important');
+    }
+
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
     
@@ -3796,6 +3807,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Inicializar sesión de Supabase y luego hacer checkAuth
     async function inicializarSesionAuth() {
         try {
+            // Ocultar contenedores de inmediato antes del fetch para evitar destellos (Race Condition)
+            if (loginScreen) {
+                loginScreen.classList.add('hidden');
+                loginScreen.style.setProperty('display', 'none', 'important');
+            }
+            if (crmLayout) {
+                crmLayout.classList.add('hidden');
+                crmLayout.style.setProperty('display', 'none', 'important');
+            }
+
             const { data: { session }, error } = await supabaseClient.auth.getSession();
             if (error) throw error;
 
@@ -3813,6 +3834,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (loginOverlay) {
                     loginOverlay.classList.add('force-hide-modal');
                     loginOverlay.style.setProperty('display', 'none', 'important');
+                }
+            } else {
+                // Fallback para mantener sesión local si se inició de forma local
+                const localAgent = sessionStorage.getItem('spoke_agent');
+                if (!localAgent) {
+                    sessionStorage.removeItem('spoke_agent');
                 }
             }
         } catch (err) {
