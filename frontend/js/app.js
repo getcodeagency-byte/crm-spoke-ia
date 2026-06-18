@@ -7,7 +7,28 @@
 // ==========================================================================
 const supabaseUrl = 'https://luyeqpcqhdngaisfzdnl.supabase.co';
 const supabaseKey = 'sb_publishable_5PhCsOnvuqs3HagvA1CxxA_lHYhuEjb';
-const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey, {
+    auth: {
+        storage: window.localStorage,
+        autoRefreshToken: true,
+        persistSession: true
+    }
+});
+
+// Validar y sanear URLs de imágenes de prueba/rotas para evitar errores de red en la consola
+function getValidImageUrl(url, fallback = 'https://placehold.co/260x380?text=No+Image') {
+    if (!url || typeof url !== 'string') return fallback;
+    const trimmed = url.trim();
+    if (trimmed.includes('muebleoexample.com') || trimmed.includes('via.placeholder.com')) {
+        return fallback;
+    }
+    // Si es una ruta relativa o URL mal formada (ej. "12345.jpg" o similar sin protocolo)
+    if (!trimmed.startsWith('http://') && !trimmed.startsWith('https://') && !trimmed.startsWith('data:')) {
+        return fallback;
+    }
+    return trimmed;
+}
+
 
 async function guardarMensajeEnSupabase(leadId, sender, content, msgType = 'text', metadata = null) {
     try {
@@ -51,7 +72,7 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
     }
 });
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
 
     // ----------------------------------------------------------------------
     // 1. Datos iniciales simulados (Semilla)
@@ -1534,8 +1555,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 const productCardsHTML = msg.products.map(prod => {
-                    const imgUrl = prod.imagen || prod.image || prod.image_url || prod.url || prod.img || prod.thumbnail || '';
-                    const fallbackImg = 'https://via.placeholder.com/260x380?text=No+Image';
+                    const fallbackImg = 'https://placehold.co/260x380?text=No+Image';
+                    const imgUrl = getValidImageUrl(prod.imagen || prod.image || prod.image_url || prod.url || prod.img || prod.thumbnail || '', fallbackImg);
                     const nombre = prod.nombre || prod.name || prod.titulo || prod.title || 'Producto';
                     
                     const precio = prod.precio !== undefined ? prod.precio : prod.price;
@@ -1546,7 +1567,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     return `
                         <div class="product-card">
                             <div class="card-img-container">
-                                <img src="${imgUrl || fallbackImg}" alt="${nombre}" onerror="this.src='${fallbackImg}'">
+                                <img src="${imgUrl}" alt="${nombre}" onerror="this.src='${fallbackImg}'">
                             </div>
                             <div class="card-info">
                                 <h3 class="card-title">${nombre}</h3>
@@ -1585,7 +1606,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (msg.type === 'image') {
                 bubble.innerHTML = `
                     <div class="chat-image-bubble">
-                        <img src="${msg.imgUrl}" alt="Imagen enviada" class="chat-sent-image" onclick="window.open(this.src)" />
+                        <img src="${getValidImageUrl(msg.imgUrl)}" alt="Imagen enviada" class="chat-sent-image" onclick="window.open(this.src)" onerror="this.src='https://placehold.co/260x380?text=No+Image'" />
                     </div>
                     <span class="bubble-meta">${msg.time}</span>
                 `;
@@ -1674,8 +1695,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
 
                     const productCardsHTML = parsedProducts.map(prod => {
-                        const imgUrl = prod.imagen || prod.image || prod.image_url || prod.url || prod.img || prod.thumbnail || '';
-                        const fallbackImg = 'https://via.placeholder.com/260x380?text=No+Image';
+                        const fallbackImg = 'https://placehold.co/260x380?text=No+Image';
+                        const imgUrl = getValidImageUrl(prod.imagen || prod.image || prod.image_url || prod.url || prod.img || prod.thumbnail || '', fallbackImg);
                         const nombre = prod.nombre || prod.name || prod.titulo || prod.title || 'Producto';
                         const precio = prod.precio !== undefined ? prod.precio : prod.price;
                         const precioFormateado = precio ? Number(precio).toLocaleString('es-CO') : null;
@@ -1684,7 +1705,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         return `
                             <div class="product-card">
                                 <div class="card-img-container">
-                                    <img src="${imgUrl || fallbackImg}" alt="${nombre}" onerror="this.src='${fallbackImg}'">
+                                    <img src="${imgUrl}" alt="${nombre}" onerror="this.src='${fallbackImg}'">
                                 </div>
                                 <div class="card-info">
                                     <h3 class="card-title">${nombre}</h3>
@@ -3807,53 +3828,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // Inicializar sesión de Supabase y luego hacer checkAuth
     async function inicializarSesionAuth() {
         try {
-            // Ocultar contenedores de inmediato antes del fetch para evitar destellos (Race Condition)
-            if (loginScreen) {
-                loginScreen.classList.add('hidden');
-                loginScreen.style.setProperty('display', 'none', 'important');
-            }
-            if (crmLayout) {
-                crmLayout.classList.add('hidden');
-                crmLayout.style.setProperty('display', 'none', 'important');
-            }
-
             const { data: { session }, error } = await supabaseClient.auth.getSession();
             if (error) throw error;
-
-            if (session && session.user) {
-                const user = session.user;
-                const agentSession = { 
-                    uuid: user.id,
-                    name: user.user_metadata?.name || user.email.split('@')[0], 
-                    email: user.email, 
-                    photo: user.user_metadata?.avatar_url || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=100&h=100' 
-                };
-                sessionStorage.setItem('spoke_agent', JSON.stringify(agentSession));
-                
-                const loginOverlay = document.getElementById('login-screen');
-                if (loginOverlay) {
-                    loginOverlay.classList.add('force-hide-modal');
-                    loginOverlay.style.setProperty('display', 'none', 'important');
-                }
-            } else {
-                // Fallback para mantener sesión local si se inició de forma local
-                const localAgent = sessionStorage.getItem('spoke_agent');
-                if (!localAgent) {
-                    sessionStorage.removeItem('spoke_agent');
-                }
-            }
+            console.log("Estado de sesión:", session);
         } catch (err) {
             console.error("Error al obtener sesión de Supabase:", err.message);
-        } finally {
-            checkAuth();
-            renderizarGraficoPipeline();
         }
     }
 
     // Configurar listener para cambios de autenticación en Supabase
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
         console.log(`🔑 Evento de Auth de Supabase: ${event}`);
-        if (event === 'SIGNED_IN' && session && session.user) {
+        console.log("Estado de sesión:", session);
+
+        const hasValidSession = (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') && session && session.user;
+
+        if (hasValidSession) {
             const user = session.user;
             const agentSession = { 
                 uuid: user.id,
@@ -3863,22 +3853,29 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             sessionStorage.setItem('spoke_agent', JSON.stringify(agentSession));
             
-            const loginOverlay = document.getElementById('login-screen');
-            if (loginOverlay) {
-                loginOverlay.classList.add('force-hide-modal');
-                loginOverlay.style.setProperty('display', 'none', 'important');
+            if (loginScreen) {
+                loginScreen.classList.add('hidden');
+                loginScreen.style.setProperty('display', 'none', 'important');
+            }
+            if (crmLayout) {
+                crmLayout.classList.remove('hidden');
+                crmLayout.style.setProperty('display', 'flex', 'important');
             }
             checkAuth();
-        } else if (event === 'SIGNED_OUT') {
+        } else if (event === 'SIGNED_OUT' || !session) {
             sessionStorage.removeItem('spoke_agent');
-            const loginOverlay = document.getElementById('login-screen');
-            if (loginOverlay) {
-                loginOverlay.classList.remove('force-hide-modal');
-                loginOverlay.style.removeProperty('display');
+            if (crmLayout) {
+                crmLayout.classList.add('hidden');
+                crmLayout.style.setProperty('display', 'none', 'important');
+            }
+            if (loginScreen) {
+                loginScreen.classList.remove('hidden');
+                loginScreen.style.removeProperty('display');
             }
             checkAuth();
         }
+        renderizarGraficoPipeline();
     });
 
-    inicializarSesionAuth();
+    await inicializarSesionAuth();
 });

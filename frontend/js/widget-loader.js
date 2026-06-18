@@ -228,7 +228,15 @@
                     carouselContainer.className = "muebleo-widget-carousel-container";
 
                     productos.forEach(prod => {
-                        const imgUrl = prod.imagen || prod.image || prod.image_url || prod.url || prod.img || prod.thumbnail || 'https://via.placeholder.com/150?text=No+Image';
+                        const fallbackImg = 'https://placehold.co/150?text=No+Image';
+                        let rawImg = prod.imagen || prod.image || prod.image_url || prod.url || prod.img || prod.thumbnail || '';
+                        let imgUrl = fallbackImg;
+                        if (rawImg && typeof rawImg === 'string') {
+                            const trimmed = rawImg.trim();
+                            if (!trimmed.includes('muebleoexample.com') && !trimmed.includes('via.placeholder.com') && (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('data:'))) {
+                                imgUrl = trimmed;
+                            }
+                        }
                         const nombre = prod.nombre || prod.name || prod.titulo || prod.title || 'Producto';
                         const precio = prod.precio !== undefined ? prod.precio : prod.price;
                         const precioFormateado = precio ? Number(precio).toLocaleString('es-CO') : null;
@@ -241,7 +249,7 @@
 
                         productCard.innerHTML = `
                             <div class="muebleo-widget-card-img-container">
-                                <img src="${imgUrl}" alt="${nombre}">
+                                <img src="${imgUrl}" alt="${nombre}" onerror="this.src='${fallbackImg}'">
                             </div>
                             <div class="muebleo-widget-card-info">
                                 <h4 class="muebleo-widget-card-title">${nombre}</h4>
