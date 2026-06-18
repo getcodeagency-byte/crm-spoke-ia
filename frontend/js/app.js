@@ -81,6 +81,28 @@ supabaseClient.auth.onAuthStateChange(async (event, session) => {
 });
 
 document.addEventListener('DOMContentLoaded', async () => {
+    let currentSession = null;
+
+    function getCurrentAgent() {
+        if (currentSession && currentSession.user) {
+            const user = currentSession.user;
+            const photo = user.user_metadata?.avatar_url || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=100&h=100';
+            return {
+                uuid: user.id,
+                name: user.user_metadata?.name || user.email.split('@')[0], 
+                email: user.email, 
+                photo: photo,
+                avatar: photo
+            };
+        }
+        return {
+            uuid: 'advisor-vendedora-uuid',
+            name: 'Vendedora Activa',
+            email: 'vendedora@muebleo.com',
+            photo: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=100&h=100',
+            avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=100&h=100'
+        };
+    }
 
     // ----------------------------------------------------------------------
     // 1. Datos iniciales simulados (Semilla)
@@ -477,59 +499,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // Comprobar si ya existe sesión activa en sessionStorage
+    // Comprobar si ya existe sesión activa en sessionStorage (Desactivado legacy)
     function checkAuth() {
-        const currentAgent = sessionStorage.getItem('spoke_agent');
-        if (currentAgent) {
-            const agentData = JSON.parse(currentAgent);
-            if (agentDisplayName) agentDisplayName.textContent = agentData.name;
-            if (dashboardWelcome) dashboardWelcome.textContent = `¡Hola, ${agentData.name.split(' ')[0]}!`;
-            
-            // Cargar avatar en el sidebar
-            const avatarImg = document.getElementById('agent-profile-img');
-            if (avatarImg && agentData.photo) {
-                avatarImg.src = agentData.photo;
-            }
-            
-            if (loginScreen) {
-                loginScreen.classList.add('hidden');
-                loginScreen.style.display = 'none';
-            }
-            if (crmLayout) {
-                crmLayout.classList.remove('hidden');
-                crmLayout.style.setProperty('display', 'flex', 'important');
-            }
-            
-            // Cargar Presencia Asesor
-            const savedPresence = localStorage.getItem('spoke_presence') || 'active';
-            const presenceSelect = document.getElementById('agent-presence-select');
-            if (presenceSelect) {
-                presenceSelect.value = savedPresence;
-                updatePresenceUI(savedPresence);
-            }
-
-            // Renderizar datos iniciales
-            renderDashboardStats();
-            renderKanban();
-            if (typeof renderNotifications === 'function') renderNotifications();
-
-            if (typeof updateTagFilterDropdowns === 'function') updateTagFilterDropdowns();
-            if (typeof loadAIConfig === 'function') loadAIConfig();
-            if (typeof loadChannelsStatus === 'function') loadChannelsStatus();
-            if (typeof loadCatalogConnections === 'function') loadCatalogConnections();
-            
-            // Cargar conversaciones desde Supabase de manera asíncrona
-            cargarConversacionesDesdeSupabase();
-        } else {
-            if (loginScreen) {
-                loginScreen.classList.remove('hidden');
-                loginScreen.style.display = '';
-            }
-            if (crmLayout) {
-                crmLayout.classList.add('hidden');
-                crmLayout.style.display = '';
-            }
-        }
+        // Obsoleto, la autenticación ahora es manejada por el flujo de Supabase y cambiarPantallaSegunSesion
     }
 
     async function cargarConversacionesDesdeSupabase() {
@@ -654,7 +626,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const email = loginEmailInput.value.trim();
             const password = loginPasswordInput.value;
 
-            // Intentar iniciar sesión primero con Supabase Auth
             try {
                 const { data, error } = await supabaseClient.auth.signInWithPassword({
                     email: email,
@@ -662,62 +633,26 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
 
                 if (error) {
-                    console.log("Supabase login falló, intentando base de datos local...");
-                    
-                    // Fallback a base de datos local
-                    const registeredUsers = JSON.parse(localStorage.getItem('spoke_registered_users') || '[]');
-                    const user = registeredUsers.find(u => u.email === email && u.password === password);
-
-                    if (user) {
-                        const agentSession = { 
-                            uuid: user.uuid || 'advisor-' + user.email,
-                            name: user.name, 
-                            email: email, 
-                            photo: user.photo 
-                        };
-                        sessionStorage.setItem('spoke_agent', JSON.stringify(agentSession));
-                        if (loginErrorMsg) loginErrorMsg.classList.add('hidden');
-                        
-                        if (loginEmailInput) loginEmailInput.value = '';
-                        if (loginPasswordInput) loginPasswordInput.value = '';
-                        
-                        const _loginOverlay1 = document.getElementById('login-screen');
-                        if (_loginOverlay1) {
-                            _loginOverlay1.classList.add('force-hide-modal');
-                            _loginOverlay1.style.setProperty('display', 'none', 'important');
-                        }
-                        checkAuth();
-                    } else if (email === 'vendedora@muebleo.com' && password === 'muebleo123') {
-                        // Credenciales semilla por defecto
-                        const agentSession = { 
-                            uuid: 'advisor-vendedora-uuid',
-                            name: 'Vendedora Activa', 
-                            email: email, 
-                            photo: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=100&h=100' 
-                        };
-                        sessionStorage.setItem('spoke_agent', JSON.stringify(agentSession));
-                        if (loginErrorMsg) loginErrorMsg.classList.add('hidden');
-                        
-                        if (loginEmailInput) loginEmailInput.value = '';
-                        if (loginPasswordInput) loginPasswordInput.value = '';
-                        
-                        const _loginOverlay2 = document.getElementById('login-screen');
-                        if (_loginOverlay2) {
-                            _loginOverlay2.classList.add('force-hide-modal');
-                            _loginOverlay2.style.setProperty('display', 'none', 'important');
-                        }
-                        checkAuth();
-                    } else {
-                        if (loginErrorMsg) loginErrorMsg.classList.remove('hidden');
+                    console.error("Supabase login falló:", error.message);
+                    if (loginErrorMsg) {
+                        loginErrorMsg.textContent = "Error al iniciar sesión: " + error.message;
+                        loginErrorMsg.classList.remove('hidden');
                     }
-                } else {
-                    console.log("Sesión de Supabase iniciada exitosamente.");
-                    if (loginEmailInput) loginEmailInput.value = '';
-                    if (loginPasswordInput) loginPasswordInput.value = '';
+                    return;
                 }
+
+                console.log("Sesión de Supabase iniciada exitosamente.");
+                if (loginEmailInput) loginEmailInput.value = '';
+                if (loginPasswordInput) loginPasswordInput.value = '';
+                if (loginErrorMsg) loginErrorMsg.classList.add('hidden');
+                
+                cambiarPantallaSegunSesion(data.session);
             } catch (err) {
                 console.error("Error durante login:", err.message);
-                if (loginErrorMsg) loginErrorMsg.classList.remove('hidden');
+                if (loginErrorMsg) {
+                    loginErrorMsg.textContent = "Error inesperado durante login.";
+                    loginErrorMsg.classList.remove('hidden');
+                }
             }
         });
     }
@@ -732,9 +667,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             const photoFile = regPhotoInput.files[0];
 
             async function saveAndLogin(photoBase64) {
-                // Registrar en Supabase Auth
+                // Registrar en Supabase Auth 100%
                 try {
-                    await supabaseClient.auth.signUp({
+                    const { data, error } = await supabaseClient.auth.signUp({
                         email: email,
                         password: password,
                         options: {
@@ -744,45 +679,34 @@ document.addEventListener('DOMContentLoaded', async () => {
                             }
                         }
                     });
-                } catch (signUpErr) {
-                    console.warn("Supabase signUp error:", signUpErr.message);
-                }
 
-                // Guardar usuario registrado en localStorage
-                const registeredUsers = JSON.parse(localStorage.getItem('spoke_registered_users') || '[]');
-                
-                // Evitar correos duplicados en registro
-                const emailExists = registeredUsers.some(u => u.email === email);
-                if (emailExists || email === 'vendedora@muebleo.com') {
+                    if (error) {
+                        if (registerErrorMsg) {
+                            registerErrorMsg.textContent = 'Error al registrar: ' + error.message;
+                            registerErrorMsg.classList.remove('hidden');
+                        }
+                        return;
+                    }
+
+                    // Limpiar campos
+                    regNameInput.value = '';
+                    regEmailInput.value = '';
+                    regPasswordInput.value = '';
+                    regPhotoInput.value = '';
+                    if (registerErrorMsg) registerErrorMsg.classList.add('hidden');
+
+                    alert('Registro exitoso. Si es necesario, verifica tu correo. Ahora puedes iniciar sesión.');
+                    
+                    // Ir a la pestaña de login
+                    if (tabLogin) tabLogin.click();
+
+                } catch (signUpErr) {
+                    console.error("Supabase signUp error:", signUpErr.message);
                     if (registerErrorMsg) {
-                        registerErrorMsg.textContent = 'Este correo electrónico ya está registrado.';
+                        registerErrorMsg.textContent = 'Error inesperado durante el registro.';
                         registerErrorMsg.classList.remove('hidden');
                     }
-                    return;
                 }
-
-                const newUuid = 'advisor-' + Date.now();
-                registeredUsers.push({
-                    uuid: newUuid,
-                    name: name,
-                    email: email,
-                    password: password,
-                    photo: photoBase64
-                });
-                localStorage.setItem('spoke_registered_users', JSON.stringify(registeredUsers));
-
-                // Guardar sesión y entrar automáticamente
-                const agentSession = { uuid: newUuid, name: name, email: email, photo: photoBase64 };
-                sessionStorage.setItem('spoke_agent', JSON.stringify(agentSession));
-                
-                // Limpiar campos
-                regNameInput.value = '';
-                regEmailInput.value = '';
-                regPasswordInput.value = '';
-                regPhotoInput.value = '';
-                if (registerErrorMsg) registerErrorMsg.classList.add('hidden');
-
-                checkAuth();
             }
 
             if (photoFile) {
@@ -817,17 +741,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     console.warn("Supabase signOut error:", signOutErr.message);
                 }
 
-                // 2. Limpiar sesión
-                sessionStorage.removeItem('spoke_agent');
-
-                // 3. Desbloquear el overlay de login (quitar la clase que lo forzó oculto)
-                const loginOverlay = document.getElementById('login-screen');
-                if (loginOverlay) {
-                    loginOverlay.classList.remove('force-hide-modal');
-                    loginOverlay.style.removeProperty('display');
-                }
-
-                // 4. Recargar la página para purgar el CRM de memoria y restaurar el login
+                // 2. Cambiar la pantalla a login y recargar la página para purgar memoria
+                cambiarPantallaSegunSesion(null);
                 window.location.reload();
             }
         });
@@ -1009,8 +924,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Obtener todos los asesores registrados (V3.5)
     function getRegisteredAdvisors() {
-        const currentAgentStr = sessionStorage.getItem('spoke_agent');
-        const currentAgent = currentAgentStr ? JSON.parse(currentAgentStr) : null;
+        const currentAgent = getCurrentAgent();
         
         const advisors = [
             { uuid: 'advisor-vendedora-uuid', name: 'Vendedora Activa', photo: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=100&h=100' },
@@ -1523,7 +1437,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (msg.sender === 'ai') {
                 avatarSrc = './assets/ai-avatar.png';
             } else if (msg.sender === 'human') {
-                const currentAgent = JSON.parse(sessionStorage.getItem('spoke_agent') || '{}');
+                const currentAgent = getCurrentAgent();
                 avatarSrc = currentAgent.avatar || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23374151'><circle cx='12' cy='12' r='12' fill='%23D1D5DB'/><path d='M12 14c-4.418 0-8 2.582-8 6v1h16v-1c0-3.418-3.582-6-8-6zm0-1c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z'/></svg>";
             } else {
                 avatarSrc = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236B7280'><circle cx='12' cy='12' r='12' fill='%23E5E7EB'/><path d='M12 14c-4.418 0-8 2.582-8 6v1h16v-1c0-3.418-3.582-6-8-6zm0-1c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z'/></svg>";
@@ -1790,7 +1704,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Filtrar leads para el Inbox
         const filteredLeads = leadsList.filter(lead => {
             // Filtro de pertenencia (Mis Leads vs Todos) (V3.5)
-            const currentAgent = JSON.parse(sessionStorage.getItem('spoke_agent') || '{}');
+            const currentAgent = getCurrentAgent();
             const myUuid = currentAgent.uuid || 'advisor-vendedora-uuid';
             const assignedTo = lead.assigned_to || (lead.ai_chat_status === 'ai_active' ? 'advisor-ia-uuid' : 'advisor-vendedora-uuid');
             
@@ -1851,7 +1765,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const activeLead = leadsList.find(l => l.id === activeInboxLeadId);
             if (activeLead && activeLead.id !== 'lead-simulador-ia' && activeLead.ai_chat_status === 'ai_active') {
                 activeLead.ai_chat_status = 'human_paused';
-                const currentAgent = JSON.parse(sessionStorage.getItem('spoke_agent') || '{}');
+                const currentAgent = getCurrentAgent();
                 const myUuid = currentAgent.uuid || 'advisor-vendedora-uuid';
                 activeLead.assigned_to = myUuid;
                 if (aiControlToggle) aiControlToggle.checked = false;
@@ -2075,7 +1989,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (activeLead && activeLead.ai_chat_status === 'ai_active') {
             activeLead.ai_chat_status = 'human_paused';
             
-            const currentAgent = JSON.parse(sessionStorage.getItem('spoke_agent') || '{}');
+            const currentAgent = getCurrentAgent();
             const myUuid = currentAgent.uuid || 'advisor-vendedora-uuid';
             activeLead.assigned_to = myUuid; // Auto-asignar al humano activo
             
@@ -2099,7 +2013,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Re-renderizar listas laterales de forma silenciosa para actualizar los indicadores
             renderInboxList(leadsList.filter(lead => {
-                const currentAgent = JSON.parse(sessionStorage.getItem('spoke_agent') || '{}');
+                const currentAgent = getCurrentAgent();
                 const myUuid = currentAgent.uuid || 'advisor-vendedora-uuid';
                 const assignedTo = lead.assigned_to || (lead.ai_chat_status === 'ai_active' ? 'advisor-ia-uuid' : 'advisor-vendedora-uuid');
                 
@@ -3070,7 +2984,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 estimated_budget: budget,
                 quoted_value: 0.00,
                 avatar_url: randomAvatar,
-                assigned_to: (JSON.parse(sessionStorage.getItem('spoke_agent') || '{}').uuid) || 'advisor-vendedora-uuid',
+                assigned_to: getCurrentAgent().uuid || 'advisor-vendedora-uuid',
                 time_in_stage: 'Ahora',
                 delivery_date: '',
                 observations: '',
@@ -3834,33 +3748,48 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     // Inicializar sesión de Supabase y luego hacer checkAuth
-    async function inicializarSesionAuth() {
-        try {
-            const { data: { session }, error } = await supabaseClient.auth.getSession();
-            if (error) throw error;
-            console.log("Estado de sesión:", session);
-        } catch (err) {
-            console.error("Error al obtener sesión de Supabase:", err.message);
+    function inicializarDashboardConDatos(session) {
+        if (!session || !session.user) return;
+        
+        currentSession = session; // Guardar en caché local
+        const user = session.user;
+        const agentName = user.user_metadata?.name || user.email.split('@')[0];
+        const agentPhoto = user.user_metadata?.avatar_url || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=100&h=100';
+
+        if (agentDisplayName) agentDisplayName.textContent = agentName;
+        if (dashboardWelcome) dashboardWelcome.textContent = `¡Hola, ${agentName.split(' ')[0]}!`;
+        
+        const avatarImg = document.getElementById('agent-profile-img');
+        if (avatarImg) {
+            avatarImg.src = agentPhoto;
         }
+
+        // Cargar Presencia Asesor
+        const savedPresence = localStorage.getItem('spoke_presence') || 'active';
+        if (presenceSelect) {
+            presenceSelect.value = savedPresence;
+            updatePresenceUI(savedPresence);
+        }
+
+        // Renderizar datos del Dashboard
+        renderDashboardStats();
+        renderKanban();
+        if (typeof renderNotifications === 'function') renderNotifications();
+        if (typeof updateTagFilterDropdowns === 'function') updateTagFilterDropdowns();
+        if (typeof loadAIConfig === 'function') loadAIConfig();
+        if (typeof loadChannelsStatus === 'function') loadChannelsStatus();
+        if (typeof loadCatalogConnections === 'function') loadCatalogConnections();
+        
+        // Cargar conversaciones desde Supabase de manera asíncrona
+        cargarConversacionesDesdeSupabase();
+        renderizarGraficoPipeline();
     }
 
-    // Configurar listener para cambios de autenticación en Supabase
-    supabaseClient.auth.onAuthStateChange(async (event, session) => {
-        console.log(`🔑 Evento de Auth de Supabase: ${event}`);
-        console.log("Estado de sesión:", session);
-
-        const hasValidSession = (event === 'INITIAL_SESSION' || event === 'SIGNED_IN') && session && session.user;
-
-        if (hasValidSession) {
-            const user = session.user;
-            const agentSession = { 
-                uuid: user.id,
-                name: user.user_metadata?.name || user.email.split('@')[0], 
-                email: user.email, 
-                photo: user.user_metadata?.avatar_url || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=100&h=100' 
-            };
-            sessionStorage.setItem('spoke_agent', JSON.stringify(agentSession));
-            
+    function cambiarPantallaSegunSesion(session) {
+        currentSession = session; // Guardar en caché local
+        
+        if (session && session.user) {
+            // Mostrar CRM
             if (loginScreen) {
                 loginScreen.classList.add('hidden');
                 loginScreen.style.setProperty('display', 'none', 'important');
@@ -3869,9 +3798,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 crmLayout.classList.remove('hidden');
                 crmLayout.style.setProperty('display', 'flex', 'important');
             }
-            checkAuth();
-        } else if (event === 'SIGNED_OUT' || !session) {
-            sessionStorage.removeItem('spoke_agent');
+            inicializarDashboardConDatos(session);
+        } else {
+            // Mostrar Login
             if (crmLayout) {
                 crmLayout.classList.add('hidden');
                 crmLayout.style.setProperty('display', 'none', 'important');
@@ -3880,9 +3809,42 @@ document.addEventListener('DOMContentLoaded', async () => {
                 loginScreen.classList.remove('hidden');
                 loginScreen.style.removeProperty('display');
             }
-            checkAuth();
         }
-        renderizarGraficoPipeline();
+    }
+
+    // Inicializar sesión de Supabase y luego hacer checkAuth
+    async function inicializarSesionAuth() {
+        try {
+            // Ocultar contenedores de inmediato antes del fetch para evitar destellos (Race Condition)
+            if (loginScreen) {
+                loginScreen.classList.add('hidden');
+                loginScreen.style.setProperty('display', 'none', 'important');
+            }
+            if (crmLayout) {
+                crmLayout.classList.add('hidden');
+                crmLayout.style.setProperty('display', 'none', 'important');
+            }
+
+            const { data, error } = await supabaseClient.auth.getSession();
+            if (error) throw error;
+            console.log("Estado de sesión:", data.session);
+            cambiarPantallaSegunSesion(data.session);
+        } catch (err) {
+            console.error("Error al obtener sesión de Supabase:", err.message);
+            cambiarPantallaSegunSesion(null);
+        }
+    }
+
+    // Configurar listener para cambios de autenticación en Supabase
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+        console.log(`🔑 Evento de Auth de Supabase: ${event}`);
+        console.log("Estado de sesión:", session);
+
+        if (event === 'SIGNED_IN' && session) {
+            cambiarPantallaSegunSesion(session);
+        } else if (event === 'SIGNED_OUT') {
+            cambiarPantallaSegunSesion(null);
+        }
     });
 
     await inicializarSesionAuth();

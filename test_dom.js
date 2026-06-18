@@ -38,7 +38,18 @@ dom.window.supabase = {
     createClient: () => {
         return {
             auth: {
-                getSession: async () => ({ data: { session: null }, error: null }),
+                getSession: async () => ({ 
+                    data: { 
+                        session: { 
+                            user: { 
+                                id: 'advisor-vendedora-uuid', 
+                                email: 'vendedora@muebleo.com',
+                                user_metadata: { name: 'Vendedora Test' }
+                            } 
+                        } 
+                    }, 
+                    error: null 
+                }),
                 onAuthStateChange: () => {},
                 updateUser: async () => ({ error: null }),
                 resetPasswordForEmail: async () => ({ error: null }),
