@@ -7,19 +7,27 @@
 // ==========================================================================
 const supabaseUrl = 'https://luyeqpcqhdngaisfzdnl.supabase.co';
 const supabaseKey = 'sb_publishable_5PhCsOnvuqs3HagvA1CxxA_lHYhuEjb';
-const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey, {
-    auth: {
-        storage: window.localStorage,
-        autoRefreshToken: true,
-        persistSession: true
-    }
-});
+// Patrón Singleton estricto para evitar múltiples instancias de GoTrueClient
+if (!window.supabaseClient) {
+    window.supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey, {
+        auth: {
+            storage: window.localStorage,
+            autoRefreshToken: true,
+            persistSession: true
+        }
+    });
+}
+const supabaseClient = window.supabaseClient;
 
 // Validar y sanear URLs de imágenes de prueba/rotas para evitar errores de red en la consola
 function getValidImageUrl(url, fallback = 'https://placehold.co/260x380?text=No+Image') {
     if (!url || typeof url !== 'string') return fallback;
     const trimmed = url.trim();
     if (trimmed.includes('muebleoexample.com') || trimmed.includes('via.placeholder.com')) {
+        return fallback;
+    }
+    // Interceptar secuencias numéricas de prueba en la raíz de Muebleo o terminadas en /12345.jpg, /12346.jpg
+    if (/muebleo\.com\/\d+/i.test(trimmed) || /\/\d+\.(jpg|jpeg|png|webp|gif)$/i.test(trimmed)) {
         return fallback;
     }
     // Si es una ruta relativa o URL mal formada (ej. "12345.jpg" o similar sin protocolo)

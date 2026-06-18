@@ -88,7 +88,18 @@
 
         const supabaseUrl = 'https://luyeqpcqhdngaisfzdnl.supabase.co';
         const supabaseKey = 'sb_publishable_5PhCsOnvuqs3HagvA1CxxA_lHYhuEjb';
-        const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+        
+        // Patrón Singleton estricto para evitar múltiples instancias de GoTrueClient
+        if (!window.supabaseClient) {
+            window.supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey, {
+                auth: {
+                    storage: window.localStorage,
+                    autoRefreshToken: true,
+                    persistSession: true
+                }
+            });
+        }
+        const supabaseClient = window.supabaseClient;
 
         // Guardar mensaje local con fallback y sincronización
         async function localGuardarMensajeEnSupabase(leadId, sender, content, msgType = 'text', metadata = null) {
@@ -233,7 +244,11 @@
                         let imgUrl = fallbackImg;
                         if (rawImg && typeof rawImg === 'string') {
                             const trimmed = rawImg.trim();
-                            if (!trimmed.includes('muebleoexample.com') && !trimmed.includes('via.placeholder.com') && (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('data:'))) {
+                            const isInvalid = trimmed.includes('muebleoexample.com') || 
+                                              trimmed.includes('via.placeholder.com') ||
+                                              /muebleo\.com\/\d+/i.test(trimmed) || 
+                                              /\/\d+\.(jpg|jpeg|png|webp|gif)$/i.test(trimmed);
+                            if (!isInvalid && (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('data:'))) {
                                 imgUrl = trimmed;
                             }
                         }
