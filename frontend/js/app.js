@@ -734,16 +734,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         logoutBtn.addEventListener('click', async (e) => {
             e.preventDefault();
             if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-                // 1. Limpiar sesión de Supabase Auth
                 try {
                     await supabaseClient.auth.signOut();
                 } catch (signOutErr) {
                     console.warn("Supabase signOut error:", signOutErr.message);
                 }
-
-                // 2. Cambiar la pantalla a login y recargar la página para purgar memoria
-                cambiarPantallaSegunSesion(null);
-                window.location.reload();
             }
         });
     }
