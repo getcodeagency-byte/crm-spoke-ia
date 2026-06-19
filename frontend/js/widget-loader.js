@@ -176,26 +176,21 @@
 
             // Disparo Non-Blocking al Webhook de n8n (solo para el visitante)
             if (crmSender === 'customer') {
-                (async () => {
-                    try {
-                        const URL_WEBHOOK_N8N = 'https://n8n.srv1718653.hstgr.cloud/webhook/3940b692-d275-434b-82d0-c75e0ec43c07';
-                        await fetch(URL_WEBHOOK_N8N, {
-                            method: 'POST',
-                            mode: 'no-cors',
-                            headers: {
-                                'Content-Type': 'text/plain'
-                            },
-                            body: JSON.stringify({
-                                lead_id: leadId,
-                                mensaje: content,
-                                remitente: 'visitante',
-                                timestamp: new Date().toISOString()
-                            })
-                        });
-                    } catch (webhookErr) {
-                        console.warn("n8n Webhook inaccesible");
-                    }
-                })();
+                const URL_WEBHOOK_N8N = 'https://n8n.srv1718653.hstgr.cloud/webhook/3940b692-d275-434b-82d0-c75e0ec43c07';
+                const payload = {
+                    lead_id: leadId,
+                    mensaje: content,
+                    remitente: 'visitante',
+                    timestamp: new Date().toISOString()
+                };
+                fetch(URL_WEBHOOK_N8N, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'text/plain'
+                    },
+                    body: JSON.stringify(payload)
+                }).catch(e => console.warn('n8n silencioso:', e));
             }
         }
 

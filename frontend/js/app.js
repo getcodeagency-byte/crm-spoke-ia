@@ -57,25 +57,21 @@ async function guardarMensajeEnSupabase(leadId, sender, content, msgType = 'text
 
         // Disparo Non-Blocking al Webhook de n8n (solo para el asesor)
         if (sender === 'human' || sender === 'advisor') {
-            (async () => {
-                try {
-                    const URL_WEBHOOK_N8N = 'https://n8n.srv1718653.hstgr.cloud/webhook/3940b692-d275-434b-82d0-c75e0ec43c07';
-                    await fetch(URL_WEBHOOK_N8N, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            lead_id: leadId,
-                            mensaje: content || (msgType === 'file' ? '📁 Archivo' : msgType === 'image' ? '📷 Imagen' : ''),
-                            remitente: 'asesor',
-                            timestamp: new Date().toISOString()
-                        })
-                    });
-                } catch (webhookErr) {
-                    console.warn("n8n Webhook inaccesible");
-                }
-            })();
+            const URL_WEBHOOK_N8N = 'https://n8n.srv1718653.hstgr.cloud/webhook/3940b692-d275-434b-82d0-c75e0ec43c07';
+            const payload = {
+                lead_id: leadId,
+                mensaje: content || (msgType === 'file' ? '📁 Archivo' : msgType === 'image' ? '📷 Imagen' : ''),
+                remitente: 'asesor',
+                timestamp: new Date().toISOString()
+            };
+            fetch(URL_WEBHOOK_N8N, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'text/plain'
+                },
+                body: JSON.stringify(payload)
+            }).catch(e => console.warn('n8n silencioso:', e));
         }
     } catch (error) {
         console.error("❌ Error al guardar en Supabase:", error.message);
@@ -2032,12 +2028,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         try {
-            await fetch(URL_WEBHOOK_N8N, {
+            const payload = { sessionId, mensaje, tipo, mediaUrl, origen: 'CRM Local' };
+            fetch(URL_WEBHOOK_N8N, {
                 method: 'POST',
                 mode: 'no-cors',
-                headers: { 'Content-Type': 'text/plain' },
-                body: JSON.stringify({ sessionId, mensaje, tipo, mediaUrl, origen: 'CRM Local' })
-            });
+                headers: {
+                    'Content-Type': 'text/plain'
+                },
+                body: JSON.stringify(payload)
+            }).catch(e => console.warn('n8n silencioso:', e));
 
             // Ocultar indicador de escritura después de un breve delay ya que no leemos respuesta
             setTimeout(() => {
