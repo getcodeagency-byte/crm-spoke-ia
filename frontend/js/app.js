@@ -2019,8 +2019,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function enviarAlWebhook({ sessionId, mensaje, tipo, mediaUrl }) {
-        const WEBHOOK_URL = 'https://muebleoia.app.n8n.cloud/webhook/3940b692-d275-434b-82d0-c75e0ec43c07';
-        console.log(`🚀 Disparando webhook n8n | tipo: ${tipo} | mediaUrl: ${mediaUrl || 'N/A'}`);
+        const URL_WEBHOOK_N8N = 'https://n8n.srv1718653.hstgr.cloud/webhook/3940b692-d275-434b-82d0-c75e0ec43c07';
+        console.log(`🚀 Disparando webhook n8n (fire-and-forget) | tipo: ${tipo} | mediaUrl: ${mediaUrl || 'N/A'}`);
         
         let typingEl = null;
         const targetLead = leadsList.find(l => l.id === sessionId);
@@ -2032,55 +2032,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         try {
-            const response = await fetch(WEBHOOK_URL, {
+            await fetch(URL_WEBHOOK_N8N, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain' },
                 body: JSON.stringify({ sessionId, mensaje, tipo, mediaUrl, origen: 'CRM Local' })
             });
 
-            if (typingEl) {
-                removeAITypingIndicator(typingEl);
-                typingEl = null;
-            }
-
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            const data = await response.json().catch(() => ({}));
-            console.log('✅ Webhook n8n respondió:', data);
-
-            // Procesar respuesta de IA si aplica
-            const replyText = data ? (data.respuesta || data.output || data.response || data.text || data.respuesta_ia || data.mensaje || '') : '';
-            const shouldReply = replyText && (isSimulator || (targetLead && targetLead.ai_chat_status === 'ai_active'));
-
-            if (shouldReply) {
-                const timeStr = new Date().toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
-                if (!chatsHistory[sessionId]) chatsHistory[sessionId] = [];
-
-                let parsedProducts = null;
-                let leadingText = '';
-                try {
-                    const jsonMatch = replyText.match(/\[\s*\{[\s\S]*\}\s*\]/);
-                    if (jsonMatch) {
-                        const parsed = JSON.parse(jsonMatch[0]);
-                        if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].nombre && parsed[0].precio !== undefined) {
-                            parsedProducts = parsed;
-                            leadingText = replyText.substring(0, replyText.indexOf(jsonMatch[0])).trim();
-                        }
-                    }
-                } catch (e) { /* respuesta de texto plano */ }
-
-                if (parsedProducts) {
-                    chatsHistory[sessionId].push({ sender: 'ai', type: 'carousel', products: parsedProducts, content: leadingText, time: timeStr });
-                    await guardarMensajeEnSupabase(sessionId, 'ai', leadingText || '', 'carousel', parsedProducts);
-                } else {
-                    chatsHistory[sessionId].push({ sender: 'ai', content: replyText, time: timeStr });
-                    await guardarMensajeEnSupabase(sessionId, 'ai', replyText, 'text');
+            // Ocultar indicador de escritura después de un breve delay ya que no leemos respuesta
+            setTimeout(() => {
+                if (typingEl) {
+                    removeAITypingIndicator(typingEl);
+                    typingEl = null;
                 }
-
-                if (activeInboxLeadId === sessionId) { 
-                    renderInbox(); 
-                    renderActiveChat(); 
-                }
-            }
+            }, 3000);
         } catch (err) {
             if (typingEl) {
                 removeAITypingIndicator(typingEl);
@@ -2227,7 +2192,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             chatBtnAiAssist.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
 
             console.log("✨ Solicitando sugerencia de IA a n8n...");
-            fetch('https://muebleoia.app.n8n.cloud/webhook/3940b692-d275-434b-82d0-c75e0ec43c07', {
+            const URL_WEBHOOK_N8N = 'https://n8n.srv1718653.hstgr.cloud/webhook/3940b692-d275-434b-82d0-c75e0ec43c07';
+            fetch(URL_WEBHOOK_N8N, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

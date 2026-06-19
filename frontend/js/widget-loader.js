@@ -181,8 +181,9 @@
                         const URL_WEBHOOK_N8N = 'https://n8n.srv1718653.hstgr.cloud/webhook/3940b692-d275-434b-82d0-c75e0ec43c07';
                         await fetch(URL_WEBHOOK_N8N, {
                             method: 'POST',
+                            mode: 'no-cors',
                             headers: {
-                                'Content-Type': 'application/json'
+                                'Content-Type': 'text/plain'
                             },
                             body: JSON.stringify({
                                 lead_id: leadId,
@@ -341,17 +342,58 @@
             }
         }
 
+        // Suscribirse a tiempo real en el widget para recibir respuestas de la IA/Asesor automáticamente
+        function suscribirseAMensajesRealtimeWidget() {
+            if (typeof supabaseClient.channel !== 'function') return;
+
+            supabaseClient
+                .channel('widget-realtime')
+                .on(
+                    'postgres_changes',
+                    {
+                        event: 'INSERT',
+                        schema: 'public',
+                        table: 'chat_history',
+                        filter: `lead_id=eq.${visitorId}`
+                    },
+                    (payload) => {
+                        console.log('📬 [Widget] Nuevo mensaje en Supabase:', payload);
+                        const newMsg = payload.new;
+                        if (!newMsg) return;
+
+                        // Solo renderizar si el remitente es la IA ('ai') o el asesor ('human'/'advisor')
+                        if (newMsg.sender === 'ai' || newMsg.sender === 'human' || newMsg.sender === 'advisor') {
+                            const chatBody = document.getElementById("muebleo-widget-messages");
+                            if (chatBody) {
+                                // Quitar cualquier typing indicator si existe
+                                const typingIndicators = chatBody.querySelectorAll('.muebleo-widget-typing-indicator');
+                                typingIndicators.forEach(indicator => {
+                                    if (chatBody.contains(indicator)) {
+                                        chatBody.removeChild(indicator);
+                                    }
+                                });
+                            }
+                            const role = 'ai'; // para la burbuja de la izquierda en el widget
+                            renderWidgetMessage(role, newMsg.content, newMsg.products_data);
+                        }
+                    }
+                )
+                .subscribe();
+        }
+
         // Exponer función de sincronización al CRM
         if (window.spokeCRM) {
             window.spokeCRM.syncWidgetHistory = syncWidgetHistory;
         }
 
-        // Carga inicial del historial
+        // Carga inicial del historial y suscripción Realtime
         if (window.spokeCRM && window.spokeCRM.chatsHistory[visitorId]) {
             syncWidgetHistory(visitorId);
         } else {
             await loadHistory();
         }
+
+        suscribirseAMensajesRealtimeWidget();
 
         // Lógica de Enviar Mensaje
         async function sendMessageFromWeb() {
@@ -376,62 +418,12 @@
             chatBody.appendChild(typingIndicator);
             chatBody.scrollTop = chatBody.scrollHeight;
 
-            // 4. Petición a Webhook n8n
-            const webhookUrl = "https://muebleoia.app.n8n.cloud/webhook/webchat-muebleo";
-            try {
-                const response = await fetch(webhookUrl, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ mensaje: text })
-                });
-
-                const data = await response.json();
-
-                // Quitar indicador de escritura
+            // Remover automáticamente después de 12 segundos si la IA no responde
+            setTimeout(() => {
                 if (chatBody.contains(typingIndicator)) {
                     chatBody.removeChild(typingIndicator);
                 }
-
-                const responseText = data.respuesta || data.output || data.response || data.text || '';
-                if (responseText) {
-                    let parsedProducts = null;
-                    let textOnly = responseText;
-                    try {
-                        const jsonMatch = responseText.match(/\[\s*\{[\s\S]*\}\s*\]/);
-                        if (jsonMatch) {
-                            const parsed = JSON.parse(jsonMatch[0]);
-                            if (Array.isArray(parsed) && parsed.length > 0) {
-                                parsedProducts = parsed;
-                                textOnly = responseText.replace(jsonMatch[0], '').trim();
-                            }
-                        }
-                    } catch (e) {
-                        console.error("[Widget] Error al parsear respuesta IA:", e);
-                    }
-
-                    // 5. Mostrar respuesta en el Widget
-                    renderWidgetMessage('ai', responseText);
-
-                    // 6. Guardar en Supabase y sincronizar CRM
-                    if (parsedProducts) {
-                        await localGuardarMensajeEnSupabase(visitorId, 'ai', textOnly || '', 'carousel', parsedProducts);
-                    } else {
-                        await localGuardarMensajeEnSupabase(visitorId, 'ai', responseText, 'text');
-                    }
-                }
-            } catch (err) {
-                console.error("❌ [Widget] Error de conexión con n8n:", err);
-                if (chatBody.contains(typingIndicator)) {
-                    chatBody.removeChild(typingIndicator);
-                }
-                const errorMsg = document.createElement("div");
-                errorMsg.className = "muebleo-widget-bubble muebleo-widget-ia";
-                errorMsg.textContent = "Lo siento, mi conexión falló un momento. ¿Puedes repetirlo?";
-                chatBody.appendChild(errorMsg);
-            }
-            chatBody.scrollTop = chatBody.scrollHeight;
+            }, 12000);
         }
 
         // Adjuntar manejadores de eventos
