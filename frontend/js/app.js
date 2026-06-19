@@ -733,13 +733,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (logoutBtn) {
         logoutBtn.addEventListener('click', async (e) => {
             e.preventDefault();
-            if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-                try {
-                    await supabaseClient.auth.signOut();
-                } catch (signOutErr) {
-                    console.warn("Supabase signOut error:", signOutErr.message);
+            try {
+                await window.supabaseClient.auth.signOut();
+            } catch (signOutErr) {
+                console.warn("Supabase signOut error:", signOutErr.message);
+            }
+
+            for (let i = localStorage.length - 1; i >= 0; i--) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('sb-')) {
+                    localStorage.removeItem(key);
                 }
             }
+            sessionStorage.clear();
+
+            window.location.href = window.location.origin + window.location.pathname;
         });
     }
 
