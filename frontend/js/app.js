@@ -592,9 +592,154 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (typeof renderKanban === 'function') renderKanban();
                 if (typeof renderDashboardStats === 'function') renderDashboardStats();
             }
+
+            // Suscribirse a tiempo real
+            suscribirseAMensajesRealtime();
         } catch (e) {
             console.error("❌ Error al cargar conversaciones desde Supabase:", e.message);
         }
+    }
+
+    function suscribirseAMensajesRealtime() {
+        if (typeof window.supabaseClient.channel !== 'function') {
+            console.warn("⚠️ window.supabaseClient.channel no está disponible (puede ser un mock de pruebas).");
+            return;
+        }
+
+        if (window.supabaseRealtimeChannel) {
+            try {
+                window.supabaseClient.removeChannel(window.supabaseRealtimeChannel);
+            } catch (err) {
+                console.warn("Error al remover canal existente:", err.message);
+            }
+        }
+
+        console.log("🔌 Inicializando suscripción en tiempo real para chat_history...");
+        window.supabaseRealtimeChannel = window.supabaseClient
+            .channel('chat-realtime')
+            .on(
+                'postgres_changes',
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'chat_history'
+                },
+                (payload) => {
+                    console.log('📬 Nuevo mensaje recibido en tiempo real:', payload);
+                    const newMsg = payload.new;
+                    if (!newMsg) return;
+
+                    const leadId = newMsg.lead_id;
+
+                    // 1. Agrega el mensaje dinámicamente al objeto global chatsHistory
+                    if (!chatsHistory[leadId]) {
+                        chatsHistory[leadId] = [];
+                    }
+
+                    let timeStr = 'Ahora';
+                    if (newMsg.created_at) {
+                        try {
+                            const date = new Date(newMsg.created_at);
+                            timeStr = date.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+                        } catch (e) {}
+                    }
+
+                    const item = {
+                        sender: newMsg.sender,
+                        content: newMsg.content,
+                        time: timeStr
+                    };
+
+                    if (newMsg.type) {
+                        item.type = newMsg.type;
+                    }
+
+                    if (newMsg.products_data) {
+                        if (newMsg.type === 'carousel') {
+                            item.products = newMsg.products_data;
+                        } else {
+                            Object.assign(item, newMsg.products_data);
+                            if (newMsg.type === 'image' && !item.imgUrl) {
+                                item.imgUrl = newMsg.products_data.mediaUrl || newMsg.content;
+                            }
+                            if (newMsg.type === 'file' && !item.fileName) {
+                                item.fileName = newMsg.products_data.fileName || newMsg.content;
+                            }
+                            if (newMsg.type === 'audio' && !item.audioUrl) {
+                                item.audioUrl = newMsg.products_data.mediaUrl || newMsg.products_data.audioUrl;
+                            }
+                        }
+                    }
+
+                    // Evitar duplicados (por ejemplo, si el cliente local que envió el mensaje ya lo agregó de forma optimista)
+                    const leadHistory = chatsHistory[leadId];
+                    const isDuplicate = leadHistory.length > 0 && 
+                        leadHistory[leadHistory.length - 1].sender === item.sender && 
+                        leadHistory[leadHistory.length - 1].content === item.content;
+
+                    if (!isDuplicate) {
+                        leadHistory.push(item);
+                    }
+
+                    // 2. Si el visitante es nuevo y su ID no existe en leadsList, crea dinámicamente el objeto Lead
+                    const exists = leadsList.some(l => l.id === leadId);
+                    if (!exists && leadId !== 'lead-simulador-ia') {
+                        let createdAtStr = new Date().toISOString().split('T')[0];
+                        if (newMsg.created_at) {
+                            try {
+                                createdAtStr = new Date(newMsg.created_at).toISOString().split('T')[0];
+                            } catch (e) {}
+                        }
+                        const isUnread = newMsg.sender === 'customer' || newMsg.sender === 'user';
+                        const newLead = {
+                            id: leadId,
+                            name: `Visitante Web (${leadId.replace('visitor-', '')})`,
+                            phone: '',
+                            channel_source: 'webchat',
+                            ai_chat_status: 'ai_active',
+                            commercial_stage: 'nuevo',
+                            unread: isUnread,
+                            estimated_budget: 0.00,
+                            quoted_value: 0.00,
+                            avatar_url: 'https://placehold.co/100x100/1e293b/06B6D4?text=WEB',
+                            time_in_stage: 'ahora',
+                            created_at: createdAtStr,
+                            assigned_to: 'advisor-ia-uuid',
+                            delivery_date: '',
+                            observations: 'Lead creado dinámicamente vía WebSockets.',
+                            attachments: [],
+                            activity_log: [
+                                { time: 'Ahora', author: 'Sistema', content: 'Lead creado por mensaje recibido en tiempo real.' }
+                            ],
+                            tags: [
+                                { name: 'Nuevo', color: '#03DAC6' }
+                            ]
+                        };
+                        leadsList.unshift(newLead);
+                    } else if (exists) {
+                        // Si el lead existe y el mensaje no es del asesor y no pertenece al chat activo, marcar como no leído
+                        const lead = leadsList.find(l => l.id === leadId);
+                        if (lead && leadId !== activeInboxLeadId && (newMsg.sender === 'customer' || newMsg.sender === 'user')) {
+                            lead.unread = true;
+                        }
+                    }
+
+                    // 3. Dispara renderInbox() para actualizar la barra lateral
+                    if (typeof renderInbox === 'function') {
+                        renderInbox();
+                    }
+
+                    // 4. Si el lead_id coincide con el chat abierto actualmente, dispara renderActiveChat()
+                    if (leadId === activeInboxLeadId) {
+                        if (typeof renderActiveChat === 'function') {
+                            renderActiveChat();
+                        }
+                    }
+                }
+            )
+            .subscribe((status) => {
+                console.log(`🔌 Estado de la suscripción Realtime: ${status}`);
+            });
     }
 
     function updatePresenceUI(status) {

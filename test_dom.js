@@ -67,7 +67,21 @@ dom.window.supabase = {
                 from: () => ({
                     getPublicUrl: () => ({ data: { publicUrl: 'mockUrl' } })
                 })
-            }
+            },
+            channel: (channelName) => {
+                const chan = {
+                    on: (event, filter, callback) => {
+                        chan._callback = callback;
+                        return chan;
+                    },
+                    subscribe: (statusCallback) => {
+                        if (statusCallback) statusCallback('SUBSCRIBED');
+                        return chan;
+                    }
+                };
+                return chan;
+            },
+            removeChannel: () => {}
         };
     }
 };
