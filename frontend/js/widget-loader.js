@@ -103,6 +103,8 @@
 
         // Guardar mensaje local con fallback y sincronización
         async function localGuardarMensajeEnSupabase(leadId, sender, content, msgType = 'text', metadata = null) {
+            const crmSender = sender === 'user' ? 'customer' : 'ai';
+
             if (window.spokeCRM) {
                 // Si el lead no existe en leadsList del CRM, crearlo dinámicamente
                 if (window.spokeCRM.leadsList && !window.spokeCRM.leadsList.some(l => l.id === leadId)) {
@@ -140,7 +142,6 @@
                 }
                 
                 // Mapear sender para cumplir con estructura CRM (customer/ai)
-                const crmSender = sender === 'user' ? 'customer' : 'ai';
                 if (msgType === 'carousel') {
                     window.spokeCRM.chatsHistory[leadId].push({ 
                         sender: crmSender, 
@@ -170,8 +171,30 @@
                     if (typeof window.spokeCRM.renderActiveChat === 'function') window.spokeCRM.renderActiveChat();
                 }
             } else {
-                const crmSender = sender === 'user' ? 'customer' : 'ai';
                 await saveDirectly(leadId, crmSender, content, msgType, metadata);
+            }
+
+            // Disparo Non-Blocking al Webhook de n8n (solo para el visitante)
+            if (crmSender === 'customer') {
+                (async () => {
+                    try {
+                        const URL_WEBHOOK_N8N = 'https://n8n.srv1718653.hstgr.cloud/webhook/3940b692-d275-434b-82d0-c75e0ec43c07';
+                        await fetch(URL_WEBHOOK_N8N, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                lead_id: leadId,
+                                mensaje: content,
+                                remitente: 'visitante',
+                                timestamp: new Date().toISOString()
+                            })
+                        });
+                    } catch (webhookErr) {
+                        console.warn("n8n Webhook inaccesible");
+                    }
+                })();
             }
         }
 

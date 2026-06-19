@@ -54,6 +54,29 @@ async function guardarMensajeEnSupabase(leadId, sender, content, msgType = 'text
 
         if (error) throw error;
         console.log(`✅ Mensaje de ${sender} guardado exitosamente en Supabase.`);
+
+        // Disparo Non-Blocking al Webhook de n8n (solo para el asesor)
+        if (sender === 'human' || sender === 'advisor') {
+            (async () => {
+                try {
+                    const URL_WEBHOOK_N8N = 'https://n8n.srv1718653.hstgr.cloud/webhook/3940b692-d275-434b-82d0-c75e0ec43c07';
+                    await fetch(URL_WEBHOOK_N8N, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            lead_id: leadId,
+                            mensaje: content || (msgType === 'file' ? '📁 Archivo' : msgType === 'image' ? '📷 Imagen' : ''),
+                            remitente: 'asesor',
+                            timestamp: new Date().toISOString()
+                        })
+                    });
+                } catch (webhookErr) {
+                    console.warn("n8n Webhook inaccesible");
+                }
+            })();
+        }
     } catch (error) {
         console.error("❌ Error al guardar en Supabase:", error.message);
     }
