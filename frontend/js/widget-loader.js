@@ -1,4 +1,4 @@
-(function() {
+(function () {
     // 1. Obtener la ruta base desde donde se carga el script
     const scriptUrl = document.currentScript ? document.currentScript.src : '';
     let cssOrigin = '';
@@ -88,7 +88,7 @@
 
         const supabaseUrl = 'https://luyeqpcqhdngaisfzdnl.supabase.co';
         const supabaseKey = 'sb_publishable_5PhCsOnvuqs3HagvA1CxxA_lHYhuEjb';
-        
+
         // Patrón Singleton estricto para evitar múltiples instancias de GoTrueClient
         if (!window.supabaseClient) {
             window.supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey, {
@@ -140,24 +140,24 @@
                 if (!window.spokeCRM.chatsHistory[leadId]) {
                     window.spokeCRM.chatsHistory[leadId] = [];
                 }
-                
+
                 // Mapear sender para cumplir con estructura CRM (customer/ai)
                 if (msgType === 'carousel') {
-                    window.spokeCRM.chatsHistory[leadId].push({ 
-                        sender: crmSender, 
-                        type: 'carousel', 
-                        products: metadata, 
-                        content: content, 
-                        time: timeStr 
+                    window.spokeCRM.chatsHistory[leadId].push({
+                        sender: crmSender,
+                        type: 'carousel',
+                        products: metadata,
+                        content: content,
+                        time: timeStr
                     });
                 } else {
-                    window.spokeCRM.chatsHistory[leadId].push({ 
-                        sender: crmSender, 
-                        content: content, 
-                        time: timeStr 
+                    window.spokeCRM.chatsHistory[leadId].push({
+                        sender: crmSender,
+                        content: content,
+                        time: timeStr
                     });
                 }
-                
+
                 // Intentar guardar a través de la función del CRM si existe
                 if (typeof window.spokeCRM.guardarMensajeEnSupabase === 'function') {
                     await window.spokeCRM.guardarMensajeEnSupabase(leadId, crmSender, content, msgType, metadata);
@@ -199,12 +199,12 @@
                 const { error } = await supabaseClient
                     .from('chat_history')
                     .insert([
-                        { 
-                            lead_id: leadId, 
-                            sender: sender, 
-                            content: content, 
+                        {
+                            lead_id: leadId,
+                            sender: sender,
+                            content: content,
                             type: msgType,
-                            products_data: metadata 
+                            products_data: metadata
                         }
                     ]);
                 if (error) throw error;
@@ -263,10 +263,10 @@
                         let imgUrl = fallbackImg;
                         if (rawImg && typeof rawImg === 'string') {
                             const trimmed = rawImg.trim();
-                            const isInvalid = trimmed.includes('muebleoexample.com') || 
-                                              trimmed.includes('via.placeholder.com') ||
-                                              /muebleo\.com\/\d+/i.test(trimmed) || 
-                                              /\/\d+\.(jpg|jpeg|png|webp|gif)$/i.test(trimmed);
+                            const isInvalid = trimmed.includes('muebleoexample.com') ||
+                                trimmed.includes('via.placeholder.com') ||
+                                /muebleo\.com\/\d+/i.test(trimmed) ||
+                                /\/\d+\.(jpg|jpeg|png|webp|gif)$/i.test(trimmed);
                             if (!isInvalid && (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('data:'))) {
                                 imgUrl = trimmed;
                             }
