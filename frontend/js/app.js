@@ -55,7 +55,7 @@ async function guardarMensajeEnSupabase(leadId, sender, content, msgType = 'text
         if (error) throw error;
         console.log(`✅ Mensaje de ${sender} guardado exitosamente en Supabase.`);
 
-        // Disparo Non-Blocking al Webhook de n8n (solo para el asesor)
+        // Disparo Non-Blocking al Webhook de n8n (solo para el asesor) - Evasión Estricta de CORS
         if (sender === 'human' || sender === 'advisor') {
             const URL_WEBHOOK_N8N = 'https://n8n.srv1718653.hstgr.cloud/webhook/3940b692-d275-434b-82d0-c75e0ec43c07';
             const payload = {
