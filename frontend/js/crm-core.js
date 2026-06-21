@@ -38,7 +38,7 @@ function getValidImageUrl(url, fallback = 'https://placehold.co/260x380?text=No+
 }
 
 let spokeAudioCtx = null;
-function playSpokeSound(type) {
+window.playSpokeSound = function(type) {
     try {
         if (!spokeAudioCtx) {
             spokeAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -695,7 +695,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             avatar_url: 'https://placehold.co/100x100/1e293b/06B6D4?text=WEB',
                             time_in_stage: 'ahora',
                             created_at: createdAtStr,
-                            assigned_to: 'advisor-ia-uuid',
+                            assigned_to: (typeof getCurrentAgent === 'function' ? getCurrentAgent().uuid : 'advisor-vendedora-uuid'),
                             delivery_date: '',
                             observations: 'Lead cargado dinámicamente desde Supabase.',
                             attachments: [],
@@ -826,7 +826,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             avatar_url: 'https://placehold.co/100x100/1e293b/06B6D4?text=WEB',
                             time_in_stage: 'ahora',
                             created_at: createdAtStr,
-                            assigned_to: 'advisor-ia-uuid',
+                            assigned_to: (typeof getCurrentAgent === 'function' ? getCurrentAgent().uuid : 'advisor-vendedora-uuid'),
                             delivery_date: '',
                             observations: 'Lead creado dinámicamente vía WebSockets.',
                             attachments: [],
@@ -838,7 +838,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                             ]
                         };
                         leadsList.unshift(newLead);
-                        playSpokeSound('new_lead');
+                        if (newMsg.sender === 'customer' || newMsg.sender === 'user') {
+                            window.playSpokeSound('new_lead');
+                        }
                     } else if (exists) {
                         // Si el lead existe y el mensaje no es del asesor y no pertenece al chat activo, marcar como no leído
                         const lead = leadsList.find(l => l.id === leadId);
@@ -846,7 +848,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             lead.unread = true;
                         }
                         if (newMsg.sender === 'customer' || newMsg.sender === 'user') {
-                            playSpokeSound('new_message');
+                            window.playSpokeSound('new_message');
                         }
                     }
 
@@ -1937,11 +1939,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
 
         chatHistoryContainer.scrollTop = chatHistoryContainer.scrollHeight;
-
-        // Sincronizar el widget si el canal del lead activo es webchat
-        if (activeLead && activeLead.channel_source === 'webchat' && window.spokeCRM && typeof window.spokeCRM.syncWidgetHistory === 'function') {
-            window.spokeCRM.syncWidgetHistory(activeInboxLeadId);
-        }
     }
 
     function clearActiveChat() {
@@ -3166,7 +3163,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (typeof addAINotification === 'function') {
                         addAINotification('venta', `¡Nuevo cierre de venta! ${lead.name} por $${saleValue.toLocaleString('es-CO')} COP.`);
                     }
-                    playSpokeSound('sale_won');
+                    window.playSpokeSound('sale_won');
                 } else {
                     if (typeof addAINotification === 'function') {
                         addAINotification('estado', `La IA movió a ${lead.name} a la columna ${getStageDisplayName(targetStage)}.`);
