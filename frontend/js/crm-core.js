@@ -37,6 +37,109 @@ function getValidImageUrl(url, fallback = 'https://placehold.co/260x380?text=No+
     return trimmed;
 }
 
+let spokeAudioCtx = null;
+function playSpokeSound(type) {
+    try {
+        if (!spokeAudioCtx) {
+            spokeAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (spokeAudioCtx.state === 'suspended') {
+            spokeAudioCtx.resume();
+        }
+        
+        const ctx = spokeAudioCtx;
+        const now = ctx.currentTime;
+        
+        if (type === 'new_message') {
+            // Tono suave y corto (bloop)
+            const osc = ctx.createOscillator();
+            const gainNode = ctx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(ctx.destination);
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(350, now);
+            osc.frequency.exponentialRampToValueAtTime(700, now + 0.12);
+            gainNode.gain.setValueAtTime(0.2, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+            osc.start(now);
+            osc.stop(now + 0.15);
+            
+        } else if (type === 'new_lead') {
+            // Tono doble (ding-dong)
+            // Ding
+            const osc1 = ctx.createOscillator();
+            const gain1 = ctx.createGain();
+            osc1.connect(gain1);
+            gain1.connect(ctx.destination);
+            osc1.type = 'sine';
+            osc1.frequency.setValueAtTime(880, now);
+            gain1.gain.setValueAtTime(0.15, now);
+            gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+            osc1.start(now);
+            osc1.stop(now + 0.25);
+            
+            // Dong
+            const osc2 = ctx.createOscillator();
+            const gain2 = ctx.createGain();
+            osc2.connect(gain2);
+            gain2.connect(ctx.destination);
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(660, now + 0.15);
+            gain2.gain.setValueAtTime(0.15, now + 0.15);
+            gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+            osc2.start(now + 0.15);
+            osc2.stop(now + 0.45);
+            
+        } else if (type === 'sale_won') {
+            // Sonido ka-ching de caja registradora + acorde victorioso
+            // Clink metálico (ruido blanco filtrado de alta frecuencia)
+            const bufferSize = ctx.sampleRate * 0.08; 
+            const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+            const noiseNode = ctx.createBufferSource();
+            noiseNode.buffer = buffer;
+            
+            const filter = ctx.createBiquadFilter();
+            filter.type = 'bandpass';
+            filter.frequency.value = 6000;
+            filter.Q.value = 4;
+            
+            const noiseGain = ctx.createGain();
+            noiseGain.gain.setValueAtTime(0.25, now);
+            noiseGain.gain.exponentialRampToValueAtTime(0.005, now + 0.06);
+            
+            noiseNode.connect(filter);
+            filter.connect(noiseGain);
+            noiseGain.connect(ctx.destination);
+            noiseNode.start(now);
+            noiseNode.stop(now + 0.08);
+            
+            // Acorde victorioso en arpegio (Do Mayor: C5 -> E5 -> G5 -> C6)
+            const frequencies = [523.25, 659.25, 783.99, 1046.50];
+            frequencies.forEach((freq, idx) => {
+                const osc = ctx.createOscillator();
+                const gainNode = ctx.createGain();
+                osc.connect(gainNode);
+                gainNode.connect(ctx.destination);
+                osc.type = 'triangle';
+                const noteStart = now + 0.04 + idx * 0.035;
+                osc.frequency.setValueAtTime(freq, noteStart);
+                
+                gainNode.gain.setValueAtTime(0, now);
+                gainNode.gain.linearRampToValueAtTime(0.1, noteStart + 0.02);
+                gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.45 + idx * 0.035);
+                
+                osc.start(noteStart);
+                osc.stop(now + 0.55 + idx * 0.035);
+            });
+        }
+    } catch (e) {
+        console.warn("⚠️ AudioContext no pudo reproducir el sonido (bloqueo o falta de interacción):", e);
+    }
+}
 
 async function guardarMensajeEnSupabase(leadId, sender, content, msgType = 'text', metadata = null) {
     try {
@@ -735,11 +838,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                             ]
                         };
                         leadsList.unshift(newLead);
+                        playSpokeSound('new_lead');
                     } else if (exists) {
                         // Si el lead existe y el mensaje no es del asesor y no pertenece al chat activo, marcar como no leído
                         const lead = leadsList.find(l => l.id === leadId);
                         if (lead && leadId !== activeInboxLeadId && (newMsg.sender === 'customer' || newMsg.sender === 'user')) {
                             lead.unread = true;
+                        }
+                        if (newMsg.sender === 'customer' || newMsg.sender === 'user') {
+                            playSpokeSound('new_message');
                         }
                     }
 
@@ -3059,6 +3166,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (typeof addAINotification === 'function') {
                         addAINotification('venta', `¡Nuevo cierre de venta! ${lead.name} por $${saleValue.toLocaleString('es-CO')} COP.`);
                     }
+                    playSpokeSound('sale_won');
                 } else {
                     if (typeof addAINotification === 'function') {
                         addAINotification('estado', `La IA movió a ${lead.name} a la columna ${getStageDisplayName(targetStage)}.`);
