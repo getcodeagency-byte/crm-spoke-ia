@@ -89,17 +89,12 @@
         const supabaseUrl = 'https://luyeqpcqhdngaisfzdnl.supabase.co';
         const supabaseKey = 'sb_publishable_5PhCsOnvuqs3HagvA1CxxA_lHYhuEjb';
 
-        // Patrón Singleton estricto para evitar múltiples instancias de GoTrueClient
-        if (!window.supabaseClient) {
-            window.supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey, {
-                auth: {
-                    storage: window.localStorage,
-                    autoRefreshToken: true,
-                    persistSession: true
-                }
-            });
-        }
-        const supabaseClient = window.supabaseClient;
+        // Instancia de Supabase independiente para el Widget (evita colisiones de sesión y de Realtime con el CRM)
+        const widgetSupabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey, {
+            auth: {
+                persistSession: false // Desactivado para no heredar ni alterar la sesión del CRM
+            }
+        });
 
         // Guardar mensaje local con fallback y sincronización
         async function localGuardarMensajeEnSupabase(leadId, sender, content, msgType = 'text', metadata = null) {
@@ -196,7 +191,7 @@
 
         async function saveDirectly(leadId, sender, content, msgType, metadata) {
             try {
-                const { error } = await supabaseClient
+                const { error } = await widgetSupabaseClient
                     .from('chat_history')
                     .insert([
                         {
@@ -303,7 +298,7 @@
         async function loadHistory() {
             const targetLeadId = visitorId;
             try {
-                const { data, error } = await supabaseClient
+                const { data, error } = await widgetSupabaseClient
                     .from('chat_history')
                     .select('*')
                     .eq('lead_id', targetLeadId)
@@ -339,9 +334,9 @@
 
         // Suscribirse a tiempo real en el widget para recibir respuestas de la IA/Asesor automáticamente
         function suscribirseAMensajesRealtimeWidget() {
-            if (typeof supabaseClient.channel !== 'function') return;
+            if (typeof widgetSupabaseClient.channel !== 'function') return;
 
-            supabaseClient
+            widgetSupabaseClient
                 .channel('widget-realtime')
                 .on(
                     'postgres_changes',

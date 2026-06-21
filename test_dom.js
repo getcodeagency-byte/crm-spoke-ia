@@ -9,8 +9,8 @@ let html = fs.readFileSync(htmlPath, 'utf8');
 // Strip external links and scripts that would fail and delay DOMContentLoaded
 html = html.replace(/<link[^>]*href="http[^"]*"[^>]*>/gi, '');
 html = html.replace(/<script[^>]*src="http[^"]*"[^>]*><\/script>/gi, '');
-html = html.replace(/<script[^>]*src="[^"]*widget-loader\.js"[^>]*><\/script>/gi, '');
-html = html.replace(/<script[^>]*src="[^"]*app\.js"[^>]*><\/script>/gi, '');
+html = html.replace(/<script[^>]*src="[^"]*widget-loader\.js[^"]*"[^>]*><\/script>/gi, '');
+html = html.replace(/<script[^>]*src="[^"]*crm-core\.js[^"]*"[^>]*><\/script>/gi, '');
 
 // We need mock sessionStorage for the scripts to run
 const dom = new JSDOM(html, {
@@ -87,7 +87,7 @@ dom.window.supabase = {
 };
 
 // Load JS script in the DOM context
-const jsPath = path.join(__dirname, 'frontend', 'js', 'app.js');
+const jsPath = path.join(__dirname, 'frontend', 'js', 'crm-core.js');
 let jsContent = fs.readFileSync(jsPath, 'utf8');
 
 // Run the script in JSDOM context
