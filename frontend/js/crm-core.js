@@ -158,12 +158,9 @@ async function guardarMensajeEnSupabase(leadId, sender, content, msgType = 'text
         if (error) throw error;
         console.log(`✅ Mensaje de ${sender} guardado exitosamente en Supabase.`);
 
-        // ⚡ Disparo AISLADO al Webhook de n8n (fire-and-forget)
-        // IMPORTANTE: Se ejecuta en un setTimeout(0) para desacoplar completamente
-        // del hilo de Supabase y evitar que un fallo de red (CORS/Mixed Content)
-        // arrastre la conexión WebSocket de Realtime.
-        // ⚠️ MIXED CONTENT: Si URL_WEBHOOK_N8N usa http:// en vez de https://,
-        // Chrome y Firefox lo bloquearán silenciosamente en producción.
+        // 🔇 [DIAGNÓSTICO] Webhook n8n DESACTIVADO temporalmente para aislar ERR_CONNECTION_CLOSED en Chromium.
+        // TODO: Reactivar cuando se confirme que Supabase Realtime es estable sin este fetch.
+        /*
         if (sender === 'human' || sender === 'advisor') {
             setTimeout(async () => {
                 try {
@@ -186,6 +183,10 @@ async function guardarMensajeEnSupabase(leadId, sender, content, msgType = 'text
                     console.warn('⚠️ [Webhook n8n] Interceptado localmente — no afecta Supabase:', e.message || e);
                 }
             }, 0);
+        }
+        */
+        if (sender === 'human' || sender === 'advisor') {
+            console.log('🔇 [Webhook n8n] SUPRIMIDO — guardarMensaje para lead:', leadId, '(diagnóstico activo)');
         }
     } catch (error) {
         console.error("❌ Error al guardar en Supabase:", error.message);
@@ -2135,8 +2136,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // WebSocket de Supabase Realtime.
     // ⚠️ MIXED CONTENT: Si URL_WEBHOOK_N8N usa http:// en producción HTTPS,
     // Chrome/Firefox lo bloquearán. Debe ser siempre https://.
+    // 🔇 [DIAGNÓSTICO] enviarAlWebhook — fetch a n8n DESACTIVADO para aislar ERR_CONNECTION_CLOSED.
+    // TODO: Reactivar cuando se confirme estabilidad de Supabase Realtime sin este fetch.
     async function enviarAlWebhook({ sessionId, mensaje, tipo, mediaUrl }) {
-        console.log(`🚀 [Webhook n8n] Preparando disparo aislado | tipo: ${tipo} | mediaUrl: ${mediaUrl || 'N/A'}`);
+        console.log(`🔇 [Webhook n8n] SUPRIMIDO — enviarAlWebhook | sesión: ${sessionId} | tipo: ${tipo} | mediaUrl: ${mediaUrl || 'N/A'} (diagnóstico activo)`);
 
         let typingEl = null;
         const targetLead = leadsList.find(l => l.id === sessionId);
@@ -2147,7 +2150,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             typingEl = showAITypingIndicator();
         }
 
-        // Desacoplar el fetch del hilo principal con setTimeout(0)
+        /*
         setTimeout(async () => {
             try {
                 const URL_WEBHOOK_N8N = 'https://n8n.srv1718653.hstgr.cloud/webhook/3940b692-d275-434b-82d0-c75e0ec43c07';
@@ -2163,7 +2166,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             } catch (e) {
                 console.warn('⚠️ [Webhook n8n] Interceptado localmente — no afecta Supabase:', e.message || e);
             } finally {
-                // Limpiar indicador de escritura después de un delay razonable
                 setTimeout(() => {
                     if (typingEl) {
                         removeAITypingIndicator(typingEl);
@@ -2172,6 +2174,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }, 3000);
             }
         }, 0);
+        */
+
+        // Limpiar indicador de typing igualmente después de 3s
+        setTimeout(() => {
+            if (typingEl) {
+                removeAITypingIndicator(typingEl);
+                typingEl = null;
+            }
+        }, 3000);
     }
 
     // 3. Envío de Archivos y Fotos en el Chat
@@ -2310,13 +2321,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             const originalHTML = chatBtnAiAssist.innerHTML;
             chatBtnAiAssist.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
 
-            // ⚡ Sugerencia de IA: Convertido a fire-and-forget con mode:'no-cors'
-            // para evitar que Chrome/Firefox disparen un preflight OPTIONS que
-            // colapsa la red y mata los WebSockets de Supabase.
-            // La respuesta de la IA llegará por Realtime (INSERT en chat_history),
-            // no por la respuesta HTTP de este fetch.
-            // ⚠️ MIXED CONTENT: URL debe ser siempre https:// en producción.
-            console.log('📡 [Webhook n8n] Solicitando sugerencia de IA (fire-and-forget)...');
+            // 🔇 [DIAGNÓSTICO] Sugerencia de IA — fetch a n8n DESACTIVADO para aislar ERR_CONNECTION_CLOSED.
+            // TODO: Reactivar cuando se confirme estabilidad de red sin este fetch.
+            console.log('🔇 [Webhook n8n] SUPRIMIDO — sugerencia IA para sesión:', activeInboxLeadId, '(diagnóstico activo)');
+            /*
             setTimeout(async () => {
                 try {
                     const URL_WEBHOOK_N8N = 'https://n8n.srv1718653.hstgr.cloud/webhook/3940b692-d275-434b-82d0-c75e0ec43c07';
@@ -2334,13 +2342,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                 } catch (e) {
                     console.warn('⚠️ [Webhook n8n] Sugerencia IA interceptada localmente:', e.message || e);
                 } finally {
-                    // Restaurar estado del botón después de un breve delay
                     setTimeout(() => {
                         chatBtnAiAssist.disabled = false;
                         chatBtnAiAssist.innerHTML = originalHTML;
                     }, 2000);
                 }
             }, 0);
+            */
+            // Restaurar botón inmediatamente ya que no hay fetch
+            setTimeout(() => {
+                chatBtnAiAssist.disabled = false;
+                chatBtnAiAssist.innerHTML = originalHTML;
+            }, 500);
         });
     }
 
