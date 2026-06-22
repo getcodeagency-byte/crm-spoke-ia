@@ -158,23 +158,34 @@ async function guardarMensajeEnSupabase(leadId, sender, content, msgType = 'text
         if (error) throw error;
         console.log(`✅ Mensaje de ${sender} guardado exitosamente en Supabase.`);
 
-        // Disparo Non-Blocking al Webhook de n8n (solo para el asesor) - Evasión Estricta de CORS
+        // ⚡ Disparo AISLADO al Webhook de n8n (fire-and-forget)
+        // IMPORTANTE: Se ejecuta en un setTimeout(0) para desacoplar completamente
+        // del hilo de Supabase y evitar que un fallo de red (CORS/Mixed Content)
+        // arrastre la conexión WebSocket de Realtime.
+        // ⚠️ MIXED CONTENT: Si URL_WEBHOOK_N8N usa http:// en vez de https://,
+        // Chrome y Firefox lo bloquearán silenciosamente en producción.
         if (sender === 'human' || sender === 'advisor') {
-            const URL_WEBHOOK_N8N = 'https://n8n.srv1718653.hstgr.cloud/webhook/3940b692-d275-434b-82d0-c75e0ec43c07';
-            const payload = {
-                lead_id: leadId,
-                mensaje: content || (msgType === 'file' ? '📁 Archivo' : msgType === 'image' ? '📷 Imagen' : ''),
-                remitente: 'asesor',
-                timestamp: new Date().toISOString()
-            };
-            fetch(URL_WEBHOOK_N8N, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'text/plain'
-                },
-                body: JSON.stringify(payload)
-            }).catch(e => console.warn('n8n silencioso:', e));
+            setTimeout(async () => {
+                try {
+                    const URL_WEBHOOK_N8N = 'https://n8n.srv1718653.hstgr.cloud/webhook/3940b692-d275-434b-82d0-c75e0ec43c07';
+                    const payload = {
+                        lead_id: leadId,
+                        mensaje: content || (msgType === 'file' ? '📁 Archivo' : msgType === 'image' ? '📷 Imagen' : ''),
+                        remitente: 'asesor',
+                        timestamp: new Date().toISOString()
+                    };
+                    console.log('📡 [Webhook n8n] Intentando disparo fire-and-forget para lead:', leadId);
+                    await fetch(URL_WEBHOOK_N8N, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'text/plain' },
+                        body: JSON.stringify(payload)
+                    });
+                    console.log('✅ [Webhook n8n] Disparo completado (opaco, sin lectura de respuesta).');
+                } catch (e) {
+                    console.warn('⚠️ [Webhook n8n] Interceptado localmente — no afecta Supabase:', e.message || e);
+                }
+            }, 0);
         }
     } catch (error) {
         console.error("❌ Error al guardar en Supabase:", error.message);
@@ -2118,9 +2129,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // ⚡ enviarAlWebhook: Totalmente aislado del hilo principal.
+    // El fetch se ejecuta dentro de setTimeout(0) para que cualquier error de red
+    // (CORS, Mixed Content, ERR_CONNECTION_CLOSED) NO arrastre la conexión
+    // WebSocket de Supabase Realtime.
+    // ⚠️ MIXED CONTENT: Si URL_WEBHOOK_N8N usa http:// en producción HTTPS,
+    // Chrome/Firefox lo bloquearán. Debe ser siempre https://.
     async function enviarAlWebhook({ sessionId, mensaje, tipo, mediaUrl }) {
-        const URL_WEBHOOK_N8N = 'https://n8n.srv1718653.hstgr.cloud/webhook/3940b692-d275-434b-82d0-c75e0ec43c07';
-        console.log(`🚀 Disparando webhook n8n (fire-and-forget) | tipo: ${tipo} | mediaUrl: ${mediaUrl || 'N/A'}`);
+        console.log(`🚀 [Webhook n8n] Preparando disparo aislado | tipo: ${tipo} | mediaUrl: ${mediaUrl || 'N/A'}`);
 
         let typingEl = null;
         const targetLead = leadsList.find(l => l.id === sessionId);
@@ -2131,31 +2147,31 @@ document.addEventListener('DOMContentLoaded', async () => {
             typingEl = showAITypingIndicator();
         }
 
-        try {
-            const payload = { sessionId, mensaje, tipo, mediaUrl, origen: 'CRM Local' };
-            fetch(URL_WEBHOOK_N8N, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'text/plain'
-                },
-                body: JSON.stringify(payload)
-            }).catch(e => console.warn('n8n silencioso:', e));
-
-            // Ocultar indicador de escritura después de un breve delay ya que no leemos respuesta
-            setTimeout(() => {
-                if (typingEl) {
-                    removeAITypingIndicator(typingEl);
-                    typingEl = null;
-                }
-            }, 3000);
-        } catch (err) {
-            if (typingEl) {
-                removeAITypingIndicator(typingEl);
-                typingEl = null;
+        // Desacoplar el fetch del hilo principal con setTimeout(0)
+        setTimeout(async () => {
+            try {
+                const URL_WEBHOOK_N8N = 'https://n8n.srv1718653.hstgr.cloud/webhook/3940b692-d275-434b-82d0-c75e0ec43c07';
+                const payload = { sessionId, mensaje, tipo, mediaUrl, origen: 'CRM Local' };
+                console.log('📡 [Webhook n8n] Disparando fire-and-forget para sesión:', sessionId);
+                await fetch(URL_WEBHOOK_N8N, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify(payload)
+                });
+                console.log('✅ [Webhook n8n] Disparo completado (opaco).');
+            } catch (e) {
+                console.warn('⚠️ [Webhook n8n] Interceptado localmente — no afecta Supabase:', e.message || e);
+            } finally {
+                // Limpiar indicador de escritura después de un delay razonable
+                setTimeout(() => {
+                    if (typingEl) {
+                        removeAITypingIndicator(typingEl);
+                        typingEl = null;
+                    }
+                }, 3000);
             }
-            console.error('❌ Error al enviar al webhook n8n:', err);
-        }
+        }, 0);
     }
 
     // 3. Envío de Archivos y Fotos en el Chat
@@ -2294,43 +2310,37 @@ document.addEventListener('DOMContentLoaded', async () => {
             const originalHTML = chatBtnAiAssist.innerHTML;
             chatBtnAiAssist.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
 
-            console.log("✨ Solicitando sugerencia de IA a n8n...");
-            const URL_WEBHOOK_N8N = 'https://n8n.srv1718653.hstgr.cloud/webhook/3940b692-d275-434b-82d0-c75e0ec43c07';
-            fetch(URL_WEBHOOK_N8N, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    sessionId: activeInboxLeadId,
-                    mensaje: text || '[Sugerir respuesta]',
-                    origen: 'CRM Local'
-                })
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json().catch(() => ({}));
-                })
-                .then(data => {
-                    const suggestion = data ? (data.respuesta_ia || data.mensaje) : '';
-                    if (suggestion && chatInputField) {
-                        chatInputField.value = suggestion;
-                        // Forzar trigger de input event
-                        chatInputField.dispatchEvent(new Event('input'));
-                    } else {
-                        console.warn("La IA no devolvió ninguna sugerencia en respuesta_ia o mensaje");
-                    }
-                })
-                .catch(error => {
-                    console.error("Error al obtener asistencia de IA:", error);
-                })
-                .finally(() => {
-                    // Restaurar estado del botón
-                    chatBtnAiAssist.disabled = false;
-                    chatBtnAiAssist.innerHTML = originalHTML;
-                });
+            // ⚡ Sugerencia de IA: Convertido a fire-and-forget con mode:'no-cors'
+            // para evitar que Chrome/Firefox disparen un preflight OPTIONS que
+            // colapsa la red y mata los WebSockets de Supabase.
+            // La respuesta de la IA llegará por Realtime (INSERT en chat_history),
+            // no por la respuesta HTTP de este fetch.
+            // ⚠️ MIXED CONTENT: URL debe ser siempre https:// en producción.
+            console.log('📡 [Webhook n8n] Solicitando sugerencia de IA (fire-and-forget)...');
+            setTimeout(async () => {
+                try {
+                    const URL_WEBHOOK_N8N = 'https://n8n.srv1718653.hstgr.cloud/webhook/3940b692-d275-434b-82d0-c75e0ec43c07';
+                    await fetch(URL_WEBHOOK_N8N, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'text/plain' },
+                        body: JSON.stringify({
+                            sessionId: activeInboxLeadId,
+                            mensaje: text || '[Sugerir respuesta]',
+                            origen: 'CRM Local'
+                        })
+                    });
+                    console.log('✅ [Webhook n8n] Solicitud de sugerencia IA enviada (opaca).');
+                } catch (e) {
+                    console.warn('⚠️ [Webhook n8n] Sugerencia IA interceptada localmente:', e.message || e);
+                } finally {
+                    // Restaurar estado del botón después de un breve delay
+                    setTimeout(() => {
+                        chatBtnAiAssist.disabled = false;
+                        chatBtnAiAssist.innerHTML = originalHTML;
+                    }, 2000);
+                }
+            }, 0);
         });
     }
 
