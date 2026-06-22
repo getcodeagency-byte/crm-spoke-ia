@@ -6,7 +6,7 @@
 // 1. INICIALIZACIÓN DE SUPABASE Y FUNCIÓN MAESTRA
 // ==========================================================================
 const supabaseUrl = 'https://luyeqpcqhdngaisfzdnl.supabase.co';
-const supabaseKey = 'sb_publishable_5PhCsOnvuqs3HagvA1CxxA_lHYhuEjb';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eWVxcGNxaGRuZ2Fpc2Z6ZG5sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNzU1MDcsImV4cCI6MjA5NTg1MTUwN30.LTT9jBg2qFqTtxXijgyW242BKS-s3_w68e9VTCEI5Tg';
 // Patrón Singleton estricto para evitar múltiples instancias de GoTrueClient
 if (!window.supabaseClient) {
     window.supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey, {
@@ -38,7 +38,7 @@ function getValidImageUrl(url, fallback = 'https://placehold.co/260x380?text=No+
 }
 
 let spokeAudioCtx = null;
-window.playSpokeSound = function(type) {
+window.playSpokeSound = function (type) {
     try {
         if (!spokeAudioCtx) {
             spokeAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -46,10 +46,10 @@ window.playSpokeSound = function(type) {
         if (spokeAudioCtx.state === 'suspended') {
             spokeAudioCtx.resume();
         }
-        
+
         const ctx = spokeAudioCtx;
         const now = ctx.currentTime;
-        
+
         if (type === 'new_message') {
             // Tono suave y corto (bloop)
             const osc = ctx.createOscillator();
@@ -63,7 +63,7 @@ window.playSpokeSound = function(type) {
             gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
             osc.start(now);
             osc.stop(now + 0.15);
-            
+
         } else if (type === 'new_lead') {
             // Tono doble (ding-dong)
             // Ding
@@ -77,7 +77,7 @@ window.playSpokeSound = function(type) {
             gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
             osc1.start(now);
             osc1.stop(now + 0.25);
-            
+
             // Dong
             const osc2 = ctx.createOscillator();
             const gain2 = ctx.createGain();
@@ -89,11 +89,11 @@ window.playSpokeSound = function(type) {
             gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
             osc2.start(now + 0.15);
             osc2.stop(now + 0.45);
-            
+
         } else if (type === 'sale_won') {
             // Sonido ka-ching de caja registradora + acorde victorioso
             // Clink metálico (ruido blanco filtrado de alta frecuencia)
-            const bufferSize = ctx.sampleRate * 0.08; 
+            const bufferSize = ctx.sampleRate * 0.08;
             const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
             const data = buffer.getChannelData(0);
             for (let i = 0; i < bufferSize; i++) {
@@ -101,22 +101,22 @@ window.playSpokeSound = function(type) {
             }
             const noiseNode = ctx.createBufferSource();
             noiseNode.buffer = buffer;
-            
+
             const filter = ctx.createBiquadFilter();
             filter.type = 'bandpass';
             filter.frequency.value = 6000;
             filter.Q.value = 4;
-            
+
             const noiseGain = ctx.createGain();
             noiseGain.gain.setValueAtTime(0.25, now);
             noiseGain.gain.exponentialRampToValueAtTime(0.005, now + 0.06);
-            
+
             noiseNode.connect(filter);
             filter.connect(noiseGain);
             noiseGain.connect(ctx.destination);
             noiseNode.start(now);
             noiseNode.stop(now + 0.08);
-            
+
             // Acorde victorioso en arpegio (Do Mayor: C5 -> E5 -> G5 -> C6)
             const frequencies = [523.25, 659.25, 783.99, 1046.50];
             frequencies.forEach((freq, idx) => {
@@ -127,11 +127,11 @@ window.playSpokeSound = function(type) {
                 osc.type = 'triangle';
                 const noteStart = now + 0.04 + idx * 0.035;
                 osc.frequency.setValueAtTime(freq, noteStart);
-                
+
                 gainNode.gain.setValueAtTime(0, now);
                 gainNode.gain.linearRampToValueAtTime(0.1, noteStart + 0.02);
                 gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.45 + idx * 0.035);
-                
+
                 osc.start(noteStart);
                 osc.stop(now + 0.55 + idx * 0.035);
             });
@@ -146,12 +146,12 @@ async function guardarMensajeEnSupabase(leadId, sender, content, msgType = 'text
         const { data, error } = await supabaseClient
             .from('chat_history')
             .insert([
-                { 
-                    lead_id: leadId, 
-                    sender: sender, 
-                    content: content, 
+                {
+                    lead_id: leadId,
+                    sender: sender,
+                    content: content,
                     type: msgType,
-                    products_data: metadata 
+                    products_data: metadata
                 }
             ]);
 
@@ -211,8 +211,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const photo = user.user_metadata?.avatar_url || 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=100&h=100';
             return {
                 uuid: user.id,
-                name: user.user_metadata?.name || user.email.split('@')[0], 
-                email: user.email, 
+                name: user.user_metadata?.name || user.email.split('@')[0],
+                email: user.email,
                 photo: photo,
                 avatar: photo
             };
@@ -560,20 +560,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
-    
+
     const loginEmailInput = document.getElementById('login-email');
     const loginPasswordInput = document.getElementById('login-password');
     const loginErrorMsg = document.getElementById('login-error-msg');
-    
+
     const regNameInput = document.getElementById('reg-name');
     const regEmailInput = document.getElementById('reg-email');
     const regPasswordInput = document.getElementById('reg-password');
     const regPhotoInput = document.getElementById('reg-photo');
     const registerErrorMsg = document.getElementById('register-error-msg');
-    
+
     const tabLogin = document.getElementById('tab-login');
     const tabRegister = document.getElementById('tab-register');
-    
+
     const agentDisplayName = document.getElementById('agent-display-name');
     const dashboardWelcome = document.getElementById('dashboard-welcome');
     const logoutBtn = document.getElementById('logout-btn');
@@ -654,15 +654,15 @@ document.addEventListener('DOMContentLoaded', async () => {
                             try {
                                 const date = new Date(msg.created_at);
                                 timeStr = date.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
-                            } catch (e) {}
+                            } catch (e) { }
                         }
-                        
+
                         const item = {
                             sender: msg.sender,
                             content: msg.content,
                             time: timeStr
                         };
-                        
+
                         if (msg.type === 'carousel') {
                             item.type = 'carousel';
                             item.products = msg.products_data;
@@ -676,7 +676,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         if (leadMsgs[0] && leadMsgs[0].created_at) {
                             try {
                                 createdAtStr = new Date(leadMsgs[0].created_at).toISOString().split('T')[0];
-                            } catch (e) {}
+                            } catch (e) { }
                         }
 
                         const lastMsg = leadMsgs[leadMsgs.length - 1];
@@ -763,7 +763,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         try {
                             const date = new Date(newMsg.created_at);
                             timeStr = date.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
-                        } catch (e) {}
+                        } catch (e) { }
                     }
 
                     const item = {
@@ -795,8 +795,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                     // Evitar duplicados (por ejemplo, si el cliente local que envió el mensaje ya lo agregó de forma optimista)
                     const leadHistory = chatsHistory[leadId];
-                    const isDuplicate = leadHistory.length > 0 && 
-                        leadHistory[leadHistory.length - 1].sender === item.sender && 
+                    const isDuplicate = leadHistory.length > 0 &&
+                        leadHistory[leadHistory.length - 1].sender === item.sender &&
                         leadHistory[leadHistory.length - 1].content === item.content;
 
                     if (!isDuplicate) {
@@ -810,7 +810,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         if (newMsg.created_at) {
                             try {
                                 createdAtStr = new Date(newMsg.created_at).toISOString().split('T')[0];
-                            } catch (e) {}
+                            } catch (e) { }
                         }
                         const isUnread = newMsg.sender === 'customer' || newMsg.sender === 'user';
                         const newLead = {
@@ -918,7 +918,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (loginEmailInput) loginEmailInput.value = '';
                 if (loginPasswordInput) loginPasswordInput.value = '';
                 if (loginErrorMsg) loginErrorMsg.classList.add('hidden');
-                
+
                 cambiarPantallaSegunSesion(data.session);
             } catch (err) {
                 console.error("Error durante login:", err.message);
@@ -969,7 +969,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (registerErrorMsg) registerErrorMsg.classList.add('hidden');
 
                     alert('Registro exitoso. Si es necesario, verifica tu correo. Ahora puedes iniciar sesión.');
-                    
+
                     // Ir a la pestaña de login
                     if (tabLogin) tabLogin.click();
 
@@ -1104,7 +1104,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function updatePlatformSelection() {
         if (!platformSelect) return;
         const selectedVal = platformSelect.value;
-        
+
         // Actualizar textos e identidades visuales según la plataforma
         let displayName = 'Todas';
         if (selectedVal !== 'all') {
@@ -1113,7 +1113,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         activePlatformName.textContent = displayName;
-        
+
         // Cambiar el color neón del badge según la marca seleccionada
         const brandColor = platformColors[selectedVal] || 'var(--neon-green)';
         platformStatusBadge.style.color = brandColor;
@@ -1138,8 +1138,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const selectedVal = platformSelect ? platformSelect.value : 'all';
 
         // Filtrar productos
-        const filteredProducts = selectedVal === 'all' 
-            ? productCache 
+        const filteredProducts = selectedVal === 'all'
+            ? productCache
             : productCache.filter(p => p.platform === selectedVal);
 
         filteredProducts.forEach(prod => {
@@ -1201,7 +1201,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Obtener todos los asesores registrados (V3.5)
     function getRegisteredAdvisors() {
         const currentAgent = getCurrentAgent();
-        
+
         const advisors = [
             { uuid: 'advisor-vendedora-uuid', name: 'Vendedora Activa', photo: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=100&h=100' },
             { uuid: 'advisor-ia-uuid', name: 'Asesor IA', photo: 'https://placehold.co/100x100/111827/03dac6?text=IA' }
@@ -1253,16 +1253,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!createdDateStr) return 'all';
         const createdDate = new Date(createdDateStr);
         const now = new Date();
-        
-        createdDate.setHours(0,0,0,0);
+
+        createdDate.setHours(0, 0, 0, 0);
         const today = new Date(now);
-        today.setHours(0,0,0,0);
-        
+        today.setHours(0, 0, 0, 0);
+
         const diffTime = today - createdDate;
         const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-        
+
         const isSameMonth = createdDate.getMonth() === today.getMonth() && createdDate.getFullYear() === today.getFullYear();
-        
+
         if (diffDays >= 0 && diffDays <= 7) {
             return 'this_week';
         } else if (diffDays > 7 && diffDays <= 14) {
@@ -1278,17 +1278,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     function checkDeliveryDates() {
         if (typeof aiNotifications === 'undefined') return; // Prevenir ejecuciones antes de la inicialización del feed
         const now = new Date();
-        now.setHours(0,0,0,0);
-        
+        now.setHours(0, 0, 0, 0);
+
         leadsList.forEach(lead => {
             const hasConversionTag = lead.tags.some(t => t.name === 'Conversión');
             if (hasConversionTag && lead.delivery_date) {
                 const deliveryDate = new Date(lead.delivery_date);
-                deliveryDate.setHours(0,0,0,0);
-                
+                deliveryDate.setHours(0, 0, 0, 0);
+
                 const diffTime = deliveryDate - now;
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                
+
                 if (diffDays === 5) {
                     const msg = `La IA advierte: El lead ${lead.name} está a 5 días de su fecha de despacho (${lead.delivery_date}).`;
                     if (!aiNotifications.some(n => n.message === msg)) {
@@ -1359,7 +1359,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const stage = lead.commercial_stage;
             if (counters[stage] !== undefined) {
                 counters[stage]++;
-                
+
                 // Sumar al total de la columna (priorizar quoted_value, sino usar estimated_budget)
                 const leadValue = lead.quoted_value > 0 ? lead.quoted_value : lead.estimated_budget;
                 financialTotals[stage] += leadValue;
@@ -1370,9 +1370,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             let isDeliveryExpired = false;
             if (hasConversionTag && lead.delivery_date) {
                 const deliveryDate = new Date(lead.delivery_date);
-                deliveryDate.setHours(0,0,0,0);
+                deliveryDate.setHours(0, 0, 0, 0);
                 const today = new Date();
-                today.setHours(0,0,0,0);
+                today.setHours(0, 0, 0, 0);
                 const diffTime = deliveryDate - today;
                 const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                 if (diffDays === 0) {
@@ -1385,16 +1385,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             card.className = 'lead-card' + (isDeliveryExpired ? ' delivery-expired' : '');
             card.dataset.id = lead.id;
             card.setAttribute('draggable', 'true');
-            
+
             card.addEventListener('dragstart', (e) => {
                 e.dataTransfer.setData('text/plain', lead.id);
                 card.classList.add('dragging');
             });
-            
+
             card.addEventListener('dragend', () => {
                 card.classList.remove('dragging');
             });
- 
+
             let budgetHTML = '';
             if (lead.estimated_budget > 0) {
                 budgetHTML = `<div class="lead-budget-badge">$${(lead.estimated_budget / 1000000).toFixed(1)}M COP</div>`;
@@ -1403,7 +1403,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else {
                 budgetHTML = `<div class="lead-budget-badge" style="background:transparent; border-style:dashed; color:var(--text-muted)">Calculando...</div>`;
             }
- 
+
             const tagsHTML = (lead.tags || []).map(t => {
                 let colorVal = t.color || '#cccccc';
                 if (t.name === 'Alta Prioridad') {
@@ -1417,12 +1417,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
                 return `<span class="lead-tag-badge" style="background-color: #000000; color: #FFFFFF; border: 1px solid #000000; box-shadow: none;">${t.name}</span>`;
             }).join('');
- 
+
             const timeHTML = `<div class="lead-card-time" style="font-size: 11px; color: var(--text-muted); margin-top: 4px;"><i class="fa-regular fa-clock"></i> ${getStageDisplayName(lead.commercial_stage)} &bull; ${lead.time_in_stage}</div>`;
-            
+
             // Fecha de creación del lead (V2.9.3)
             const creationDateHTML = `<div class="lead-card-created" style="font-size: 10px; color: var(--text-muted); margin-top: 2px;"><i class="fa-regular fa-calendar"></i> Creado: ${lead.created_at || 'Sin fecha'}</div>`;
- 
+
             const assignedTo = lead.assigned_to || (lead.ai_chat_status === 'ai_active' ? 'advisor-ia-uuid' : 'advisor-vendedora-uuid');
             const assigneeInfo = resolveAssigneeDetails(assignedTo);
             const assigneeHTML = `
@@ -1496,7 +1496,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const chatActiveStatus = document.getElementById('chat-active-status');
     const aiControlToggle = document.getElementById('ai-control-toggle');
     const aiControlStatusText = document.getElementById('ai-control-status-text');
-    
+
     const chatMessageForm = document.getElementById('chat-message-form');
     const chatInputField = document.getElementById('chat-input-field');
     const chatSendBtn = document.getElementById('chat-send-btn');
@@ -1514,7 +1514,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const isAIActive = aiControlToggle.checked;
             aiControlStatusText.textContent = isAIActive ? 'Activo (AI)' : 'Pausado (Humano)';
             aiControlStatusText.className = isAIActive ? 'status-active' : 'status-paused';
-            
+
             chatInputField.disabled = false;
             chatSendBtn.disabled = false;
             if (isAIActive) {
@@ -1522,7 +1522,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else {
                 chatInputField.placeholder = "Escribe un mensaje para responder...";
             }
-            
+
             if (chatBtnMic) chatBtnMic.disabled = false;
 
             const activeLead = leadsList.find(l => l.id === activeInboxLeadId);
@@ -1561,7 +1561,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
                 return `<span class="convo-card-tag-badge" style="background-color: #000000; color: #FFFFFF; border: 1px solid #000000; box-shadow: none;">${t.name}</span>`;
             }).join('');
- 
+
             const assignedTo = lead.assigned_to || (lead.ai_chat_status === 'ai_active' ? 'advisor-ia-uuid' : 'advisor-vendedora-uuid');
             const assigneeInfo = resolveAssigneeDetails(assignedTo);
             const assigneeHTML = `
@@ -1570,7 +1570,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <span class="lead-assignee-tooltip">Asignado: ${assigneeInfo.name}</span>
                 </div>
             `;
- 
+
             card.innerHTML = `
                 <div class="convo-avatar">
                     <img class="convo-avatar-img" src="${lead.avatar_url}" alt="${lead.name}" onerror="this.src='https://placehold.co/50x50/111/fff?text=Client'" />
@@ -1623,7 +1623,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (activeLead) {
             activeLead.unread = false;
         }
-        
+
         // Habilitar campos de entrada
         if (chatInputField) {
             chatInputField.disabled = false;
@@ -1634,7 +1634,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (chatSendBtn) chatSendBtn.disabled = false;
         if (chatBtnMic) chatBtnMic.disabled = false;
         if (aiControlToggle) aiControlToggle.disabled = false;
-        
+
         renderInbox();
         renderActiveChat();
     }
@@ -1654,12 +1654,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const chatAssigneeSelect = document.getElementById('chat-assignee-select');
         if (chatAssigneeSelect) {
             chatAssigneeSelect.innerHTML = '';
-            
+
             const optUnassigned = document.createElement('option');
             optUnassigned.value = 'unassigned';
             optUnassigned.textContent = 'Sin Asignar';
             chatAssigneeSelect.appendChild(optUnassigned);
-            
+
             const advisors = getRegisteredAdvisors();
             advisors.forEach(adv => {
                 const opt = document.createElement('option');
@@ -1667,7 +1667,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 opt.textContent = adv.name;
                 chatAssigneeSelect.appendChild(opt);
             });
-            
+
             const currentAssigned = activeLead.assigned_to || (activeLead.ai_chat_status === 'ai_active' ? 'advisor-ia-uuid' : 'advisor-vendedora-uuid');
             chatAssigneeSelect.value = currentAssigned;
         }
@@ -1677,11 +1677,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         aiControlToggle.checked = isAI;
         aiControlStatusText.textContent = isAI ? 'Activo (AI)' : 'Pausado (Humano)';
         aiControlStatusText.className = isAI ? 'status-active' : 'status-paused';
-        
+
         if (chatMessageForm) {
             chatMessageForm.classList.remove('hidden');
         }
-        
+
         chatInputField.disabled = false;
         chatSendBtn.disabled = false;
         if (isAI) {
@@ -1722,14 +1722,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             const createMessageRow = (bubbleElement) => {
                 const row = document.createElement('div');
                 row.className = `message-row ${rowClass}`;
-                
+
                 const avatarImg = document.createElement('img');
                 avatarImg.className = 'avatar';
                 avatarImg.src = avatarSrc;
                 avatarImg.alt = msg.sender === 'ai' ? 'IA' : msg.sender;
-                avatarImg.onerror = function() { this.style.display = 'none'; };
+                avatarImg.onerror = function () { this.style.display = 'none'; };
                 avatarImg.setAttribute('onerror', "this.style.display='none'");
-                
+
                 row.appendChild(avatarImg);
                 row.appendChild(bubbleElement);
                 return row;
@@ -1756,11 +1756,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const fallbackImg = 'https://placehold.co/260x380?text=No+Image';
                     const imgUrl = getValidImageUrl(prod.imagen || prod.image || prod.image_url || prod.url || prod.img || prod.thumbnail || '', fallbackImg);
                     const nombre = prod.nombre || prod.name || prod.titulo || prod.title || 'Producto';
-                    
+
                     const precio = prod.precio !== undefined ? prod.precio : prod.price;
                     const precioFormateado = precio ? Number(precio).toLocaleString('es-CO') : null;
                     const priceText = precioFormateado ? `$${precioFormateado} COP` : 'Consultar Precio';
-                    
+
                     const url = prod.url || prod.product_url || prod.link || '#';
                     return `
                         <div class="product-card">
@@ -1831,13 +1831,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                     </div>
                     <span class="bubble-meta">${msg.time}</span>
                 `;
-                const playBtn   = bubble.querySelector('.audio-play-btn');
-                const playIcon  = playBtn ? playBtn.querySelector('i') : null;
-                const audioEl   = bubble.querySelector('audio');
-                const waveBars  = bubble.querySelectorAll('.wave-bar');
+                const playBtn = bubble.querySelector('.audio-play-btn');
+                const playIcon = playBtn ? playBtn.querySelector('i') : null;
+                const audioEl = bubble.querySelector('audio');
+                const waveBars = bubble.querySelectorAll('.wave-bar');
 
                 const startWave = () => waveBars.forEach(b => b.style.animation = 'wavePlayAnimation 1.2s infinite alternate');
-                const stopWave  = () => waveBars.forEach(b => b.style.animation = 'none');
+                const stopWave = () => waveBars.forEach(b => b.style.animation = 'none');
 
                 if (playBtn && playIcon) {
                     if (audioEl) {
@@ -1845,14 +1845,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                         playBtn.addEventListener('click', (e) => {
                             e.stopPropagation();
                             if (audioEl.paused) {
-                                audioEl.play().catch(() => {});
+                                audioEl.play().catch(() => { });
                             } else {
                                 audioEl.pause();
                             }
                         });
-                        audioEl.addEventListener('play',  () => { playIcon.className = 'fa-solid fa-pause'; startWave(); });
-                        audioEl.addEventListener('pause', () => { playIcon.className = 'fa-solid fa-play';  stopWave();  });
-                        audioEl.addEventListener('ended', () => { playIcon.className = 'fa-solid fa-play';  stopWave();  });
+                        audioEl.addEventListener('play', () => { playIcon.className = 'fa-solid fa-pause'; startWave(); });
+                        audioEl.addEventListener('pause', () => { playIcon.className = 'fa-solid fa-play'; stopWave(); });
+                        audioEl.addEventListener('ended', () => { playIcon.className = 'fa-solid fa-play'; stopWave(); });
                     } else {
                         // Sin URL disponible — feedback visual de que no hay audio
                         playBtn.addEventListener('click', (e) => {
@@ -1978,11 +1978,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             const currentAgent = getCurrentAgent();
             const myUuid = currentAgent.uuid || 'advisor-vendedora-uuid';
             const assignedTo = lead.assigned_to || (lead.ai_chat_status === 'ai_active' ? 'advisor-ia-uuid' : 'advisor-vendedora-uuid');
-            
+
             if (currentInboxPertenenciaFilter === 'my' && assignedTo !== myUuid) {
                 return false;
             }
-            
+
             // Filtro de no leídos
             if (currentInboxFilter === 'unread' && !lead.unread) {
                 return false;
@@ -2086,7 +2086,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         avatarImg.className = 'avatar';
         avatarImg.src = './assets/ai-avatar.png';
         avatarImg.alt = 'IA';
-        avatarImg.onerror = function() { this.style.display = 'none'; };
+        avatarImg.onerror = function () { this.style.display = 'none'; };
         avatarImg.setAttribute('onerror', "this.style.display='none'");
 
         const typingEl = document.createElement('div');
@@ -2121,12 +2121,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function enviarAlWebhook({ sessionId, mensaje, tipo, mediaUrl }) {
         const URL_WEBHOOK_N8N = 'https://n8n.srv1718653.hstgr.cloud/webhook/3940b692-d275-434b-82d0-c75e0ec43c07';
         console.log(`🚀 Disparando webhook n8n (fire-and-forget) | tipo: ${tipo} | mediaUrl: ${mediaUrl || 'N/A'}`);
-        
+
         let typingEl = null;
         const targetLead = leadsList.find(l => l.id === sessionId);
         const isSimulator = sessionId === 'lead-simulador-ia';
         const isAIActive = isSimulator || (targetLead && targetLead.ai_chat_status === 'ai_active');
-        
+
         if (isAIActive && activeInboxLeadId === sessionId) {
             typingEl = showAITypingIndicator();
         }
@@ -2184,9 +2184,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // 4. Clasificación dinámica por MIME type real del archivo
             let tipo;
-            if (file.type.startsWith('image/'))      tipo = 'imagen';
+            if (file.type.startsWith('image/')) tipo = 'imagen';
             else if (file.type.startsWith('audio/')) tipo = 'audio';
-            else                                     tipo = 'documento';
+            else tipo = 'documento';
             await enviarAlWebhook({ sessionId: targetLeadId, mensaje: '', tipo, mediaUrl });
 
             chatFileInput.value = '';
@@ -2227,11 +2227,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         const activeLead = leadsList.find(l => l.id === activeInboxLeadId);
         if (activeLead && activeLead.ai_chat_status === 'ai_active') {
             activeLead.ai_chat_status = 'human_paused';
-            
+
             const currentAgent = getCurrentAgent();
             const myUuid = currentAgent.uuid || 'advisor-vendedora-uuid';
             activeLead.assigned_to = myUuid; // Auto-asignar al humano activo
-            
+
             // Actualizar la UI del control de IA directamente sin re-renderizar todo el chat para conservar el foco del input
             if (aiControlToggle) {
                 aiControlToggle.checked = false;
@@ -2243,7 +2243,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (chatInputField) {
                 chatInputField.placeholder = "Escribe un mensaje para responder...";
             }
-            
+
             // Sincronizar el selector de asesor asignado con la vendedora activa para evitar desajustes visuales
             const chatAssigneeSelect = document.getElementById('chat-assignee-select');
             if (chatAssigneeSelect) {
@@ -2255,7 +2255,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const currentAgent = getCurrentAgent();
                 const myUuid = currentAgent.uuid || 'advisor-vendedora-uuid';
                 const assignedTo = lead.assigned_to || (lead.ai_chat_status === 'ai_active' ? 'advisor-ia-uuid' : 'advisor-vendedora-uuid');
-                
+
                 if (currentInboxPertenenciaFilter === 'my' && assignedTo !== myUuid) return false;
                 if (currentInboxFilter === 'unread' && !lead.unread) return false;
                 if (currentInboxTagFilter !== 'all' && !lead.tags.some(t => t.name === currentInboxTagFilter)) return false;
@@ -2307,30 +2307,30 @@ document.addEventListener('DOMContentLoaded', async () => {
                     origen: 'CRM Local'
                 })
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json().catch(() => ({}));
-            })
-            .then(data => {
-                const suggestion = data ? (data.respuesta_ia || data.mensaje) : '';
-                if (suggestion && chatInputField) {
-                    chatInputField.value = suggestion;
-                    // Forzar trigger de input event
-                    chatInputField.dispatchEvent(new Event('input'));
-                } else {
-                    console.warn("La IA no devolvió ninguna sugerencia en respuesta_ia o mensaje");
-                }
-            })
-            .catch(error => {
-                console.error("Error al obtener asistencia de IA:", error);
-            })
-            .finally(() => {
-                // Restaurar estado del botón
-                chatBtnAiAssist.disabled = false;
-                chatBtnAiAssist.innerHTML = originalHTML;
-            });
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json().catch(() => ({}));
+                })
+                .then(data => {
+                    const suggestion = data ? (data.respuesta_ia || data.mensaje) : '';
+                    if (suggestion && chatInputField) {
+                        chatInputField.value = suggestion;
+                        // Forzar trigger de input event
+                        chatInputField.dispatchEvent(new Event('input'));
+                    } else {
+                        console.warn("La IA no devolvió ninguna sugerencia en respuesta_ia o mensaje");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error al obtener asistencia de IA:", error);
+                })
+                .finally(() => {
+                    // Restaurar estado del botón
+                    chatBtnAiAssist.disabled = false;
+                    chatBtnAiAssist.innerHTML = originalHTML;
+                });
         });
     }
 
@@ -2358,7 +2358,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Toggle de pertenencia en Inbox (V3.5)
     const filterMyLeadsBtn = document.getElementById('inbox-filter-my-leads');
     const filterAllLeadsBtn = document.getElementById('inbox-filter-all-leads');
-    
+
     if (filterMyLeadsBtn && filterAllLeadsBtn) {
         filterMyLeadsBtn.addEventListener('click', () => {
             filterMyLeadsBtn.classList.add('active');
@@ -2366,7 +2366,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             currentInboxPertenenciaFilter = 'my';
             renderInbox();
         });
-        
+
         filterAllLeadsBtn.addEventListener('click', () => {
             filterAllLeadsBtn.classList.add('active');
             filterMyLeadsBtn.classList.remove('active');
@@ -2383,10 +2383,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (activeLead) {
                 const newAssignee = e.target.value;
                 const oldAssignee = activeLead.assigned_to || (activeLead.ai_chat_status === 'ai_active' ? 'advisor-ia-uuid' : 'advisor-vendedora-uuid');
-                
+
                 if (newAssignee !== oldAssignee) {
                     activeLead.assigned_to = newAssignee;
-                    
+
                     if (newAssignee === 'advisor-ia-uuid') {
                         activeLead.ai_chat_status = 'ai_active';
                         if (aiControlToggle) {
@@ -2402,10 +2402,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                             aiControlStatusText.className = 'status-paused';
                         }
                     }
-                    
+
                     const advisors = getRegisteredAdvisors();
                     const newAdvisorObj = advisors.find(a => a.uuid === newAssignee) || { name: 'Sin Asignar' };
-                    
+
                     if (!activeLead.activity_log) {
                         activeLead.activity_log = [];
                     }
@@ -2414,7 +2414,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         author: 'Sistema',
                         content: `Lead reasignado a: ${newAdvisorObj.name}.`
                     });
-                    
+
                     renderInbox();
                     renderKanban();
                 }
@@ -2426,7 +2426,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 9. Panel de Gestión de Etiquetas
     // ----------------------------------------------------------------------
     const tagsManagementContainer = document.getElementById('tags-management-container');
-    
+
     function renderTagsPanel() {
         if (!tagsManagementContainer) return;
         tagsManagementContainer.innerHTML = '';
@@ -2501,16 +2501,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 2. Renderizar Dashboard de Impacto por Etiquetas (Derecha)
         const pipelineDashboard = document.getElementById('tags-pipeline-dashboard');
         const pipelineTotalValEl = document.getElementById('pipeline-total-value');
-        
+
         if (pipelineDashboard && pipelineTotalValEl) {
             pipelineDashboard.innerHTML = '';
-            
+
             // Total Pipeline General
             const totalPipelineVal = leadsList.reduce((sum, l) => {
                 const leadValue = l.quoted_value > 0 ? l.quoted_value : l.estimated_budget;
                 return sum + leadValue;
             }, 0);
-            
+
             pipelineTotalValEl.textContent = totalPipelineVal.toLocaleString('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }) + ' COP';
 
             // Para cada etiqueta, pintar barra de progreso
@@ -2520,9 +2520,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const leadValue = l.quoted_value > 0 ? l.quoted_value : l.estimated_budget;
                     return sum + leadValue;
                 }, 0);
-                
+
                 const percentage = totalPipelineVal > 0 ? ((totalVal / totalPipelineVal) * 100).toFixed(1) : 0;
-                
+
                 const progressItem = document.createElement('div');
                 progressItem.className = 'tag-progress-item';
                 progressItem.innerHTML = `
@@ -2579,17 +2579,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             const ctx = new AudioContext();
             const osc = ctx.createOscillator();
             const gain = ctx.createGain();
-            
+
             osc.connect(gain);
             gain.connect(ctx.destination);
-            
+
             osc.type = 'sine';
             osc.frequency.setValueAtTime(523.25, ctx.currentTime);
-            
+
             gain.gain.setValueAtTime(0, ctx.currentTime);
-            gain.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 0.03); 
-            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6); 
-            
+            gain.gain.linearRampToValueAtTime(0.2, ctx.currentTime + 0.03);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+
             osc.start(ctx.currentTime);
             osc.stop(ctx.currentTime + 0.6);
         } catch (error) {
@@ -2682,12 +2682,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const jiraFileInput = document.getElementById('jira-file-input');
     const jiraAttachmentsList = document.getElementById('jira-attachments-list');
     const jiraTimeline = document.getElementById('jira-timeline');
-    
+
     let currentJiraLead = null;
 
     function openJiraModal(lead) {
         currentJiraLead = lead;
-        
+
         // Cargar campos básicos
         document.getElementById('jira-modal-title').textContent = `Ficha: ${lead.name}`;
         document.getElementById('jira-avatar').src = lead.avatar_url;
@@ -2695,7 +2695,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('jira-client-phone').textContent = lead.phone;
         document.getElementById('jira-stage-badge').textContent = getStageDisplayName(lead.commercial_stage);
         document.getElementById('jira-time-in-stage').textContent = lead.time_in_stage;
-        
+
         // Canal
         const channelBadge = document.getElementById('jira-channel');
         channelBadge.className = `channel-indicator ${lead.channel_source}`;
@@ -2708,7 +2708,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Formulario editable
         jiraObservations.value = lead.observations || '';
         jiraDeliveryDate.value = lead.delivery_date || '';
-        
+
         // Cargar fecha de pedido (creación) (V3.5)
         const jiraOrderDate = document.getElementById('jira-order-date');
         if (jiraOrderDate) {
@@ -2730,12 +2730,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const jiraAssigneeSelect = document.getElementById('jira-assignee');
         if (jiraAssigneeSelect) {
             jiraAssigneeSelect.innerHTML = '';
-            
+
             const optUnassigned = document.createElement('option');
             optUnassigned.value = 'unassigned';
             optUnassigned.textContent = 'Sin Asignar';
             jiraAssigneeSelect.appendChild(optUnassigned);
-            
+
             const advisors = getRegisteredAdvisors();
             advisors.forEach(adv => {
                 const opt = document.createElement('option');
@@ -2743,7 +2743,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 opt.textContent = adv.name;
                 jiraAssigneeSelect.appendChild(opt);
             });
-            
+
             const currentAssigned = lead.assigned_to || (lead.ai_chat_status === 'ai_active' ? 'advisor-ia-uuid' : 'advisor-vendedora-uuid');
             jiraAssigneeSelect.value = currentAssigned;
         }
@@ -2801,7 +2801,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function renderJiraAttachments() {
         if (!jiraAttachmentsList || !currentJiraLead) return;
         jiraAttachmentsList.innerHTML = '';
-        
+
         if (currentJiraLead.attachments.length === 0) {
             jiraAttachmentsList.innerHTML = '<p style="font-size:11px; color:var(--text-muted); text-align:center;">Sin archivos adjuntos.</p>';
             return;
@@ -2820,7 +2820,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </div>
                 <button class="jira-attachment-remove" data-index="${index}">&times;</button>
             `;
-            
+
             div.querySelector('.jira-attachment-remove').addEventListener('click', () => {
                 currentJiraLead.attachments.splice(index, 1);
                 currentJiraLead.activity_log.push({
@@ -2870,7 +2870,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Registrar cambios en el log
             let changeMade = false;
- 
+
             // Guardar asignación del asesor (V3.5)
             const jiraAssigneeSelect = document.getElementById('jira-assignee');
             if (jiraAssigneeSelect) {
@@ -2954,7 +2954,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Gestionar prioridad
             const isPriorityChecked = jiraPriorityToggle.checked;
             const hasPriorityTag = currentJiraLead.tags.some(t => t.name === 'Alta Prioridad');
-            
+
             if (isPriorityChecked && !hasPriorityTag) {
                 currentJiraLead.tags.unshift({ name: 'Alta Prioridad', color: 'var(--neon-green)' });
                 currentJiraLead.activity_log.push({
@@ -3008,15 +3008,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (currentJiraLead) {
                 // Cerrar modal
                 jiraModal.classList.add('hidden');
-                
+
                 // Seleccionar lead activo
                 activeInboxLeadId = currentJiraLead.id;
-                
+
                 // Restablecer filtros de Inbox
                 currentInboxPertenenciaFilter = 'all';
                 currentInboxFilter = 'all';
                 currentInboxTagFilter = 'all';
-                
+
                 // Actualizar interfaz visual de filtros
                 const filterMyLeadsBtn = document.getElementById('inbox-filter-my-leads');
                 const filterAllLeadsBtn = document.getElementById('inbox-filter-all-leads');
@@ -3024,7 +3024,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     filterAllLeadsBtn.classList.add('active');
                     filterMyLeadsBtn.classList.remove('active');
                 }
-                
+
                 const filterBtns = document.querySelectorAll('.inbox-filter-btn');
                 filterBtns.forEach(btn => {
                     if (btn.getAttribute('data-filter') === 'all') {
@@ -3033,12 +3033,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                         btn.classList.remove('active');
                     }
                 });
-                
+
                 const tagFilterInbox = document.getElementById('inbox-tag-filter');
                 if (tagFilterInbox) {
                     tagFilterInbox.value = 'all';
                 }
-                
+
                 // Cambiar vista SPA al Inbox
                 const inboxTab = document.querySelector('[data-target="view-inbox"]');
                 if (inboxTab) {
@@ -3053,7 +3053,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         }
                     });
                 }
-                
+
                 // Activar el chat del cliente seleccionado
                 activateChatForLead(currentJiraLead.id);
             }
@@ -3100,12 +3100,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function handleSimulatedFiles(files) {
         if (!currentJiraLead || files.length === 0) return;
-        
+
         Array.from(files).forEach(file => {
-            const sizeStr = file.size > 1024 * 1024 
+            const sizeStr = file.size > 1024 * 1024
                 ? (file.size / (1024 * 1024)).toFixed(1) + ' MB'
                 : (file.size / 1024).toFixed(0) + ' KB';
-                
+
             currentJiraLead.attachments.push({
                 name: file.name,
                 size: sizeStr
@@ -3141,16 +3141,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         column.addEventListener('drop', (e) => {
             e.preventDefault();
             column.classList.remove('drag-over');
-            
+
             const leadId = e.dataTransfer.getData('text/plain');
             const lead = leadsList.find(l => l.id === leadId);
             const targetStage = column.getAttribute('data-stage');
-            
+
             if (lead && lead.commercial_stage !== targetStage) {
                 const oldStage = lead.commercial_stage;
                 lead.commercial_stage = targetStage;
                 lead.time_in_stage = 'Ahora';
-                
+
                 lead.activity_log.push({
                     time: 'Ahora',
                     author: 'Sistema',
@@ -3169,7 +3169,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         addAINotification('estado', `La IA movió a ${lead.name} a la columna ${getStageDisplayName(targetStage)}.`);
                     }
                 }
-                
+
                 renderKanban();
             }
         });
@@ -3179,7 +3179,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const leadCreationModal = document.getElementById('lead-creation-modal');
     const closeCreationModalBtn = document.getElementById('close-creation-modal-btn');
     const leadCreationForm = document.getElementById('lead-creation-form');
-    
+
     // Asignar clicks a los botones de añadir inline
     document.querySelectorAll('.btn-add-lead-inline').forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -3259,7 +3259,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (conversionToggle.checked && currentJiraLead) {
                 // Loguear evento
                 console.log("%c[Meta CAPI] Enviando evento de conversión a Meta CAPI vía n8n workflow...", "color: #FF0266; font-weight: bold; font-size: 13px; text-shadow: 0 0 4px rgba(255, 2, 102, 0.4);");
-                
+
                 const capiPayload = {
                     event_name: "Purchase",
                     event_time: Math.floor(Date.now() / 1000),
@@ -3275,7 +3275,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     action_source: "physical_store",
                     opt_out: false
                 };
-                
+
                 console.log("CAPI Payload Sent (JSON):", JSON.stringify(capiPayload, null, 2));
 
                 // Agregar entrada de log inmediata al timeline
@@ -3289,7 +3289,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (typeof addAINotification === 'function') {
                     addAINotification('prioridad', `La IA registró un evento de Conversión para ${currentJiraLead.name}.`);
                 }
-                
+
                 renderJiraTimeline();
             }
         });
@@ -3342,7 +3342,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
         aiNotifications.unshift(newNoti);
         renderNotifications();
-        
+
         // Efecto visual en la campana
         if (notiBellBtn) {
             notiBellBtn.style.transform = 'scale(1.2)';
@@ -3497,25 +3497,25 @@ document.addEventListener('DOMContentLoaded', async () => {
     function updateSidebarClock() {
         const timeTextEl = document.getElementById('sidebar-time-text');
         if (!timeTextEl) return;
-        
+
         const now = new Date();
         const days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
         const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-        
+
         const dayName = days[now.getDay()];
         const dayNum = now.getDate();
         const monthName = months[now.getMonth()];
-        
+
         let hours = now.getHours();
         const minutes = now.getMinutes().toString().padStart(2, '0');
         const ampm = hours >= 12 ? 'PM' : 'AM';
         hours = hours % 12;
         hours = hours ? hours : 12; // 0 debe ser 12
         const hourStr = hours.toString().padStart(2, '0');
-        
+
         timeTextEl.textContent = `${dayName}, ${dayNum} ${monthName} • ${hourStr}:${minutes} ${ampm}`;
     }
-    
+
     updateSidebarClock();
     setInterval(updateSidebarClock, 60000);
 
@@ -3675,10 +3675,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         saveAiConfigBtn.addEventListener('click', () => {
             const model = aiModelSelect ? aiModelSelect.value : 'claude-3-5';
             const prompt = aiSystemPrompt ? aiSystemPrompt.value : '';
-            
+
             const config = { model, prompt };
             localStorage.setItem('spoke_ai_config', JSON.stringify(config));
-            
+
             alert(`¡Configuración de IA guardada con éxito!\n\nModelo: ${model === 'gpt-4o' ? 'GPT-4o' : model === 'gemini-1-5' ? 'Gemini 1.5 Pro' : 'Claude 3.5 Sonnet'}\nSystem Prompt actualizado.`);
         });
     }
@@ -3700,11 +3700,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     function loadChannelsStatus() {
         const defaultStatus = { whatsapp: false, messenger: false, tiktok: false, webchat: false };
         const status = JSON.parse(localStorage.getItem('spoke_channels_status') || JSON.stringify(defaultStatus));
-        
+
         Object.keys(status).forEach(key => {
             const badge = document.getElementById(`status-${key}`);
             const btn = document.querySelector(`.btn-channel-vincular[data-channel="${key}"]`);
-            
+
             if (badge) {
                 if (status[key]) {
                     badge.className = 'channel-status-badge connected';
@@ -3714,7 +3714,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     badge.textContent = 'Desconectado';
                 }
             }
-            
+
             if (btn) {
                 btn.textContent = status[key] ? 'Desvincular' : 'Vincular';
                 if (status[key]) {
@@ -3733,7 +3733,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         btn.addEventListener('click', (e) => {
             const channel = btn.getAttribute('data-channel');
             const status = JSON.parse(localStorage.getItem('spoke_channels_status') || '{"whatsapp":false,"messenger":false,"tiktok":false,"webchat":false}');
-            
+
             if (status[channel]) {
                 // Desvincular
                 if (confirm(`¿Estás seguro de que deseas desvincular el canal ${channelNames[channel]}?`)) {
@@ -3746,16 +3746,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                 document.getElementById('channel-modal-type').value = channel;
                 document.getElementById('channel-modal-name').value = channelNames[channel];
                 document.getElementById('channel-endpoint-url').value = `https://n8n.spoke-ia.com/webhook/v1/${channel}/muebleo`;
-                
+
                 // Limpiar inputs
                 document.getElementById('channel-api-key').value = '';
-                
+
                 if (channelLoadingSpinner) channelLoadingSpinner.classList.add('hidden');
                 if (channelSubmitBtn) {
                     channelSubmitBtn.disabled = false;
                     channelSubmitBtn.textContent = 'Vincular Canal';
                 }
-                
+
                 if (channelModal) channelModal.classList.remove('hidden');
             }
         });
@@ -3771,7 +3771,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         channelForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const channel = document.getElementById('channel-modal-type').value;
-            
+
             // Simular vinculación con spinner
             if (channelLoadingSpinner) channelLoadingSpinner.classList.remove('hidden');
             if (channelSubmitBtn) {
@@ -3783,10 +3783,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const status = JSON.parse(localStorage.getItem('spoke_channels_status') || '{"whatsapp":false,"messenger":false,"tiktok":false,"webchat":false}');
                 status[channel] = true;
                 localStorage.setItem('spoke_channels_status', JSON.stringify(status));
-                
+
                 if (channelModal) channelModal.classList.add('hidden');
                 loadChannelsStatus();
-                
+
                 alert(`¡Canal ${channelNames[channel]} conectado con éxito!\nWebhook configurado y validado en n8n.`);
             }, 1500);
         });
@@ -3804,11 +3804,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     function loadCatalogConnections() {
         const defaultConns = { shopify: false, woocommerce: false, apirest: false };
         const conns = JSON.parse(localStorage.getItem('spoke_catalog_connections') || JSON.stringify(defaultConns));
-        
+
         Object.keys(conns).forEach(platform => {
             const badge = catalogStatusBadges[platform];
             const btn = document.querySelector(`.btn-catalog-connect[data-platform="${platform}"]`);
-            
+
             if (badge) {
                 if (conns[platform]) {
                     badge.className = 'catalog-status-badge connected';
@@ -3820,7 +3820,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     badge.style.color = 'var(--text-muted)';
                 }
             }
-            
+
             if (btn) {
                 btn.textContent = conns[platform] ? 'Desconectar' : 'Conectar';
                 if (conns[platform]) {
@@ -3839,12 +3839,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             const platform = btn.getAttribute('data-platform');
             const defaultConns = { shopify: false, woocommerce: false, apirest: false };
             const conns = JSON.parse(localStorage.getItem('spoke_catalog_connections') || JSON.stringify(defaultConns));
-            
+
             // Toggle connection status
             conns[platform] = !conns[platform];
             localStorage.setItem('spoke_catalog_connections', JSON.stringify(conns));
             loadCatalogConnections();
-            
+
             const platformNames = { shopify: 'Shopify', woocommerce: 'WooCommerce', apirest: 'API REST Custom' };
             const actionStr = conns[platform] ? 'conectado' : 'desconectado';
             console.log(`Origen de datos ${platformNames[platform]} ${actionStr}.`);
@@ -3895,7 +3895,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 onHover: (event, elements) => {
                     const labelEl = document.getElementById('chart-center-label');
                     const valueEl = document.getElementById('chart-center-value');
-                    
+
                     if (elements && elements.length > 0) {
                         // El ratón está sobre un segmento
                         const index = elements[0].index;
@@ -3936,7 +3936,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             e.preventDefault();
             const startX = e.clientX;
             const startWidth = leftPanel.offsetWidth;
-            
+
             resizer.classList.add('is-dragging');
             document.body.style.userSelect = 'none';
             document.body.style.cursor = 'col-resize';
@@ -3946,7 +3946,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const minW = 240;
                 const maxW = 480;
                 const clampedWidth = Math.min(maxW, Math.max(minW, newWidth));
-                
+
                 leftPanel.style.width = clampedWidth + 'px';
                 localStorage.setItem('spoke_sidebar_width', clampedWidth);
             };
@@ -3955,7 +3955,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 resizer.classList.remove('is-dragging');
                 document.body.style.userSelect = '';
                 document.body.style.cursor = '';
-                
+
                 document.removeEventListener('mousemove', onMouseMove);
                 document.removeEventListener('mouseup', onMouseUp);
             };
@@ -3991,7 +3991,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Inicializar sesión de Supabase y luego hacer checkAuth
     function inicializarDashboardConDatos(session) {
         if (!session || !session.user) return;
-        
+
         currentSession = session; // Guardar en caché local
         const user = session.user;
         const agentName = user.user_metadata?.name || user.email.split('@')[0];
@@ -3999,7 +3999,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (agentDisplayName) agentDisplayName.textContent = agentName;
         if (dashboardWelcome) dashboardWelcome.textContent = `¡Hola, ${agentName.split(' ')[0]}!`;
-        
+
         const avatarImg = document.getElementById('agent-profile-img');
         if (avatarImg) {
             avatarImg.src = agentPhoto;
@@ -4020,7 +4020,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (typeof loadAIConfig === 'function') loadAIConfig();
         if (typeof loadChannelsStatus === 'function') loadChannelsStatus();
         if (typeof loadCatalogConnections === 'function') loadCatalogConnections();
-        
+
         // Cargar conversaciones desde Supabase de manera asíncrona
         cargarConversacionesDesdeSupabase();
         renderizarGraficoPipeline();
@@ -4028,7 +4028,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function cambiarPantallaSegunSesion(session) {
         currentSession = session; // Guardar en caché local
-        
+
         if (session && session.user) {
             // Mostrar CRM
             if (loginScreen) {

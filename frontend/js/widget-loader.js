@@ -87,7 +87,7 @@
         await loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2");
 
         const supabaseUrl = 'https://luyeqpcqhdngaisfzdnl.supabase.co';
-        const supabaseKey = 'sb_publishable_5PhCsOnvuqs3HagvA1CxxA_lHYhuEjb';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eWVxcGNxaGRuZ2Fpc2Z6ZG5sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNzU1MDcsImV4cCI6MjA5NTg1MTUwN30.LTT9jBg2qFqTtxXijgyW242BKS-s3_w68e9VTCEI5Tg';
 
         // Patrón Singleton estricto para evitar múltiples instancias de GoTrueClient
         if (!window.supabaseClient) {
