@@ -178,8 +178,7 @@ async function guardarMensajeEnSupabase(leadId, sender, content, msgType = 'text
                     console.log('📡 [Webhook n8n] Intentando disparo fire-and-forget para lead:', leadId);
                     await fetch(URL_WEBHOOK_N8N, {
                         method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'text/plain' },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
                     });
                     console.log('✅ [Webhook n8n] Disparo completado (opaco, sin lectura de respuesta).');
@@ -2178,8 +2177,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 console.log('📡 [Webhook n8n] Disparando fire-and-forget para sesión:', sessionId);
                 await fetch(URL_WEBHOOK_N8N, {
                     method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'text/plain' },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
                 console.log('✅ [Webhook n8n] Disparo completado (opaco).');
@@ -2345,8 +2343,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const URL_WEBHOOK_N8N = 'https://n8n.muebleo.com.co/webhook/3940b692-d275-434b-82d0-c75e0ec43c07';
                     await fetch(URL_WEBHOOK_N8N, {
                         method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'text/plain' },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             sessionId: activeInboxLeadId,
                             mensaje: text || '[Sugerir respuesta]',

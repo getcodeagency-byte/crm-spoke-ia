@@ -185,9 +185,8 @@
                 };
                 fetch(URL_WEBHOOK_N8N, {
                     method: 'POST',
-                    mode: 'no-cors',
                     headers: {
-                        'Content-Type': 'text/plain'
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(payload)
                 }).catch(e => console.warn('n8n silencioso:', e));
