@@ -167,7 +167,7 @@ async function guardarMensajeEnSupabase(leadId, sender, content, msgType = 'text
         if (sender === 'human' || sender === 'advisor') {
             setTimeout(async () => {
                 try {
-                    const URL_WEBHOOK_N8N = 'https://n8n.srv1718653.hstgr.cloud/webhook/3940b692-d275-434b-82d0-c75e0ec43c07';
+                    const URL_WEBHOOK_N8N = 'https://n8n.muebleo.com.co/webhook/3940b692-d275-434b-82d0-c75e0ec43c07';
                     const payload = {
                         lead_id: leadId,
                         mensaje: content || (msgType === 'file' ? '📁 Archivo' : msgType === 'image' ? '📷 Imagen' : ''),
