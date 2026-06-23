@@ -176,7 +176,7 @@
 
             // Disparo Non-Blocking al Webhook de n8n (solo para el visitante) - Evasión Estricta de CORS (Legacy URL muebleoia.app.n8n.cloud removido)
             if (crmSender === 'customer') {
-                const URL_WEBHOOK_N8N = 'https://n8n.srv1718653.hstgr.cloud/webhook/3940b692-d275-434b-82d0-c75e0ec43c07';
+                const URL_WEBHOOK_N8N = 'https://n8n.muebleo.com.co/webhook/3940b692-d275-434b-82d0-c75e0ec43c07';
                 const payload = {
                     lead_id: leadId,
                     mensaje: content,
