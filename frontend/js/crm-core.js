@@ -8,7 +8,7 @@
 const supabaseUrl = 'https://luyeqpcqhdngaisfzdnl.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eWVxcGNxaGRuZ2Fpc2Z6ZG5sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNzU1MDcsImV4cCI6MjA5NTg1MTUwN30.LTT9jBg2qFqTtxXijgyW242BKS-s3_w68e9VTCEI5Tg';
 
-const supabase = supabaseClient.createClient(supabaseUrl, supabaseKey);
+
 
 if (!window.supabaseClient) {
     window.supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey, {
@@ -20,7 +20,6 @@ if (!window.supabaseClient) {
     });
 }
 const supabaseClient = window.supabaseClient;
-
 // Validar y sanear URLs de imágenes de prueba/rotas para evitar errores de red en la consola
 function getValidImageUrl(url, fallback = 'https://placehold.co/260x380?text=No+Image') {
     if (!url || typeof url !== 'string') return fallback;
