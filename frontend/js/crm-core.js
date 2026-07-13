@@ -654,110 +654,84 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Crear la promesa singleton y almacenarla
         // Llamada a través del Proxy en Vercel para evitar bloqueos
-        const response = await fetch('/api/chat_history?select=*&order=created_at.asc', {
-            method: 'GET',
-            headers: {
-                'apikey': supabaseKey,
-                'Authorization': `Bearer ${currentSession?.access_token || ''}`
-            }
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Error al conectar con el proxy');
-        }
-        const messages = await response.json();
-
-        console.log(`✅ [Red] Historial descargado: ${messages ? messages.length : 0} mensajes. Distribuyendo a componentes de UI...`);
-
-        if (messages && messages.length > 0) {
-            const grouped = {};
-            messages.forEach(msg => {
-                if (!grouped[msg.lead_id]) {
-                    grouped[msg.lead_id] = [];
+        try {
+            console.log('🔄 [Red] Cargando conversaciones e historial desde Supabase (petición única)...');
+            const response = await fetch('/api/chat_history?select=*&order=created_at.asc', {
+                method: 'GET',
+                headers: {
+                    'apikey': supabaseKey,
+                    'Authorization': `Bearer ${currentSession?.access_token || ''}`
                 }
-                grouped[msg.lead_id].push(msg);
             });
 
-            for (const leadId in grouped) {
-                const leadMsgs = grouped[leadId];
+            if (!response.ok) throw new Error('Error al conectar con el proxy');
+            const messages = await response.json();
 
-                chatsHistory[leadId] = leadMsgs.map(msg => {
-                    let timeStr = 'Ahora';
-                    if (msg.created_at) {
-                        try {
-                            const date = new Date(msg.created_at);
-                            timeStr = date.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
-                        } catch (e) { }
-                    }
+            console.log(`✅ [Red] Historial descargado: ${messages ? messages.length : 0} mensajes.`);
 
-                    const item = {
-                        sender: msg.sender,
-                        content: msg.content,
-                        time: timeStr
-                    };
-
-                    if (msg.type === 'carousel') {
-                        item.type = 'carousel';
-                        item.products = msg.products_data;
-                    }
-                    return item;
+            if (messages && messages.length > 0) {
+                const grouped = {};
+                messages.forEach(msg => {
+                    if (!grouped[msg.lead_id]) grouped[msg.lead_id] = [];
+                    grouped[msg.lead_id].push(msg);
                 });
 
-                const exists = leadsList.some(l => l.id === leadId);
-                if (!exists && leadId !== 'lead-simulador-ia') {
-                    let createdAtStr = new Date().toISOString().split('T')[0];
-                    if (leadMsgs[0] && leadMsgs[0].created_at) {
-                        try {
-                            createdAtStr = new Date(leadMsgs[0].created_at).toISOString().split('T')[0];
-                        } catch (e) { }
+                for (const leadId in grouped) {
+                    const leadMsgs = grouped[leadId];
+                    chatsHistory[leadId] = leadMsgs.map(msg => {
+                        let timeStr = 'Ahora';
+                        if (msg.created_at) {
+                            try {
+                                const date = new Date(msg.created_at);
+                                timeStr = date.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+                            } catch (e) { }
+                        }
+                        const item = { sender: msg.sender, content: msg.content, time: timeStr };
+                        if (msg.type === 'carousel') { item.type = 'carousel'; item.products = msg.products_data; }
+                        return item;
+                    });
+
+                    const exists = leadsList.some(l => l.id === leadId);
+                    if (!exists && leadId !== 'lead-simulador-ia') {
+                        let createdAtStr = new Date().toISOString().split('T')[0];
+                        if (leadMsgs[0] && leadMsgs[0].created_at) {
+                            try { createdAtStr = new Date(leadMsgs[0].created_at).toISOString().split('T')[0]; } catch (e) { }
+                        }
+                        const isUnread = leadMsgs[leadMsgs.length - 1] && (leadMsgs[leadMsgs.length - 1].sender === 'customer' || leadMsgs[leadMsgs.length - 1].sender === 'user');
+                        const newLead = {
+                            id: leadId,
+                            name: `Visitante Web (${leadId.replace('visitor-', '')})`,
+                            phone: '',
+                            channel_source: 'webchat',
+                            ai_chat_status: 'ai_active',
+                            commercial_stage: 'nuevo',
+                            unread: isUnread,
+                            estimated_budget: 0.00,
+                            quoted_value: 0.00,
+                            avatar_url: 'https://placehold.co/100x100/1e293b/06B6D4?text=WEB',
+                            time_in_stage: 'ahora',
+                            created_at: createdAtStr,
+                            assigned_to: (typeof getCurrentAgent === 'function' ? getCurrentAgent().uuid : 'advisor-vendedora-uuid'),
+                            delivery_date: '',
+                            observations: 'Lead cargado dinámicamente desde Supabase.',
+                            attachments: [],
+                            activity_log: [{ time: 'Ahora', author: 'Sistema', content: 'Lead recuperado desde el historial de Supabase.' }],
+                            tags: [{ name: 'Nuevo', color: '#03DAC6' }]
+                        };
+                        leadsList.unshift(newLead);
                     }
-
-                    const lastMsg = leadMsgs[leadMsgs.length - 1];
-                    const isUnread = lastMsg && (lastMsg.sender === 'customer' || lastMsg.sender === 'user');
-
-                    const newLead = {
-                        id: leadId,
-                        name: `Visitante Web (${leadId.replace('visitor-', '')})`,
-                        phone: '',
-                        channel_source: 'webchat',
-                        ai_chat_status: 'ai_active',
-                        commercial_stage: 'nuevo',
-                        unread: isUnread,
-                        estimated_budget: 0.00,
-                        quoted_value: 0.00,
-                        avatar_url: 'https://placehold.co/100x100/1e293b/06B6D4?text=WEB',
-                        time_in_stage: 'ahora',
-                        created_at: createdAtStr,
-                        assigned_to: (typeof getCurrentAgent === 'function' ? getCurrentAgent().uuid : 'advisor-vendedora-uuid'),
-                        delivery_date: '',
-                        observations: 'Lead cargado dinámicamente desde Supabase.',
-                        attachments: [],
-                        activity_log: [
-                            { time: 'Ahora', author: 'Sistema', content: 'Lead recuperado desde el historial de Supabase.' }
-                        ],
-                        tags: [
-                            { name: 'Nuevo', color: '#03DAC6' }
-                        ]
-                    };
-                    leadsList.unshift(newLead);
                 }
+                if (typeof renderInbox === 'function') renderInbox();
+                if (typeof renderKanban === 'function') renderKanban();
+                if (typeof renderDashboardStats === 'function') renderDashboardStats();
             }
-
-            if (typeof renderInbox === 'function') renderInbox();
-            if (typeof renderKanban === 'function') renderKanban();
-            if (typeof renderDashboardStats === 'function') renderDashboardStats();
+            suscribirseAMensajesRealtime();
+        } catch (e) {
+            console.error('❌ Error al cargar conversaciones desde Supabase:', e.message);
+            fetchHistorialPromise = null;
+            throw e;
         }
-
-        // Suscribirse a tiempo real (solo una vez, Realtime se encarga de los nuevos mensajes)
-        suscribirseAMensajesRealtime();
-    } catch (e) {
-        console.error('❌ Error al cargar conversaciones desde Supabase:', e.message);
-        // Limpiar la promesa en caso de error para permitir reintentos futuros
-        fetchHistorialPromise = null;
-        throw e;
-    }
-})();
+    })();
 
 return fetchHistorialPromise;
     }
