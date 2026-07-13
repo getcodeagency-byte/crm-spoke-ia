@@ -5,7 +5,8 @@
 // ==========================================================================
 // 1. INICIALIZACIÓN DE SUPABASE Y FUNCIÓN MAESTRA
 // ==========================================================================
-const supabaseUrl = 'https://luyeqpcqhdngaisfzdnl.supabase.co';
+
+const supabaseUrl = '/api/supabase';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eWVxcGNxaGRuZ2Fpc2Z6ZG5sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNzU1MDcsImV4cCI6MjA5NTg1MTUwN30.LTT9jBg2qFqTtxXijgyW242BKS-s3_w68e9VTCEI5Tg';
 
 
