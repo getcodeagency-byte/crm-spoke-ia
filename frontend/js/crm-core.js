@@ -638,59 +638,55 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Obsoleto, la autenticación ahora es manejada por el flujo de Supabase y cambiarPantallaSegunSesion
     }
 
-    // ⚡ PROMISE CACHE: Garantía de petición única a Supabase durante la carga inicial.
-    // Múltiples módulos (Inbox, Kanban, Dashboard) pueden invocar esta función
-    // simultáneamente durante la inicialización. Sin este cache, cada invocación
-    // dispara un GET independiente a chat_history, activando el Rate Limit de
-    // Cloudflare/Supabase y causando ERR_CONNECTION_RESET en Chromium.
+    // ⚡ PROMISE CACHE + RETRY: Garantía de petición única y robusta a Supabase.
+    // Múltiples módulos pueden invocar esta función, pero el Promise Cache asegura una
+    // sola ejecución en vuelo. Si esta falla (ej. por Rate Limit de Supabase/Cloudflare
+    // que causa ERR_CONNECTION_RESET), el sistema reintentará con espera exponencial
+    // para darle un respiro al servidor y recuperarse de fallos transitorios.
     let fetchHistorialPromise = null;
 
-    async function cargarConversacionesDesdeSupabase() {
+    async function cargarConversacionesDesdeSupabase(retryCount = 0) {
         // Si ya hay una petición en vuelo, reutilizarla (Promise Cache / Singleton)
         if (fetchHistorialPromise) {
-            console.log('📦 [Promise Cache] Reutilizando petición en vuelo a chat_history (0 peticiones de red adicionales).');
+            console.log('📦 [Promise Cache] Reutilizando petición en vuelo a chat_history.');
             return fetchHistorialPromise;
         }
 
         // Crear la promesa singleton y almacenarla
         fetchHistorialPromise = (async () => {
+            const MAX_RETRIES = 3;
+            const delay = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
+
             try {
-                console.log('🔄 [Red] Cargando conversaciones e historial desde Supabase (petición única)...');
+                if (retryCount > 0) {
+                    console.log(`⏳ [Retry ${retryCount}/${MAX_RETRIES}] Esperando ${delay / 1000}s antes de reintentar...`);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+
+                console.log(`🔄 [Red] Cargando conversaciones e historial desde Supabase (Intento ${retryCount + 1})...`);
                 const { data: messages, error } = await supabaseClient
                     .from('chat_history')
                     .select('*')
                     .order('created_at', { ascending: true });
 
                 if (error) throw error;
-                console.log(`✅ [Red] Historial descargado: ${messages ? messages.length : 0} mensajes. Distribuyendo a componentes de UI...`);
+                console.log(`✅ [Red] Historial descargado: ${messages ? messages.length : 0} mensajes. Distribuyendo a UI...`);
 
                 if (messages && messages.length > 0) {
                     const grouped = {};
                     messages.forEach(msg => {
-                        if (!grouped[msg.lead_id]) {
-                            grouped[msg.lead_id] = [];
-                        }
+                        if (!grouped[msg.lead_id]) grouped[msg.lead_id] = [];
                         grouped[msg.lead_id].push(msg);
                     });
 
                     for (const leadId in grouped) {
                         const leadMsgs = grouped[leadId];
-
                         chatsHistory[leadId] = leadMsgs.map(msg => {
                             let timeStr = 'Ahora';
-                            if (msg.created_at) {
-                                try {
-                                    const date = new Date(msg.created_at);
-                                    timeStr = date.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
-                                } catch (e) { }
-                            }
-
-                            const item = {
-                                sender: msg.sender,
-                                content: msg.content,
-                                time: timeStr
-                            };
-
+                            try {
+                                timeStr = new Date(msg.created_at).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' });
+                            } catch (e) {}
+                            const item = { sender: msg.sender, content: msg.content, time: timeStr };
                             if (msg.type === 'carousel') {
                                 item.type = 'carousel';
                                 item.products = msg.products_data;
@@ -701,38 +697,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                         const exists = leadsList.some(l => l.id === leadId);
                         if (!exists && leadId !== 'lead-simulador-ia') {
                             let createdAtStr = new Date().toISOString().split('T')[0];
-                            if (leadMsgs[0] && leadMsgs[0].created_at) {
-                                try {
-                                    createdAtStr = new Date(leadMsgs[0].created_at).toISOString().split('T')[0];
-                                } catch (e) { }
+                            if (leadMsgs[0]?.created_at) {
+                                try { createdAtStr = new Date(leadMsgs[0].created_at).toISOString().split('T')[0]; } catch(e) {}
                             }
-
                             const lastMsg = leadMsgs[leadMsgs.length - 1];
                             const isUnread = lastMsg && (lastMsg.sender === 'customer' || lastMsg.sender === 'user');
-
                             const newLead = {
                                 id: leadId,
                                 name: `Visitante Web (${leadId.replace('visitor-', '')})`,
-                                phone: '',
-                                channel_source: 'webchat',
-                                ai_chat_status: 'ai_active',
-                                commercial_stage: 'nuevo',
-                                unread: isUnread,
-                                estimated_budget: 0.00,
-                                quoted_value: 0.00,
-                                avatar_url: 'https://placehold.co/100x100/1e293b/06B6D4?text=WEB',
-                                time_in_stage: 'ahora',
-                                created_at: createdAtStr,
-                                assigned_to: (typeof getCurrentAgent === 'function' ? getCurrentAgent().uuid : 'advisor-vendedora-uuid'),
-                                delivery_date: '',
-                                observations: 'Lead cargado dinámicamente desde Supabase.',
-                                attachments: [],
-                                activity_log: [
-                                    { time: 'Ahora', author: 'Sistema', content: 'Lead recuperado desde el historial de Supabase.' }
-                                ],
-                                tags: [
-                                    { name: 'Nuevo', color: '#03DAC6' }
-                                ]
+                                phone: '', channel_source: 'webchat', ai_chat_status: 'ai_active',
+                                commercial_stage: 'nuevo', unread: isUnread, estimated_budget: 0.00, quoted_value: 0.00,
+                                avatar_url: 'https://placehold.co/100x100/1e293b/06B6D4?text=WEB', time_in_stage: 'ahora',
+                                created_at: createdAtStr, assigned_to: getCurrentAgent().uuid, delivery_date: '',
+                                observations: 'Lead cargado dinámicamente desde Supabase.', attachments: [],
+                                activity_log: [{ time: 'Ahora', author: 'Sistema', content: 'Lead recuperado desde el historial de Supabase.' }],
+                                tags: [{ name: 'Nuevo', color: '#03DAC6' }]
                             };
                             leadsList.unshift(newLead);
                         }
@@ -743,13 +722,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (typeof renderDashboardStats === 'function') renderDashboardStats();
                 }
 
-                // Suscribirse a tiempo real (solo una vez, Realtime se encarga de los nuevos mensajes)
                 suscribirseAMensajesRealtime();
             } catch (e) {
-                console.error('❌ Error al cargar conversaciones desde Supabase:', e.message);
-                // Limpiar la promesa en caso de error para permitir reintentos futuros
-                fetchHistorialPromise = null;
-                throw e;
+                console.error(`❌ Error en intento ${retryCount + 1} de cargar desde Supabase:`, e.message);
+                fetchHistorialPromise = null; // Limpiar para permitir reintento
+
+                if (retryCount < MAX_RETRIES) {
+                    // Lanzar un nuevo intento recursivo que será cacheado
+                    return cargarConversacionesDesdeSupabase(retryCount + 1);
+                } else {
+                    console.error(`💀 [Fallo Total] No se pudo cargar el historial de Supabase tras ${MAX_RETRIES + 1} intentos.`);
+                    throw e; // Lanzar el error final
+                }
             }
         })();
 
